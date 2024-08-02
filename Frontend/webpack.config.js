@@ -65,14 +65,14 @@ module.exports = {
         }
       ]
     }),
-    new CopyPlugin({
-      patterns: [
-        {
-          from: path.resolve('src/images'),
-          to: path.resolve("dist/images")
-        }
-      ]
-    }),
+//    new CopyPlugin({
+//      patterns: [
+//        {
+//          from: path.resolve('src/images'),
+//          to: path.resolve("dist/images")
+//        }
+//      ]
+//    }),
     new CleanWebpackPlugin()
   ]
 }

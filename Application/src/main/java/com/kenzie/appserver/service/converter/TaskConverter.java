@@ -5,6 +5,7 @@ import com.kenzie.appserver.controller.model.TaskResponse;
 import com.kenzie.appserver.repositories.model.TaskRecord;
 import com.kenzie.capstone.service.model.TaskData;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 
 @Component
 public class TaskConverter {
@@ -23,6 +24,8 @@ public class TaskConverter {
         record.setStatus(request.getStatus());
         record.setPriority(request.getPriority());
         record.setTaskDueDate(request.getTaskDueDate());
+        record.setCreatedAt(LocalDateTime.now());
+        record.setUpdatedAt(LocalDateTime.now());
         return record;
     }
 
@@ -41,6 +44,8 @@ public class TaskConverter {
         response.setStatus(record.getStatus());
         response.setPriority(record.getPriority());
         response.setTaskDueDate(record.getTaskDueDate());
+        response.setCreatedAt(LocalDateTime.now());
+        response.setUpdatedAt(LocalDateTime.now());
         return response;
     }
 

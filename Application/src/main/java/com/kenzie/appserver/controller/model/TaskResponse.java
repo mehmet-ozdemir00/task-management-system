@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
  * Represents a response containing task details.
@@ -38,13 +39,20 @@ public class TaskResponse {
     private String priority;
 
     @NotNull
-    @JsonFormat(shape =  JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonProperty("taskDueDate")
     private String taskDueDate;
 
-    public String getTaskId() {
-        return taskId;
-    }
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonProperty("createdAt")
+    private LocalDateTime createdAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonProperty("updatedAt")
+    private LocalDateTime updatedAt;
+
+
+    public String getTaskId() { return taskId; }
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
@@ -90,11 +98,15 @@ public class TaskResponse {
         this.priority = priority;
     }
 
-    public String getTaskDueDate() {
-        return taskDueDate;
-    }
+    public String getTaskDueDate() { return taskDueDate; }
 
-    public void setTaskDueDate(String taskDueDate) {
-        this.taskDueDate = taskDueDate;
-    }
+    public void setTaskDueDate(String taskDueDate) { this.taskDueDate = taskDueDate; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

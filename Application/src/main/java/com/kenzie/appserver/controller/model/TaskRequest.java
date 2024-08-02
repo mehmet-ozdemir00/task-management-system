@@ -3,7 +3,6 @@ package com.kenzie.appserver.controller.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -79,11 +78,7 @@ public class TaskRequest {
         this.priority = priority;
     }
 
-    public String getTaskDueDate() {
-        return taskDueDate;
-    }
+    public String getTaskDueDate() { return taskDueDate; }
 
-    public void setTaskDueDate(String taskDueDate) {
-        this.taskDueDate = taskDueDate;
-    }
+    public void setTaskDueDate(String taskDueDate) { this.taskDueDate = taskDueDate; }
 }

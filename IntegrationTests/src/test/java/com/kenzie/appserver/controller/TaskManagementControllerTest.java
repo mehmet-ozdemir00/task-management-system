@@ -3,6 +3,7 @@ package com.kenzie.appserver.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kenzie.appserver.IntegrationTest;
 
 import com.kenzie.appserver.controller.model.TaskRequest;
@@ -50,7 +51,9 @@ public class TaskManagementControllerTest {
 
     @BeforeAll
     public static void setup() {
+        mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new Jdk8Module());
+        mapper.findAndRegisterModules();
     }
 
 

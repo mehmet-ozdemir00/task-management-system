@@ -48,6 +48,9 @@ dependencies {
     testImplementation 'net.andreinc:mockneat:0.4.8'
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+    // Add the Jackson datatype dependency
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 }
 
 processResources {

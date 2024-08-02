@@ -25,6 +25,8 @@ dependencies {
     testImplementation("org.springframework:spring-tx:5.3.16")
 
 
+    // Add the Jackson datatype dependency
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }
