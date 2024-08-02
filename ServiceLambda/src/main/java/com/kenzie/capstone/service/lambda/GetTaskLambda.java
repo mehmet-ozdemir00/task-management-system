@@ -10,14 +10,14 @@ import com.kenzie.capstone.service.LambdaService;
 import com.kenzie.capstone.service.dependency.DaggerServiceComponent;
 import com.kenzie.capstone.service.dependency.ServiceComponent;
 import com.kenzie.capstone.service.exceptions.InvalidDataException;
-import com.kenzie.capstone.service.model.BookingRecord;
+import com.kenzie.capstone.service.model.DataRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class GetBookingLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class GetTaskLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     static final Logger log = LogManager.getLogger();
 
@@ -32,25 +32,30 @@ public class GetBookingLambda implements RequestHandler<APIGatewayProxyRequestEv
         headers.put("Content-Type", "application/json");
 
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent().withHeaders(headers);
+        String taskId = input.getPathParameters().get("taskId");
 
-        String id = input.getPathParameters().get("id");
-
-        if (id == null || id.length() == 0) {
+        if (taskId == null || taskId.isEmpty()) {
             return response
                     .withStatusCode(400)
-                    .withBody("Booking ID is invalid");
+                    .withBody("TaskID is invalid");
         }
 
         try {
-            BookingRecord booking = lambdaService.getBookingData(id);
-            String output = gson.toJson(booking);
+            DataRecord record = lambdaService.getTaskDetails(taskId);
+            String output = gson.toJson(record);
             return response
                     .withStatusCode(200)
                     .withBody(output);
         } catch (InvalidDataException e) {
+            log.error("Invalid Data Exception: " + e.getMessage(), e);
             return response
                     .withStatusCode(400)
                     .withBody(gson.toJson(e.errorPayload()));
+        } catch (Exception e) {
+            log.error("Unhandled Exception: " + e.getMessage(), e);
+            return response
+                    .withStatusCode(500)
+                    .withBody("Internal Server Error");
         }
     }
 }

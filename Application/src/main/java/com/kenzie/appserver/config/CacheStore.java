@@ -2,23 +2,27 @@ package com.kenzie.appserver.config;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.kenzie.appserver.repositories.model.AppointmentRecord;
+import com.kenzie.appserver.repositories.model.TaskRecord;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A class that provides a cache store for {@link TaskRecord} objects.
+ * This cache allows for storing, retrieving, and evicting task records
+ * with a specified expiry time.
+ */
 public class CacheStore {
 
-    private Cache<String, AppointmentRecord> cache ;
+    private final Cache<String, TaskRecord> cache ;
 
     public CacheStore(int expiry, TimeUnit timeUnit) {
         // Initializing the cache with a default expiry time of 120 seconds
         this.cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(expiry, timeUnit)
                 .concurrencyLevel(Runtime.getRuntime().availableProcessors())
-                .build(CacheLoader.from((AppointmentRecord)-> cache.getIfPresent(AppointmentRecord)));
+                .build();
     }
 
-    public AppointmentRecord get(String key) {
+    public TaskRecord get(String key) {
         return cache.getIfPresent(key);
     }
 
@@ -26,7 +30,7 @@ public class CacheStore {
         cache.invalidate(key);
     }
 
-    public void add(String key, AppointmentRecord value) {
+    public void add(String key, TaskRecord value) {
         cache.put(key, value);
     }
 }

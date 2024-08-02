@@ -6,13 +6,13 @@ Parameters:
     Type: String
     Default: dev
 Resources:
-  CreateBookingLambdaFunction:
+  CreateTaskLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ServiceLambda/build/distributions/ServiceLambda.zip
-      Handler: com.kenzie.capstone.service.lambda.CreateBookingLambda
+      Handler: com.kenzie.capstone.service.lambda.CreateTaskLambda
       Runtime: java11
-      Description: Create a booking
+      Description: Create a task
       MemorySize: 512
       Timeout: 240
       Policies:
@@ -27,16 +27,16 @@ Resources:
         ScheduleVirtualConsultation:
           Type: Api
           Properties:
-            Path: /booking/create
+            Path: /task/create
             Method: post
 
-  GetBookingLambdaFunction:
+  GetTaskLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ServiceLambda/build/distributions/ServiceLambda.zip
-      Handler: com.kenzie.capstone.service.lambda.GetBookingLambda
+      Handler: com.kenzie.capstone.service.lambda.GetTaskLambda
       Runtime: java11
-      Description: Get booking
+      Description: Get a task
       MemorySize: 512
       Timeout: 240
       Policies:
@@ -51,16 +51,16 @@ Resources:
         ManageAppointmentSchedule:
           Type: Api
           Properties:
-            Path: /booking/{id}
+            Path: /task/{taskId}
             Method: get
 
-  UpdateBookingLambdaFunction:
+  UpdateTaskLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ServiceLambda/build/distributions/ServiceLambda.zip
-      Handler: com.kenzie.capstone.service.lambda.UpdateBookingLambda
+      Handler: com.kenzie.capstone.service.lambda.UpdateTaskLambda
       Runtime: java11
-      Description: Update booking information
+      Description: Update task information
       MemorySize: 512
       Timeout: 240
       Policies:
@@ -75,16 +75,16 @@ Resources:
         MonitorElderlyParentsHealth:
           Type: Api
           Properties:
-            Path: /booking/update/{id}
+            Path: /task/update/{taskId}
             Method: post
 
-  DeleteBookingLambdaFunction:
+  DeleteTaskLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ServiceLambda/build/distributions/ServiceLambda.zip
-      Handler: com.kenzie.capstone.service.lambda.DeleteBookingLambda
+      Handler: com.kenzie.capstone.service.lambda.DeleteTaskLambda
       Runtime: java11
-      Description: Delete a booking
+      Description: Delete a task
       MemorySize: 512
       Timeout: 240
       Policies:
@@ -99,5 +99,5 @@ Resources:
         ReceivePrescriptionRenewals:
           Type: Api
           Properties:
-            Path: /booking/delete/{id}
+            Path: /task/delete/{taskId}
             Method: post

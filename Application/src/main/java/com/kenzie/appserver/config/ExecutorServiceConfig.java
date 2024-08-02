@@ -7,6 +7,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Configuration class for setting up a custom {@link TaskExecutor}.
+ * This configuration defines a thread pool with a core and maximum
+ * pool size of 4 threads and initializes it with a specific thread name prefix.
+ */
 @Configuration
 public class ExecutorServiceConfig {
 

@@ -3,12 +3,12 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       "AttributeDefinitions":
-        - "AttributeName": "id"
+        - "AttributeName": "taskId"
           "AttributeType": "S"
       "KeySchema":
-        - "AttributeName": "id"
+        - "AttributeName": "taskId"
           "KeyType": "HASH"
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: false
       BillingMode: PAY_PER_REQUEST
-      TableName: "LambdaBooking"
+      TableName: "TaskManagement"

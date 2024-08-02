@@ -10,12 +10,10 @@ import com.kenzie.capstone.service.LambdaService;
 import com.kenzie.capstone.service.dependency.DaggerServiceComponent;
 import com.kenzie.capstone.service.dependency.ServiceComponent;
 import com.kenzie.capstone.service.exceptions.InvalidDataException;
-import com.kenzie.capstone.service.model.BookingData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-public class UpdateBookingLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class DeleteTaskLambda implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     static final Logger log = LogManager.getLogger();
 
@@ -30,22 +28,21 @@ public class UpdateBookingLambda implements RequestHandler<APIGatewayProxyReques
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
 
         try {
-            String appointmentId = input.getPathParameters().get("id");
-            BookingData bookingData = gson.fromJson(input.getBody(), BookingData.class);
-            if (bookingData.getId() == null || bookingData.getId().isEmpty()) {
-                throw new InvalidDataException("ID is required");
-            }
-
-            BookingData updatedBooking = lambdaService.updateBooking(appointmentId, bookingData);
-            String output = gson.toJson(updatedBooking);
-
+            String taskId = input.getPathParameters().get("taskId");
+            boolean allDeleted = lambdaService.deleteTaskFromDatabase(taskId);
             return response
                     .withStatusCode(200)
-                    .withBody(output);
+                    .withBody(gson.toJson(allDeleted));
         } catch (InvalidDataException e) {
+            log.error("Invalid Data Exception: " + e.getMessage(), e);
             return response
                     .withStatusCode(400)
                     .withBody(gson.toJson(e.errorPayload()));
+        } catch (Exception e) {
+            log.error("Unhandled Exception: " + e.getMessage(), e);
+            return response
+                    .withStatusCode(500)
+                    .withBody("Internal Server Error");
         }
     }
 }

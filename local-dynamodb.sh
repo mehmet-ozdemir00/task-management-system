@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-DYNAMODB_CONTAINER_NAME="capstone-app-dynamodb"
+DYNAMODB_CONTAINER_NAME="task-management-app-dynamodb"
 
 STORAGE_CONTAINER=$(docker ps -a -f "name=${DYNAMODB_CONTAINER_NAME}" -q)
 echo "STORAGE_CONTAINER"

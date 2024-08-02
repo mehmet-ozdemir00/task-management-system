@@ -1,108 +1,155 @@
 package com.kenzie.capstone.service;
 
-import com.kenzie.capstone.service.dao.BookingDao;
+import com.kenzie.capstone.service.dao.TaskDao;
 import com.kenzie.capstone.service.exceptions.InvalidDataException;
-import com.kenzie.capstone.service.model.BookingData;
-import com.kenzie.capstone.service.model.BookingRecord;
-import java.time.LocalDateTime;
-import javax.inject.Inject;
-import java.util.concurrent.*;
+import com.kenzie.capstone.service.model.DataRecord;
+import com.kenzie.capstone.service.model.TaskData;
 
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+
+/**
+ * Provides services for managing task data using the TaskDao.
+ * This class contains methods to get, create, update, and delete task records.
+ */
 public class LambdaService {
 
-    private final BookingDao bookingDao;
-    private final ExecutorService executor;
+    private final TaskDao taskDao;
 
+    /**
+     * Constructs a LambdaService with the specified TaskDao.
+     *
+     * @param taskDao The TaskDao instance used for data access operations.
+     */
     @Inject
-    public LambdaService(BookingDao bookingDao) {
-        this.bookingDao = bookingDao;
-        this.executor = Executors.newCachedThreadPool();
-    }
-    public LambdaService(BookingDao bookingDao, ExecutorService executor) {
-        this.bookingDao = bookingDao;
-        this.executor = executor;
+    public LambdaService(TaskDao taskDao) {
+        this.taskDao = taskDao;
     }
 
-    public BookingRecord getBookingData(String id) {
 
-        if (id == null || id.isEmpty()) {
-            throw new InvalidDataException("Booking ID must be provided");
+    /**
+     * Retrieves the details of a task by its ID.
+     *
+     * @param taskId The ID of the task to retrieve.
+     * @return The DataRecord representing the task details.
+     * @throws InvalidDataException if the task ID is null or empty.
+     */
+    public DataRecord getTaskDetails(String taskId) {
+
+        if (taskId == null || taskId.isEmpty()) {
+            throw new InvalidDataException("Task ID must be provided");
         } else {
-            return bookingDao.getBookingById(id);
+            return taskDao.getTaskData(taskId);
         }
     }
 
-    public void saveBooking(BookingData bookingData) {
 
-        String bookingId = bookingData.getId();
+    /**
+     * Creates a new task in the database.
+     *
+     * @param taskData The TaskData object containing the details of the task to create.
+     * @throws InvalidDataException if the taskData object is null, or if any required field
+     *         (task ID, task title, description, due date, status) is missing or invalid.
+     */
+    public void createNewTask(TaskData taskData) {
 
-        if (bookingId == null || bookingId.isEmpty()) {
-            throw new InvalidDataException("Booking ID must be provided");
-        } else if (bookingData.getPatientName() == null) {
-            throw new InvalidDataException("Patient name must be provided");
-        } else if (bookingData.getProviderName() == null || bookingData.getProviderName().isEmpty()) {
-            throw new InvalidDataException("Provider name must be provided");
-        } else if (bookingData.getGender() == null || bookingData.getGender().isEmpty()) {
-            throw new InvalidDataException("Gender must be provided");
+        // Validating that the taskData is not null
+        if (taskData == null) {
+            throw new InvalidDataException("TaskData must be provided");
         }
 
-        BookingRecord bookingRecord = new BookingRecord();
-        bookingRecord.setId(bookingData.getId());
-        bookingRecord.setBookingId(bookingData.getBookingId());
-        bookingRecord.setPatientName(bookingData.getPatientName() + " " + bookingData.getPatientLastName());
-        bookingRecord.setProviderName(bookingData.getProviderName());
-        bookingRecord.setGender(bookingData.getGender());
-        bookingRecord.setReminderSent(false);
-        bookingRecord.setCreatedAt(LocalDateTime.now());
-        bookingRecord.setUpdatedAt(LocalDateTime.now());
+        // Extracting task ID from taskData
+        String taskId = taskData.getTaskId();
 
-        bookingDao.createBookingData(bookingRecord);
+        if (taskId == null || taskId.isEmpty()) {
+            throw new InvalidDataException("Task ID must be provided");
+        } else if (taskData.getTaskTitle() == null || taskData.getTaskTitle().isEmpty()) {
+            throw new InvalidDataException("Task title must be provided");
+        } else if (taskData.getDescription() == null || taskData.getDescription().isEmpty()) {
+            throw new InvalidDataException("Description must be provided");
+        } else if (taskData.getDueDate() == null) {
+            throw new InvalidDataException("Due date must be provided");
+        } else if (taskData.getStatus() == null || taskData.getStatus().isEmpty()) {
+            throw new InvalidDataException("Status must be provided");
+        }
+
+        // Creating a new DataRecord object and setting its attributes from taskData
+        DataRecord dataRecord = new DataRecord();
+        dataRecord.setTaskId(taskData.getTaskId());
+        dataRecord.setTaskTitle(taskData.getTaskTitle());
+        dataRecord.setAssignedTo(taskData.getAssignedTo());
+        dataRecord.setDescription(taskData.getDescription());
+        dataRecord.setStatus(taskData.getStatus());
+        dataRecord.setCreatedAt(LocalDateTime.now());
+        dataRecord.setUpdatedAt(LocalDateTime.now());
+
+        // Saving the new task data record to the database
+        taskDao.createTaskData(dataRecord);
     }
 
-    public BookingData updateBooking(String id, BookingData bookingData) {
 
-        if (id == null || id.isEmpty()) {
-            throw new InvalidDataException("Request must contain a valid Customer ID");
-        } else if (bookingData.getPatientName() == null || bookingData.getPatientName().isEmpty()
-                || bookingData.getProviderName() == null || bookingData.getProviderName().isEmpty()) {
-            throw new InvalidDataException("Booking data must contain patient name and provider name");
+    /**
+     * Updates an existing task in the database.
+     *
+     * @param taskId The ID of the task to update.
+     * @param taskData The TaskData object containing the updated details of the task.
+     * @return The updated TaskData object.
+     * @throws InvalidDataException if the task ID is null or empty, if the task ID does not exist,
+     *         or if any required field in taskData is missing or invalid.
+     */
+    public TaskData updateExistingTask(String taskId, TaskData taskData) {
+
+        // Validating that the task ID is not null or empty
+        if (taskId == null || taskId.isEmpty()) {
+            throw new InvalidDataException("Task ID must be provided");
         }
 
-        BookingRecord bookingRecord = bookingDao.getBookingById(id);
+        // Retrieving the existing DataRecord from the database
+        DataRecord dataRecord = taskDao.getTaskData(taskId);
 
-        if (bookingRecord == null) {
-            throw new InvalidDataException("Booking ID does not exist");
+        // Validating that the task ID exists in the database
+        if (dataRecord == null) {
+            throw new InvalidDataException("Task ID does not exist");
         }
 
-        bookingRecord.setId(id);
-        bookingRecord.setBookingId(bookingData.getBookingId());
-        bookingRecord.setPatientName(bookingData.getPatientName() + " " + bookingData.getPatientLastName());
-        bookingRecord.setProviderName(bookingData.getProviderName());
-        bookingRecord.setReminderSent(bookingData.isReminderSent());
-        bookingRecord.setCreatedAt(LocalDateTime.now());
-        bookingRecord.setUpdatedAt(LocalDateTime.now());
-        bookingRecord.setGender(bookingData.getGender());
+        // Updating the existing DataRecord with new values from taskData
+        dataRecord.setTaskId(taskId);
+        dataRecord.setTaskTitle(taskData.getTaskTitle());
+        dataRecord.setAssignedTo(taskData.getAssignedTo());
+        dataRecord.setDescription(taskData.getDescription());
+        dataRecord.setStatus(taskData.getStatus());
+        dataRecord.setCreatedAt(LocalDateTime.now());
+        dataRecord.setUpdatedAt(LocalDateTime.now());
 
-        BookingRecord updatedBookingRecord = bookingDao.updateBookingData(bookingRecord);
+        // Updating the data record in the database
+        DataRecord updatedDataRecord = taskDao.updateTaskData(dataRecord);
 
-        BookingData updatedBookingData = new BookingData();
-        updatedBookingData.setId(updatedBookingRecord.getId());
-        updatedBookingData.setBookingId(updatedBookingRecord.getBookingId());
-        updatedBookingData.setPatientName(updatedBookingRecord.getPatientName());
-        updatedBookingData.setPatientLastName(updatedBookingRecord.getPatientName());
-        updatedBookingData.setProviderName(updatedBookingRecord.getProviderName());
-        updatedBookingData.setGender(updatedBookingRecord.getGender());
-        updatedBookingData.setReminderSent(updatedBookingRecord.isReminderSent());
+        // Converting the updated DataRecord back to TaskData
+        TaskData updatedTaskData = new TaskData();
+        updatedTaskData.setTaskId(updatedDataRecord.getTaskId());
+        updatedTaskData.setTaskTitle(updatedDataRecord.getTaskTitle());
+        updatedTaskData.setDescription(updatedDataRecord.getDescription());
+        updatedTaskData.setAssignedTo(updatedDataRecord.getAssignedTo());
+        updatedTaskData.setStatus(updatedDataRecord.getStatus());
 
-        return updatedBookingData;
+        // Returning the updated TaskData object
+        return updatedTaskData;
     }
 
-    public boolean deleteBookings(String bookingId) {
 
-        if (bookingId == null || bookingId.isEmpty()) {
-            throw new InvalidDataException("Request must contain a valid Booking ID");
+    /**
+     * Deletes a task from the database by its ID.
+     *
+     * @param taskId The ID of the task to delete.
+     * @return true if the task was successfully deleted, false otherwise.
+     * @throws InvalidDataException if the task ID is null or empty.
+     */
+    public boolean deleteTaskFromDatabase(String taskId) {
+
+        if (taskId == null || taskId.isEmpty()) {
+            throw new InvalidDataException("Task ID must be provided");
         } else {
-            return bookingDao.deleteBookingById(bookingId);
+            return taskDao.deleteTaskData(taskId);
         }
     }
 }
