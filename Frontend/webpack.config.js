@@ -2,17 +2,20 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   optimization: {
     usedExports: true
   },
   entry: {
-    mainPage: path.resolve(__dirname, 'src', 'pages', 'mainPage.js'),
-    scheduleAppointmentPage: path.resolve(__dirname, 'src', 'pages', 'scheduleAppointmentPage.js'),
-    updateAppointmentPage: path.resolve(__dirname, 'src', 'pages', 'updateAppointmentPage.js'),
-    deleteAppointmentPage: path.resolve(__dirname, 'src', 'pages', 'deleteAppointmentPage.js'),
-    appointmentHistoryPage: path.resolve(__dirname, 'src', 'pages', 'appointmentHistoryPage.js'),
+    indexPage: path.resolve(__dirname, 'src', 'pages', 'indexPage.js'),
+    addNewTaskPage: path.resolve(__dirname, 'src', 'pages', 'addNewTaskPage.js'),
+    updateTaskPage: path.resolve(__dirname, 'src', 'pages', 'updateTaskPage.js'),
+    deleteTaskPage: path.resolve(__dirname, 'src', 'pages', 'deleteTaskPage.js'),
+    viewTaskPage: path.resolve(__dirname, 'src', 'pages', 'viewTaskPage.js'),
+    viewCompletedTasksPage: path.resolve(__dirname, 'src', 'pages', 'viewCompletedTasksPage.js'),
+    viewIncompleteTasksPage: path.resolve(__dirname, 'src', 'pages', 'viewIncompleteTasksPage.js'),
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -22,10 +25,11 @@ module.exports = {
     https: false,
     port: 8080,
     open: true,
+    hot: true,
     proxy: [
       {
         context: [
-          '/appointments',
+          '/tasks',
         ],
         target: 'http://localhost:5001'
       }
@@ -33,28 +37,38 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/main.html',
+      template: './src/index.html',
       filename: 'index.html',
       inject: false
     }),
     new HtmlWebpackPlugin({
-      template: './src/scheduleAppointmentPage.html',
-      filename: 'scheduleAppointmentPage.html',
+      template: './src/addNewTaskPage.html',
+      filename: 'addNewTaskPage.html',
       inject: false
     }),
     new HtmlWebpackPlugin({
-      template: './src/updateAppointmentPage.html',
-      filename: 'updateAppointmentPage.html',
+      template: './src/updateTaskPage.html',
+      filename: 'updateTaskPage.html',
       inject: false
     }),
     new HtmlWebpackPlugin({
-      template: './src/deleteAppointmentPage.html',
-      filename: 'deleteAppointmentPage.html',
+      template: './src/deleteTaskPage.html',
+      filename: 'deleteTaskPage.html',
       inject: false
     }),
     new HtmlWebpackPlugin({
-      template: './src/appointmentHistoryPage.html',
-      filename: 'appointmentHistoryPage.html',
+      template: './src/viewTaskPage.html',
+      filename: 'viewTaskPage.html',
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/viewCompletedTasks.html',
+      filename: 'viewCompletedTasks.html',
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/viewIncompleteTasks.html',
+      filename: 'viewIncompleteTasks.html',
       inject: false
     }),
     new CopyPlugin({
@@ -65,14 +79,14 @@ module.exports = {
         }
       ]
     }),
-//    new CopyPlugin({
-//      patterns: [
-//        {
-//          from: path.resolve('src/images'),
-//          to: path.resolve("dist/images")
-//        }
-//      ]
-//    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve('src/images'),
+          to: path.resolve("dist/images")
+        }
+      ]
+    }),
     new CleanWebpackPlugin()
   ]
 }

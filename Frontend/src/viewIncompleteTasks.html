@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Incomplete Tasks</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="text/javascript" src="viewIncompleteTasksPage.js"></script>
+</head>
+<body>
+
+<div class="task-section">
+    <h3 style="color: #FFA500;">Incomplete Tasks</h3>
+    <p>You can retrieve all incomplete tasks by clicking on the "Retrieve Incomplete Tasks" button.</p><br><br>
+
+    <!-- Form to Retrieve Incomplete Tasks -->
+    <form id="get-incomplete-tasks-form">
+        <div class="button-container">
+            <button type="submit" class="incomplete-button">Retrieve Incomplete Tasks</button>
+            <!-- Cancel Button to go to index.html -->
+            <button type="button" class="cancel-button" onclick="window.location.href='index.html'">Cancel</button>
+        </div>
+    </form>
+
+    <div class="box-container">
+        <div class="card" id="result">
+            <div id="result-info"></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
