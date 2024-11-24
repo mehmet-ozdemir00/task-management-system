@@ -14,7 +14,6 @@ export default class Client extends BaseClass {
      * Run any functions that are supposed to be called once the client has loaded successfully.
      * @param client The client that has been successfully loaded.
      */
-
     clientLoaded(client) {
         this.client = client;
         if (this.props.hasOwnProperty("onReady")){
@@ -98,8 +97,6 @@ export default class Client extends BaseClass {
             this.handleError("deleteTask", error, errorCallback);
         }
     }
-
-
 
     /**
      * Helper method to log the error and run any error functions.

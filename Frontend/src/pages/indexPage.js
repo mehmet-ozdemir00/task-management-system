@@ -534,8 +534,8 @@ class IndexPage extends BaseClass {
     }
 
     /**
- * Fetch all tasks from the Client and update the UI.
- */
+    * Fetch all tasks from the Client and update the UI.
+    */
     async onGetAllTasks(event) {
         if (event) event.preventDefault();
 
@@ -586,9 +586,6 @@ class IndexPage extends BaseClass {
         }
     }
 
-
-
-
     // Method to close the Add Task modal
     closeAddTaskModal() {
         const modal = document.getElementById('addTaskModal');
@@ -626,20 +623,11 @@ const main = async () => {
 
 // Ensure the modal is closed when the page reloads or refreshes
 window.addEventListener('DOMContentLoaded', () => {
-//    const modal = document.getElementById('confirmationModal');
-//    const overlay = document.getElementById('modalOverlay');
-//    document.getElementById('updateTaskModal').style.display = 'none';
-//    document.getElementById('addTaskModal').style.display = 'none';
-
     document.getElementById('confirmationModal').style.display = 'none';
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('updateTaskModal').style.display = 'none';
     document.getElementById('addTaskModal').style.display = 'none';
     document.getElementById('retrieveTasksModal').style.display = 'none';
-
-    // Ensure that the modal is hidden when the page reloads
-//    modal.style.display = 'none';
-//    overlay.style.display = 'none';
 });
 
 window.addEventListener('DOMContentLoaded', main);

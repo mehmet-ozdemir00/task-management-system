@@ -25,7 +25,6 @@ module.exports = {
     https: false,
     port: 8080,
     open: true,
-    hot: true,
     proxy: [
       {
         context: [
