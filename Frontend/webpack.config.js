@@ -10,10 +10,6 @@ module.exports = {
   },
   entry: {
     indexPage: path.resolve(__dirname, 'src', 'pages', 'indexPage.js'),
-    addNewTaskPage: path.resolve(__dirname, 'src', 'pages', 'addNewTaskPage.js'),
-    updateTaskPage: path.resolve(__dirname, 'src', 'pages', 'updateTaskPage.js'),
-    deleteTaskPage: path.resolve(__dirname, 'src', 'pages', 'deleteTaskPage.js'),
-    viewTaskPage: path.resolve(__dirname, 'src', 'pages', 'viewTaskPage.js'),
     viewCompletedTasksPage: path.resolve(__dirname, 'src', 'pages', 'viewCompletedTasksPage.js'),
     viewIncompleteTasksPage: path.resolve(__dirname, 'src', 'pages', 'viewIncompleteTasksPage.js'),
   },
@@ -25,6 +21,7 @@ module.exports = {
     https: false,
     port: 8080,
     open: true,
+    hot: true,
     proxy: [
       {
         context: [
@@ -38,26 +35,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/addNewTaskPage.html',
-      filename: 'addNewTaskPage.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/updateTaskPage.html',
-      filename: 'updateTaskPage.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/deleteTaskPage.html',
-      filename: 'deleteTaskPage.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/viewTaskPage.html',
-      filename: 'viewTaskPage.html',
       inject: false
     }),
     new HtmlWebpackPlugin({

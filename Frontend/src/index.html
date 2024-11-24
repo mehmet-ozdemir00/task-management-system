@@ -9,7 +9,6 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="text/javascript" src="indexPage.js" defer></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 
@@ -57,6 +56,10 @@
 
     <h3 class="i-name">Dashboard</h3>
     <h4>Home - Task Report</h4>
+
+    <div id="daily-task-container" class="task-summary">
+        <!-- Dynamic content will be injected here -->
+    </div>
 
     <div class="values">
         <!-- Completed Tasks -->
@@ -121,7 +124,6 @@
         <a class="add-button" id="addTaskButton"><i class="fa fa-plus"></i> Add Task </a>
     </div>
 
-    <!-- ***************************************************************** -->
     <div class="tabular--wrapper">
         <h3 class="main--title">Task Management Board</h3>
         <div class="table-container">
@@ -146,8 +148,6 @@
             </table>
         </div>
     </div>
-    <!-- ***************************************************************** -->
-
 </section>
 
 

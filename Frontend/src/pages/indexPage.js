@@ -6,8 +6,10 @@ class IndexPage extends BaseClass {
 
     constructor() {
         super();
-        this.bindClassMethods(['mount', 'fetchTasks', 'updateTaskCounts', 'setupSearch', 'performSearch',
-            'renderTasks', 'onDeleteTask', 'onUpdateTask', 'saveUpdatedTask', 'closeModal', 'onCreateTask', 'renderAnalytics', 'onGetAllTasks'], this);
+        this.bindClassMethods(
+            ['mount', 'fetchTasks', 'updateTaskCounts', 'setupSearch',
+            'performSearch', 'renderTasks', 'onDeleteTask', 'onUpdateTask', 'saveUpdatedTask',
+            'closeModal', 'onCreateTask', 'renderAnalytics', 'onGetAllTasks', 'updateDailyTaskContainer'], this);
         this.toggleNotificationDropdown = this.toggleNotificationDropdown.bind(this);
         this.dataStore = new DataStore();
     }
@@ -31,6 +33,9 @@ class IndexPage extends BaseClass {
             const taskList = await this.client.getAllTasks(); // Fetch all tasks
             this.dataStore.set('tasks', taskList); // Store tasks in DataStore
 
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+            const dailyTasks = taskList.filter(task => task.taskDueDate === today); // Filter tasks for today
+
             // Calculate analytics
             const totalTasks = taskList.length;
             const completedTasks = taskList.filter(task => task.status === 'Completed').length;
@@ -45,12 +50,38 @@ class IndexPage extends BaseClass {
                 completionRate
             });
 
+            this.updateDailyTaskContainer(dailyTasks);  // Update the daily task container
             this.generateNotifications(taskList); // Generate notifications for tasks
             this.updateTaskCounts(taskList); // Update task counts based on the fetched tasks
             this.renderTasks(taskList); // Call renderTasks to display tasks in the table
             this.renderAnalytics(); // Render analytics
         } catch (error) {
             console.error("Error fetching tasks:", error);
+        }
+    }
+
+    /**
+     * Update the daily task container with the number of tasks for today.
+     * that are "In Progress."
+     * @param {Array} dailyTasks - The list of tasks for today.
+     */
+    updateDailyTaskContainer(dailyTasks) {
+        const container = document.getElementById('daily-task-container');
+        if (container) {
+            // Filter tasks for today that are "In Progress"
+            const inProgressTasks = dailyTasks.filter(task => task.status === 'In Progress');
+
+            if (inProgressTasks.length > 0) {
+                container.innerHTML = `
+                <p>Hello!</p>
+                <p>You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today..</p>
+            `;
+            } else {
+                container.innerHTML = `
+                <p>Hello!</p>
+                <p>You have no tasks today.. Enjoy your day :)</p>
+            `;
+            }
         }
     }
 
@@ -96,9 +127,6 @@ class IndexPage extends BaseClass {
             }
         }
     }
-
-
-    // Render Methods --------------------------------------------------------------------------------------------------
 
     /**
      * Render tasks in the table format.
@@ -211,15 +239,8 @@ class IndexPage extends BaseClass {
         // Add listener for the notification bell
         const notificationIcon = document.getElementById('notification-icon');
         const notificationDropdown = document.getElementById('notification-dropdown');
-
         notificationIcon.addEventListener('click', () => {
             this.toggleNotificationDropdown();
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
-                notificationDropdown.classList.remove('active');
-            }
         });
 
         // Add listener for Add Task button
@@ -256,6 +277,11 @@ class IndexPage extends BaseClass {
         notificationDropdown.classList.toggle('active');
 
         const notificationIcon = document.getElementById('notification-icon');
+        document.addEventListener('click', (event) => {
+            if (!notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                notificationDropdown.classList.remove('active');
+            }
+        });
     }
 
     // Generate notifications based on task statuses
