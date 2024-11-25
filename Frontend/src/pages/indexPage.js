@@ -3,15 +3,50 @@ import DataStore from "../util/DataStore";
 import Client from "../api/client";
 
 class IndexPage extends BaseClass {
-
     constructor() {
         super();
         this.bindClassMethods(
-            ['mount', 'fetchTasks', 'updateTaskCounts', 'setupSearch',
-            'performSearch', 'renderTasks', 'onDeleteTask', 'onUpdateTask', 'saveUpdatedTask',
-            'closeModal', 'onCreateTask', 'renderAnalytics', 'onGetAllTasks', 'updateDailyTaskContainer'], this);
-        this.toggleNotificationDropdown = this.toggleNotificationDropdown.bind(this);
+            [
+                "mount",
+                "fetchTasks",
+                "updateTaskCounts",
+                "setupSearch",
+                "performSearch",
+                "renderTasks",
+                "onDeleteTask",
+                "onUpdateTask",
+                "saveUpdatedTask",
+                "closeModal",
+                "onCreateTask",
+                "renderAnalytics",
+                "onGetAllTasks",
+                "updateDailyTaskContainer",
+                "renderCalendar",
+                "nextMonth",
+                "prevMonth",
+                "goToToday",
+                "hideTodayBtn",
+            ],
+            this
+        );
+
+        this.toggleNotificationDropdown =
+        this.toggleNotificationDropdown.bind(this);
         this.dataStore = new DataStore();
+
+        // Calendar variables
+        this.daysContainer = document.querySelector(".days");
+        this.nextBtn = document.querySelector(".next-btn");
+        this.prevBtn = document.querySelector(".prev-btn");
+        this.month = document.querySelector(".month");
+        this.todayBtn = document.querySelector(".today-btn");
+
+        const date = new Date();
+        this.currentMonth = date.getMonth();
+        this.currentYear = date.getFullYear();
+
+        this.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        this.days =   ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     }
 
     /**
@@ -22,7 +57,101 @@ class IndexPage extends BaseClass {
         await this.fetchTasks();
         this.setupSearch();
         this.renderAnalytics();
+        this.renderCalendar();
         this.addEventListeners();
+    }
+
+    renderCalendar() {
+        const daysContainer = document.querySelector(".days");
+        const month = document.querySelector(".month");
+        const todayBtn = document.querySelector(".today-btn");
+
+        // Get current date
+        const today = new Date();
+
+        // Function to render days
+        const date = new Date(this.currentYear, this.currentMonth, 1);
+        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+
+        const lastDayIndex = lastDay.getDay();
+        const lastDayDate = lastDay.getDate();
+
+        const prevLastDay = new Date(this.currentYear, this.currentMonth, 0);
+        const prevLastDayDate = prevLastDay.getDate();
+
+        const nextDays = 7 - lastDayIndex - 1;
+
+        // Update current year and month in header
+        this.month.innerHTML = `${this.months[this.currentMonth]} ${
+      this.currentYear
+    }`;
+
+        // Update days html
+        let days = "";
+
+        // Prev days html
+        for (let x = firstDay.getDay(); x > 0; x--) {
+            days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
+        }
+
+        // Current month days
+        for (let i = 1; i <= lastDayDate; i++) {
+            // Check if the date matches today's date
+            if (
+            i === today.getDate() &&
+            this.currentMonth === today.getMonth() &&
+            this.currentYear === today.getFullYear()
+            ) {
+                days += `<div class="day today">${i}</div>`;
+            } else {
+                days += `<div class="day">${i}</div>`;
+            }
+        }
+
+        // Next month days
+        for (let j = 1; j <= nextDays; j++) {
+            days += `<div class="day next">${j}</div>`;
+        }
+
+        this.daysContainer.innerHTML = days;
+        this.hideTodayBtn(this.todayBtn);
+    }
+
+    nextMonth() {
+        this.currentMonth++;
+        if (this.currentMonth > 11) {
+            this.currentMonth = 0;
+            this.currentYear++;
+        }
+        this.renderCalendar();
+    }
+
+    prevMonth() {
+        this.currentMonth--;
+        if (this.currentMonth < 0) {
+            this.currentMonth = 11;
+            this.currentYear--;
+        }
+        this.renderCalendar();
+    }
+
+    goToToday() {
+        const today = new Date();
+        this.currentMonth = today.getMonth();
+        this.currentYear = today.getFullYear();
+        this.renderCalendar();
+    }
+
+    hideTodayBtn(todayBtn) {
+        if (
+        this.currentMonth === new Date().getMonth() &&
+        this.currentYear === new Date().getFullYear()
+        ) {
+            todayBtn.style.display = "none";
+        } else {
+            todayBtn.style.display = "flex";
+        }
     }
 
     /**
@@ -30,27 +159,32 @@ class IndexPage extends BaseClass {
      */
     async fetchTasks() {
         try {
-            const taskList = await this.client.getAllTasks();
-            this.dataStore.set('tasks', taskList);
+            const taskList = await this.client.getAllTasks(); // Fetch all tasks
+            this.dataStore.set("tasks", taskList);
 
-            const today = new Date().toISOString().split('T')[0];
-            const dailyTasks = taskList.filter(task => task.taskDueDate === today);
+            const today = new Date().toISOString().split("T")[0];
+            const dailyTasks = taskList.filter((task) => task.taskDueDate === today);
 
             // Calculate analytics
             const totalTasks = taskList.length;
-            const completedTasks = taskList.filter(task => task.status === 'Completed').length;
-            const incompleteTasks = taskList.filter(task => task.status === 'Incomplete').length;
-            const completionRate = totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(2) : 0;
+            const completedTasks = taskList.filter(
+                (task) => task.status === "Completed"
+            ).length;
+            const incompleteTasks = taskList.filter(
+                (task) => task.status === "Incomplete"
+            ).length;
+            const completionRate =
+            totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(2) : 0;
 
             // Save analytics data in DataStore
-            this.dataStore.set('analytics', {
+            this.dataStore.set("analytics", {
                 totalTasks,
                 completedTasks,
                 incompleteTasks,
-                completionRate
+                completionRate,
             });
 
-            this.updateDailyTaskContainer(dailyTasks);  // Update the daily task container
+            this.updateDailyTaskContainer(dailyTasks); // Update the daily task container
             this.generateNotifications(taskList); // Generate notifications for tasks
             this.updateTaskCounts(taskList); // Update task counts based on the fetched tasks
             this.renderTasks(taskList); // Call renderTasks to display tasks in the table
@@ -66,10 +200,12 @@ class IndexPage extends BaseClass {
      * @param {Array} dailyTasks - The list of tasks for today.
      */
     updateDailyTaskContainer(dailyTasks) {
-        const container = document.getElementById('daily-task-container');
+        const container = document.getElementById("daily-task-container");
         if (container) {
             // Filter tasks for today that are "In Progress"
-            const inProgressTasks = dailyTasks.filter(task => task.status === 'In Progress');
+            const inProgressTasks = dailyTasks.filter(
+                (task) => task.status === "In Progress"
+            );
 
             if (inProgressTasks.length > 0) {
                 container.innerHTML = `
@@ -79,7 +215,7 @@ class IndexPage extends BaseClass {
             } else {
                 container.innerHTML = `
                 <p>Hello! Mehmet</p>
-                <p>You have no task(s) today.. Enjoy your day :)</p>
+                <p>You have no tasks today.. Enjoy your day.. 🙂☕</p>
             `;
             }
         }
@@ -97,26 +233,31 @@ class IndexPage extends BaseClass {
         taskList.forEach((task) => {
             if (task.status === "Completed") {
                 completedCount++;
-            } else if (["In Progress", "In Review", "Pending"].includes(task.status)) {
+            } else if (
+            ["In Progress", "In Review", "Pending"].includes(task.status)
+            ) {
                 inProgressCount++;
             } else if (task.status === "Canceled") {
                 canceledCount++;
             }
         });
 
-        document.querySelector('.val-box:nth-child(1) .task-count').textContent = completedCount;
-        document.querySelector('.val-box:nth-child(2) .task-count').textContent = inProgressCount;
-        document.querySelector('.val-box:nth-child(3) .task-count').textContent = canceledCount;
+        document.querySelector(".val-box:nth-child(1) .task-count").textContent =
+        completedCount;
+        document.querySelector(".val-box:nth-child(2) .task-count").textContent =
+        inProgressCount;
+        document.querySelector(".val-box:nth-child(3) .task-count").textContent =
+        canceledCount;
     }
 
     /**
      * Render analytics in the UI.
      */
     renderAnalytics() {
-        const analytics = this.dataStore.get('analytics');
+        const analytics = this.dataStore.get("analytics");
         if (analytics) {
-            const totalTasksElement = document.querySelector('.total-tasks');
-            const completionRateElement = document.querySelector('.completion-rate');
+            const totalTasksElement = document.querySelector(".total-tasks");
+            const completionRateElement = document.querySelector(".completion-rate");
 
             if (totalTasksElement) {
                 totalTasksElement.textContent = analytics.totalTasks;
@@ -134,14 +275,14 @@ class IndexPage extends BaseClass {
      */
     renderTasks(taskList) {
         const tableBody = document.querySelector(".table-container tbody");
-        tableBody.innerHTML = '';
+        tableBody.innerHTML = "";
 
         if (taskList.length === 0) {
             // If there are no tasks, display a message in the table
-            const noDataRow = document.createElement('tr');
+            const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `
                 <td colspan="7" style="text-align: center; font-style: italic; color: gray; font-size: 15px;">
-                    ...No Tasks Data Available...
+                    All caught up! No tasks for today. 🎉
                 </td>
             `;
             tableBody.appendChild(noDataRow);
@@ -149,29 +290,29 @@ class IndexPage extends BaseClass {
             // Render tasks if there are any
             taskList.forEach((task) => {
                 // Determine the color for the status
-                let statusColor = '';
+                let statusColor = "";
 
                 switch (task.status) {
-                    case 'Completed':
-                        statusColor = '#4CAF50'; // Green
+                    case "Completed":
+                        statusColor = "#4CAF50"; // Green
                         break;
-                    case 'In Progress':
-                        statusColor = '#FFA500' // Yellow
+                    case "In Progress":
+                        statusColor = "#FFA500"; // Yellow
                         break;
-                    case 'Canceled':
-                        statusColor = '#dc3545'; // Red
+                    case "Canceled":
+                        statusColor = "#dc3545"; // Red
                         break;
-                    case 'In Review':
-                        statusColor = '#0056b3'; // Blue
+                    case "In Review":
+                        statusColor = "#0056b3"; // Blue
                         break;
-                    case 'Pending':
-                        statusColor = '#808080'; // Default gray
+                    case "Pending":
+                        statusColor = "#808080"; // Default gray
                         break;
                     default:
-                        statusColor = '#808080'; // Default gray
+                        statusColor = "#808080"; // Default gray
                 }
 
-                const row = document.createElement('tr');
+                const row = document.createElement("tr");
                 row.innerHTML = `
                 <td><h3 class="task-info">${task.title}</h3></td>
                 <td><h3 class="task-info">${task.description}</h3></td>
@@ -201,15 +342,15 @@ class IndexPage extends BaseClass {
      * Set up the search functionality.
      */
     setupSearch() {
-        const searchIcon = document.getElementById('search-icon');
-        const searchInput = document.getElementById('search-input');
+        const searchIcon = document.getElementById("search-icon");
+        const searchInput = document.getElementById("search-input");
 
         // Check if the search icon and input are found
         if (searchIcon && searchInput) {
-            searchInput.addEventListener('input', () => {
+            searchInput.addEventListener("input", () => {
                 this.performSearch(searchInput.value);
             });
-            searchIcon.addEventListener('click', () => {
+            searchIcon.addEventListener("click", () => {
                 this.performSearch(searchInput.value);
             });
         }
@@ -220,14 +361,17 @@ class IndexPage extends BaseClass {
      * @param {string} query - The search query entered by the user.
      */
     performSearch(query) {
-        const taskList = this.dataStore.get('tasks');
-        const filteredTasks = taskList.filter(task =>
-        task.title.toLowerCase().includes(query.toLowerCase()) ||
-        task.description.toLowerCase().includes(query.toLowerCase()) ||
-        task.assignedTo.toLowerCase().includes(query.toLowerCase()) ||
-        task.status.toLowerCase().includes(query.toLowerCase()));
-        this.updateTaskCounts(filteredTasks);
-        this.renderTasks(filteredTasks);
+        const taskList = this.dataStore.get("tasks");
+        const filteredTasks = taskList.filter(
+            (task) =>
+            task.title.toLowerCase().includes(query.toLowerCase()) ||
+            task.description.toLowerCase().includes(query.toLowerCase()) ||
+            task.assignedTo.toLowerCase().includes(query.toLowerCase()) ||
+            task.status.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.updateTaskCounts(filteredTasks); // Update the task counts based on the filtered tasks
+        this.renderTasks(filteredTasks); // Re-render the tasks after filtering
     }
 
     /**
@@ -235,134 +379,179 @@ class IndexPage extends BaseClass {
      */
     addEventListeners() {
         // Add listener for the notification bell
-        const notificationIcon = document.getElementById('notification-icon');
-        const notificationDropdown = document.getElementById('notification-dropdown');
+        const notificationIcon = document.getElementById("notification-icon");
+        const notificationDropdown = document.getElementById(
+            "notification-dropdown"
+        );
         if (notificationIcon) {
-            notificationIcon.addEventListener('click', () => {
+            notificationIcon.addEventListener("click", () => {
                 this.toggleNotificationDropdown();
             });
         }
 
         // Add listener for Add Task button
-        const addTaskButton = document.querySelector('.add-button');
-        addTaskButton.addEventListener('click', this.onCreateTask);
+        const addTaskButton = document.querySelector(".add-button");
+        if (addTaskButton) {
+            addTaskButton.addEventListener("click", this.onCreateTask);
+        }
 
         // Add listeners for delete buttons
-        const deleteButtons = document.querySelectorAll('.delete-btn');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', this.onDeleteTask);
+        const deleteButtons = document.querySelectorAll(".delete-btn");
+        deleteButtons.forEach((button) => {
+            button.addEventListener("click", this.onDeleteTask);
         });
 
         // Add listeners for update buttons
-        const updateButtons = document.querySelectorAll('.update-btn');
-        updateButtons.forEach(button => {
-            button.addEventListener('click', this.onUpdateTask);
+        const updateButtons = document.querySelectorAll(".update-btn");
+        updateButtons.forEach((button) => {
+            button.addEventListener("click", this.onUpdateTask);
         });
 
         // Add listener for Retrieve Tasks button
-        const retrieveTasksButton = document.getElementById('retrieveTasksBtn');
+        const retrieveTasksButton = document.getElementById("retrieveTasksBtn");
         if (retrieveTasksButton) {
-            retrieveTasksButton.addEventListener('click', this.onGetAllTasks);
+            retrieveTasksButton.addEventListener("click", this.onGetAllTasks);
         }
 
         // Add listener for closing the modal for retrieving tasks
-        const closeRetrieveModalButton = document.getElementById('closeRetrieveModal');
+        const closeRetrieveModalButton =
+        document.getElementById("closeRetrieveModal");
         if (closeRetrieveModalButton) {
-            closeRetrieveModalButton.addEventListener('click', () => {
-                const modal = document.getElementById('retrieveTasksModal');
-                const overlay = document.getElementById('modalOverlay');
+            closeRetrieveModalButton.addEventListener("click", () => {
+                const modal = document.getElementById("retrieveTasksModal");
+                const overlay = document.getElementById("modalOverlay");
                 this.closeModal(modal, overlay);
             });
+        }
+
+        // Add calendar navigation listeners
+        const nextBtn = document.querySelector(".next-btn");
+        const prevBtn = document.querySelector(".prev-btn");
+        const todayBtn = document.querySelector(".today-btn");
+
+        if (nextBtn) {
+            nextBtn.addEventListener("click", this.nextMonth);
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener("click", this.prevMonth);
+        }
+
+        if (todayBtn) {
+            todayBtn.addEventListener("click", this.goToToday);
         }
     }
 
     // Toggle notification dropdown visibility
     toggleNotificationDropdown() {
-        const notificationDropdown = document.getElementById('notification-dropdown');
-        notificationDropdown.classList.toggle('active');
+        const notificationDropdown = document.getElementById(
+            "notification-dropdown"
+        );
+        notificationDropdown.classList.toggle("active");
 
-        const notificationIcon = document.getElementById('notification-icon');
-        document.addEventListener('click', (event) => {
-            if (!notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
-                notificationDropdown.classList.remove('active');
+        const notificationIcon = document.getElementById("notification-icon");
+        document.addEventListener("click", (event) => {
+            if (
+            !notificationIcon.contains(event.target) &&
+            !notificationDropdown.contains(event.target)
+            ) {
+                notificationDropdown.classList.remove("active");
             }
         });
     }
 
     // Generate notifications based on task statuses
     generateNotifications(taskList) {
-        const notificationList = document.getElementById('notification-list'); // For dropdown
-        const dashboardNotificationList = document.getElementById('notificationList'); // For dashboard
+        const notificationList = document.getElementById("notification-list");
+        const dashboardNotificationList =
+        document.getElementById("notificationList");
 
-        notificationList.innerHTML = ''; // Clear existing notifications in dropdown
-        dashboardNotificationList.innerHTML = ''; // Clear existing notifications in dashboard
+        notificationList.innerHTML = "";
+        dashboardNotificationList.innerHTML = "";
 
         const now = new Date();
         let notificationCount = 0;
         let dashboardHasDueSoonTasks = false;
 
         // Loop through tasks to generate notifications
-        taskList.forEach(task => {
+        taskList.forEach((task) => {
             const dueDate = new Date(task.taskDueDate);
             const timeLeft = dueDate - now;
-            const deadlineSoon = timeLeft <= 2 * 24 * 60 * 60 * 1000;
+            const deadlineSoon = timeLeft <= 2 * 24 * 60 * 60 * 1000; // 2 days threshold
 
             // Handle 'In Progress' tasks that are due soon
-            if (task.status === 'In Progress' && deadlineSoon) {
-                this.addDashboardNotificationItem(`Task "${task.title}" is approaching its due date.`, dashboardNotificationList);
+            if (task.status === "In Progress" && deadlineSoon) {
+                // Add to dashboard notifications only
+                this.addDashboardNotificationItem(
+                    `Task "${task.title}" is approaching its due date.`,
+                    dashboardNotificationList
+                );
                 dashboardHasDueSoonTasks = true;
 
-                this.addDropdownNotificationItem(`Task "${task.title}" is approaching its due date.`, notificationList);
+                this.addDropdownNotificationItem(
+                    `Task "${task.title}" is approaching its due date.`,
+                    notificationList
+                );
                 notificationCount++;
             }
 
             // Handle completed tasks
-            if (task.status === 'Completed') {
-                this.addDropdownNotificationItem(`Task "${task.title}" has been completed.`, notificationList);
+            if (task.status === "Completed") {
+                this.addDropdownNotificationItem(
+                    `Task "${task.title}" has been completed.`,
+                    notificationList
+                );
 
-                this.addDropdownNotificationItem(`Task "${task.title}" is approaching its due date.`, notificationList);
+                this.addDropdownNotificationItem(
+                    `Task "${task.title}" is approaching its due date.`,
+                    notificationList
+                );
                 notificationCount++;
             }
         });
 
         // If no due soon tasks, show "No available task due soon" in the dashboard
         if (!dashboardHasDueSoonTasks) {
-            this.addDashboardNotificationItem("No available task due soon", dashboardNotificationList);
+            this.addDashboardNotificationItem(
+                "No available task due soon",
+                dashboardNotificationList
+            );
         }
 
         // If no notifications, display "There are currently no notifications" message in the dropdown
         if (notificationCount === 0) {
-            const noNotificationsItem = document.createElement('li');
-            noNotificationsItem.classList.add('notification-item');
+            const noNotificationsItem = document.createElement("li");
+            noNotificationsItem.classList.add("notification-item");
             noNotificationsItem.textContent = "There are currently no notifications";
             notificationList.appendChild(noNotificationsItem);
         }
+
+        // Update the notification count on the dropdown icon
         this.updateNotificationCount(notificationCount);
     }
 
     // Add a notification item to the dashboard
     addDashboardNotificationItem(message, dashboardNotificationList) {
-        const dashboardItem = document.createElement('li');
-        dashboardItem.classList.add('notification-item');
+        const dashboardItem = document.createElement("li");
+        dashboardItem.classList.add("notification-item");
         dashboardItem.textContent = message;
         dashboardNotificationList.appendChild(dashboardItem);
     }
 
     // Add a notification item to the dropdown
     addDropdownNotificationItem(message, notificationList) {
-        const dropdownItem = document.createElement('li');
-        dropdownItem.classList.add('notification-item');
+        const dropdownItem = document.createElement("li");
+        dropdownItem.classList.add("notification-item");
         dropdownItem.textContent = message;
         notificationList.appendChild(dropdownItem);
     }
 
     // Update notification count on the bell icon
     updateNotificationCount(count) {
-        const notificationCount = document.getElementById('notification-count');
-        notificationCount.textContent = count > 0 ? count : '';
-        notificationCount.style.display = count > 0 ? 'inline-block' : 'none';
+        const notificationCount = document.getElementById("notification-count");
+        notificationCount.textContent = count > 0 ? count : "";
+        notificationCount.style.display = count > 0 ? "inline-block" : "none";
     }
-
 
     /**
      * Handle the creating of a task.
@@ -372,18 +561,18 @@ class IndexPage extends BaseClass {
         // Prevent the page from refreshing on form submit
         if (event) event.preventDefault();
 
-        const modal = document.getElementById('addTaskModal');
-        const overlay = document.getElementById('modalOverlay');
-        modal.style.display = 'flex';
-        overlay.style.display = 'flex';
+        const modal = document.getElementById("addTaskModal");
+        const overlay = document.getElementById("modalOverlay");
+        modal.style.display = "flex";
+        overlay.style.display = "flex";
 
         // Event listeners for Submit and Cancel buttons
-        const submitButton = document.getElementById('confirmSubmit');
-        const cancelButton = document.getElementById('cancelCancel');
+        const submitButton = document.getElementById("confirmSubmit");
+        const cancelButton = document.getElementById("cancelCancel");
 
         // Check if event listeners are already added
         if (!submitButton.dataset.listenerAdded) {
-            submitButton.addEventListener('click', async (event) => {
+            submitButton.addEventListener("click", async (event) => {
                 event.preventDefault();
                 await this.handleSubmitTask();
             });
@@ -391,7 +580,7 @@ class IndexPage extends BaseClass {
         }
 
         if (!cancelButton.dataset.listenerAdded) {
-            cancelButton.addEventListener('click', (event) => {
+            cancelButton.addEventListener("click", (event) => {
                 event.preventDefault();
                 this.closeAddTaskModal();
             });
@@ -403,12 +592,13 @@ class IndexPage extends BaseClass {
     async handleSubmitTask() {
         try {
             // Retrieve task details from input fields
-            const taskName = document.getElementById('addTaskTitle').value;
-            const taskDescription = document.getElementById('addTaskDescription').value;
-            const assignedTo = document.getElementById('addTaskAssignedTo').value;
-            const status = document.getElementById('addTaskStatus').value;
-            const priority = document.getElementById('addTaskPriority').value;
-            const taskDueDate = document.getElementById('addTaskDueDate').value;
+            const taskName = document.getElementById("addTaskTitle").value;
+            const taskDescription =
+            document.getElementById("addTaskDescription").value;
+            const assignedTo = document.getElementById("addTaskAssignedTo").value;
+            const status = document.getElementById("addTaskStatus").value;
+            const priority = document.getElementById("addTaskPriority").value;
+            const taskDueDate = document.getElementById("addTaskDueDate").value;
 
             // Validate input
             if (!taskName || !taskDescription || !assignedTo || !status || !priority || !taskDueDate) {
@@ -423,12 +613,12 @@ class IndexPage extends BaseClass {
                 assignedTo: assignedTo,
                 status: status,
                 priority: priority,
-                taskDueDate: taskDueDate
+                taskDueDate: taskDueDate,
             };
 
             // Close the modal after task creation
             this.closeAddTaskModal();
-            this.showMessage('Creating task, Please wait...');
+            this.showMessage("Creating task, Please wait...");
 
             // Make an API call to create the task
             await this.client.createTask(newTask);
@@ -438,7 +628,6 @@ class IndexPage extends BaseClass {
 
             // Refresh tasks after task is created
             await this.fetchTasks();
-
         } catch (error) {
             console.error("Error creating task:", error);
             this.showMessage("There was an error creating the task.");
@@ -451,36 +640,35 @@ class IndexPage extends BaseClass {
      */
     async onDeleteTask(event) {
         // Get taskId from the button's data attribute
-        const taskId = event.target.getAttribute('data-task-id');
+        const taskId = event.target.getAttribute("data-task-id");
 
         // Show the modal and overlay
-        const modal = document.getElementById('confirmationModal');
-        const overlay = document.getElementById('modalOverlay');
-        modal.style.display = 'flex';
-        overlay.style.display = 'flex';
+        const modal = document.getElementById("confirmationModal");
+        const overlay = document.getElementById("modalOverlay");
+        modal.style.display = "flex";
+        overlay.style.display = "flex";
 
         // Get the confirmation and cancel buttons
-        const confirmBtn = document.getElementById('confirmDelete');
-        const cancelBtn = document.getElementById('cancelDelete');
+        const confirmBtn = document.getElementById("confirmDelete");
+        const cancelBtn = document.getElementById("cancelDelete");
 
         // Event listener for confirmation
-        confirmBtn.addEventListener('click', async () => {
-
+        confirmBtn.addEventListener("click", async () => {
             this.closeModal(modal, overlay);
             try {
-                this.showMessage('Deleting task, Please wait...');
+                this.showMessage("Deleting task, Please wait...");
                 await this.client.deleteTask(taskId); // Call API to delete task
                 await this.fetchTasks(); // Re-fetch tasks after deletion
-                this.showMessage('Task successfully deleted!');
+                this.showMessage("Task successfully deleted!");
             } catch (error) {
-                this.showMessage('Error deleting task. Please try again.');
+                this.showMessage("Error deleting task. Please try again.");
                 console.error("Error deleting task:", error);
             }
             this.closeModal(modal, overlay);
         });
 
         // Event listener for cancellation
-        cancelBtn.addEventListener('click', () => {
+        cancelBtn.addEventListener("click", () => {
             this.closeModal(modal, overlay);
         });
     }
@@ -491,41 +679,43 @@ class IndexPage extends BaseClass {
      */
     async onUpdateTask(event) {
         // Get taskId from the button's data attribute
-        const taskId = event.target.getAttribute('data-task-id');
-        const taskList = this.dataStore.get('tasks');
-        const task = taskList.find(t => t.taskId === taskId);
+        const taskId = event.target.getAttribute("data-task-id");
+        const taskList = this.dataStore.get("tasks");
+        const task = taskList.find((t) => t.taskId === taskId);
 
         if (task) {
             // Prefill the update form with the task details
-            document.getElementById('taskTitle').value = task.title;
-            document.getElementById('taskDescription').value = task.description;
-            document.getElementById('taskAssignedTo').value = task.assignedTo;
-            document.getElementById('taskStatus').value = task.status;
-            document.getElementById('taskPriority').value = task.priority;
-            document.getElementById('taskDueDate').value = task.taskDueDate;
+            document.getElementById("taskTitle").value = task.title;
+            document.getElementById("taskDescription").value = task.description;
+            document.getElementById("taskAssignedTo").value = task.assignedTo;
+            document.getElementById("taskStatus").value = task.status;
+            document.getElementById("taskPriority").value = task.priority;
+            document.getElementById("taskDueDate").value = task.taskDueDate;
 
             // Show the modal and overlay for update confirmation
-            const modal = document.getElementById('updateTaskModal');
-            const overlay = document.getElementById('modalOverlay');
-            modal.style.display = 'flex';
-            overlay.style.display = 'flex';
+            const modal = document.getElementById("updateTaskModal");
+            const overlay = document.getElementById("modalOverlay");
+            modal.style.display = "flex";
+            overlay.style.display = "flex";
 
             // Event listener for confirm update button
-            let confirmUpdate = document.getElementById('confirmUpdate');
+            let confirmUpdate = document.getElementById("confirmUpdate");
 
             // Remove any existing event listeners to prevent duplication
             confirmUpdate.replaceWith(confirmUpdate.cloneNode(true));
-            confirmUpdate = document.getElementById('confirmUpdate');
+            confirmUpdate = document.getElementById("confirmUpdate");
 
-            confirmUpdate.addEventListener('click', async () => {
+            confirmUpdate.addEventListener("click", async () => {
                 // Close modal immediately upon clicking update
                 this.closeModal(modal, overlay);
                 await this.saveUpdatedTask(taskId);
             });
 
             // Add event listener for the cancel button to close the modal
-            const cancelUpdate = document.getElementById('cancelUpdate');
-            cancelUpdate.addEventListener('click', () => this.closeModal(modal, overlay));
+            const cancelUpdate = document.getElementById("cancelUpdate");
+            cancelUpdate.addEventListener("click", () =>
+            this.closeModal(modal, overlay)
+            );
         }
     }
 
@@ -536,31 +726,34 @@ class IndexPage extends BaseClass {
     async saveUpdatedTask(taskId) {
         const updatedTask = {
             taskId: taskId,
-            title: document.getElementById('taskTitle').value,
-            description: document.getElementById('taskDescription').value,
-            assignedTo: document.getElementById('taskAssignedTo').value,
-            status: document.getElementById('taskStatus').value,
-            priority: document.getElementById('taskPriority').value,
-            taskDueDate: document.getElementById('taskDueDate').value,
+            title: document.getElementById("taskTitle").value,
+            description: document.getElementById("taskDescription").value,
+            assignedTo: document.getElementById("taskAssignedTo").value,
+            status: document.getElementById("taskStatus").value,
+            priority: document.getElementById("taskPriority").value,
+            taskDueDate: document.getElementById("taskDueDate").value,
         };
 
         try {
-            this.showMessage('Updating task, Please wait...');
+            this.showMessage("Updating task, Please wait...");
             await this.client.updateTask(taskId, updatedTask); // Call API to update task
             await this.fetchTasks(); // Re-fetch tasks after update
-            const tasks = this.dataStore.get('tasks');
+            const tasks = this.dataStore.get("tasks");
 
             this.generateNotifications(tasks);
             this.showMessage(`Task successfully updated!`);
-            this.closeModal(document.getElementById('updateTaskModal'), document.getElementById('modalOverlay'));
+            this.closeModal(
+                document.getElementById("updateTaskModal"),
+                document.getElementById("modalOverlay")
+            );
         } catch (error) {
             console.error("Error updating task:", error);
         }
     }
 
     /**
-    * Fetch all tasks from the Client and update the UI.
-    */
+     * Fetch all tasks from the Client and update the UI.
+     */
     async onGetAllTasks(event) {
         if (event) event.preventDefault();
 
@@ -568,22 +761,25 @@ class IndexPage extends BaseClass {
             const taskList = await this.client.getAllTasks();
 
             // Check if tasks are retrieved successfully
-            const taskListDiv = document.getElementById('taskList');
-            taskListDiv.innerHTML = '';
+            const taskListDiv = document.getElementById("taskList");
+            taskListDiv.innerHTML = "";
 
             if (taskList.length === 0) {
-                const noTasksMessage = document.createElement('p');
+                // Display the message if no tasks are available
+                const noTasksMessage = document.createElement("p");
                 noTasksMessage.textContent = "There are currently no tasks...";
-                noTasksMessage.style.fontSize = '30px';
-                noTasksMessage.style.marginTop = '50px';
-                noTasksMessage.style.textAlign = 'center';
-                noTasksMessage.style.fontStyle = 'italic';
-                noTasksMessage.style.marginBottom = '50px';
+                // Styling for the message
+                noTasksMessage.style.fontSize = "30px";
+                noTasksMessage.style.marginTop = "50px";
+                noTasksMessage.style.textAlign = "center";
+                noTasksMessage.style.fontStyle = "italic";
+                noTasksMessage.style.marginBottom = "50px";
                 taskListDiv.appendChild(noTasksMessage);
             } else {
-                taskList.forEach(task => {
-                    const taskItem = document.createElement('div');
-                    taskItem.classList.add('task-item');
+                // Populate the taskList div with tasks
+                taskList.forEach((task) => {
+                    const taskItem = document.createElement("div");
+                    taskItem.classList.add("task-item");
                     taskItem.innerHTML = `
                      <p><strong>Title:</strong> ${task.title}</p>
                      <p><strong>Description:</strong> ${task.description}</p>
@@ -598,8 +794,10 @@ class IndexPage extends BaseClass {
 
                 this.showMessage("Tasks successfully retrieved!");
             }
-            const retrieveTasksModal = document.getElementById('retrieveTasksModal');
-            retrieveTasksModal.style.display = 'flex';
+
+            // Show the modal with populated tasks
+            const retrieveTasksModal = document.getElementById("retrieveTasksModal");
+            retrieveTasksModal.style.display = "flex";
         } catch (error) {
             this.showMessage("There was an error retrieving tasks.");
             console.error("Error fetching tasks:", error);
@@ -608,17 +806,17 @@ class IndexPage extends BaseClass {
 
     // Method to close the Add Task modal
     closeAddTaskModal() {
-        const modal = document.getElementById('addTaskModal');
-        const overlay = document.getElementById('modalOverlay');
-        modal.style.display = 'none';
-        overlay.style.display = 'none';
+        const modal = document.getElementById("addTaskModal");
+        const overlay = document.getElementById("modalOverlay");
+        modal.style.display = "none";
+        overlay.style.display = "none";
 
-        document.getElementById('addTaskTitle').value = '';
-        document.getElementById('addTaskDescription').value = '';
-        document.getElementById('addTaskAssignedTo').value = '';
-        document.getElementById('addTaskStatus').value = '';
-        document.getElementById('addTaskPriority').value = '';
-        document.getElementById('addTaskDueDate').value = '';
+        document.getElementById("addTaskTitle").value = "";
+        document.getElementById("addTaskDescription").value = "";
+        document.getElementById("addTaskAssignedTo").value = "";
+        document.getElementById("addTaskStatus").value = "";
+        document.getElementById("addTaskPriority").value = "";
+        document.getElementById("addTaskDueDate").value = "";
     }
 
     /**
@@ -627,11 +825,10 @@ class IndexPage extends BaseClass {
      * @param {HTMLElement} overlay - The overlay element to close.
      */
     closeModal(modal, overlay) {
-        modal.style.display = 'none';
-        overlay.style.display = 'none';
+        modal.style.display = "none";
+        overlay.style.display = "none";
     }
 }
-
 
 /**
  * Main method to run when the page contents have loaded.
@@ -642,12 +839,12 @@ const main = async () => {
 };
 
 // Ensure the modal is closed when the page reloads or refreshes
-window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('confirmationModal').style.display = 'none';
-    document.getElementById('modalOverlay').style.display = 'none';
-    document.getElementById('updateTaskModal').style.display = 'none';
-    document.getElementById('addTaskModal').style.display = 'none';
-    document.getElementById('retrieveTasksModal').style.display = 'none';
+window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("confirmationModal").style.display = "none";
+    document.getElementById("modalOverlay").style.display = "none";
+    document.getElementById("updateTaskModal").style.display = "none";
+    document.getElementById("addTaskModal").style.display = "none";
+    document.getElementById("retrieveTasksModal").style.display = "none";
 });
 
-window.addEventListener('DOMContentLoaded', main);
+window.addEventListener("DOMContentLoaded", main);
