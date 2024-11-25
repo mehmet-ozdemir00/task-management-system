@@ -30,11 +30,11 @@ class IndexPage extends BaseClass {
      */
     async fetchTasks() {
         try {
-            const taskList = await this.client.getAllTasks(); // Fetch all tasks
-            this.dataStore.set('tasks', taskList); // Store tasks in DataStore
+            const taskList = await this.client.getAllTasks();
+            this.dataStore.set('tasks', taskList);
 
-            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-            const dailyTasks = taskList.filter(task => task.taskDueDate === today); // Filter tasks for today
+            const today = new Date().toISOString().split('T')[0];
+            const dailyTasks = taskList.filter(task => task.taskDueDate === today);
 
             // Calculate analytics
             const totalTasks = taskList.length;
@@ -73,13 +73,13 @@ class IndexPage extends BaseClass {
 
             if (inProgressTasks.length > 0) {
                 container.innerHTML = `
-                <p>Hello!</p>
+                <p>Hello! Mehmet</p>
                 <p>You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today..</p>
             `;
             } else {
                 container.innerHTML = `
-                <p>Hello!</p>
-                <p>You have no tasks today.. Enjoy your day :)</p>
+                <p>Hello! Mehmet</p>
+                <p>You have no task(s) today.. Enjoy your day :)</p>
             `;
             }
         }
@@ -134,7 +134,7 @@ class IndexPage extends BaseClass {
      */
     renderTasks(taskList) {
         const tableBody = document.querySelector(".table-container tbody");
-        tableBody.innerHTML = ''; // Clear existing rows
+        tableBody.innerHTML = '';
 
         if (taskList.length === 0) {
             // If there are no tasks, display a message in the table
@@ -220,16 +220,14 @@ class IndexPage extends BaseClass {
      * @param {string} query - The search query entered by the user.
      */
     performSearch(query) {
-        const taskList = this.dataStore.get('tasks'); // Get the list of tasks from the data store
+        const taskList = this.dataStore.get('tasks');
         const filteredTasks = taskList.filter(task =>
         task.title.toLowerCase().includes(query.toLowerCase()) ||
         task.description.toLowerCase().includes(query.toLowerCase()) ||
         task.assignedTo.toLowerCase().includes(query.toLowerCase()) ||
-        task.status.toLowerCase().includes(query.toLowerCase())
-        );
-
-        this.updateTaskCounts(filteredTasks);  // Update the task counts based on the filtered tasks
-        this.renderTasks(filteredTasks);  // Re-render the tasks after filtering
+        task.status.toLowerCase().includes(query.toLowerCase()));
+        this.updateTaskCounts(filteredTasks);
+        this.renderTasks(filteredTasks);
     }
 
     /**
@@ -239,9 +237,11 @@ class IndexPage extends BaseClass {
         // Add listener for the notification bell
         const notificationIcon = document.getElementById('notification-icon');
         const notificationDropdown = document.getElementById('notification-dropdown');
-        notificationIcon.addEventListener('click', () => {
-            this.toggleNotificationDropdown();
-        });
+        if (notificationIcon) {
+            notificationIcon.addEventListener('click', () => {
+                this.toggleNotificationDropdown();
+            });
+        }
 
         // Add listener for Add Task button
         const addTaskButton = document.querySelector('.add-button');
@@ -261,14 +261,19 @@ class IndexPage extends BaseClass {
 
         // Add listener for Retrieve Tasks button
         const retrieveTasksButton = document.getElementById('retrieveTasksBtn');
-        retrieveTasksButton.addEventListener('click', this.onGetAllTasks);
+        if (retrieveTasksButton) {
+            retrieveTasksButton.addEventListener('click', this.onGetAllTasks);
+        }
 
+        // Add listener for closing the modal for retrieving tasks
         const closeRetrieveModalButton = document.getElementById('closeRetrieveModal');
-        closeRetrieveModalButton.addEventListener('click', () => {
-            const modal = document.getElementById('retrieveTasksModal');
-            const overlay = document.getElementById('modalOverlay');
-            this.closeModal(modal, overlay);
-        });
+        if (closeRetrieveModalButton) {
+            closeRetrieveModalButton.addEventListener('click', () => {
+                const modal = document.getElementById('retrieveTasksModal');
+                const overlay = document.getElementById('modalOverlay');
+                this.closeModal(modal, overlay);
+            });
+        }
     }
 
     // Toggle notification dropdown visibility
@@ -300,13 +305,12 @@ class IndexPage extends BaseClass {
         taskList.forEach(task => {
             const dueDate = new Date(task.taskDueDate);
             const timeLeft = dueDate - now;
-            const deadlineSoon = timeLeft <= 2 * 24 * 60 * 60 * 1000; // 2 days threshold
+            const deadlineSoon = timeLeft <= 2 * 24 * 60 * 60 * 1000;
 
             // Handle 'In Progress' tasks that are due soon
             if (task.status === 'In Progress' && deadlineSoon) {
-                // Add to dashboard notifications only
                 this.addDashboardNotificationItem(`Task "${task.title}" is approaching its due date.`, dashboardNotificationList);
-                dashboardHasDueSoonTasks = true; // Mark that there's a due soon task
+                dashboardHasDueSoonTasks = true;
 
                 this.addDropdownNotificationItem(`Task "${task.title}" is approaching its due date.`, notificationList);
                 notificationCount++;
@@ -314,7 +318,6 @@ class IndexPage extends BaseClass {
 
             // Handle completed tasks
             if (task.status === 'Completed') {
-                // Only add to dropdown notifications
                 this.addDropdownNotificationItem(`Task "${task.title}" has been completed.`, notificationList);
 
                 this.addDropdownNotificationItem(`Task "${task.title}" is approaching its due date.`, notificationList);
@@ -334,8 +337,6 @@ class IndexPage extends BaseClass {
             noNotificationsItem.textContent = "There are currently no notifications";
             notificationList.appendChild(noNotificationsItem);
         }
-
-        // Update the notification count on the dropdown icon
         this.updateNotificationCount(notificationCount);
     }
 
@@ -358,8 +359,8 @@ class IndexPage extends BaseClass {
     // Update notification count on the bell icon
     updateNotificationCount(count) {
         const notificationCount = document.getElementById('notification-count');
-        notificationCount.textContent = count > 0 ? count : ''; // Only show if count is > 0
-        notificationCount.style.display = count > 0 ? 'inline-block' : 'none'; // Toggle visibility
+        notificationCount.textContent = count > 0 ? count : '';
+        notificationCount.style.display = count > 0 ? 'inline-block' : 'none';
     }
 
 
@@ -384,7 +385,7 @@ class IndexPage extends BaseClass {
         if (!submitButton.dataset.listenerAdded) {
             submitButton.addEventListener('click', async (event) => {
                 event.preventDefault();
-                await this.handleSubmitTask(); // Call handleSubmitTask when submit is clicked
+                await this.handleSubmitTask();
             });
             submitButton.dataset.listenerAdded = true;
         }
@@ -392,7 +393,7 @@ class IndexPage extends BaseClass {
         if (!cancelButton.dataset.listenerAdded) {
             cancelButton.addEventListener('click', (event) => {
                 event.preventDefault();
-                this.closeAddTaskModal(); // Close modal when cancel is clicked
+                this.closeAddTaskModal();
             });
             cancelButton.dataset.listenerAdded = true;
         }
@@ -467,7 +468,6 @@ class IndexPage extends BaseClass {
 
             this.closeModal(modal, overlay);
             try {
-                // Show message that deletion is in progress
                 this.showMessage('Deleting task, Please wait...');
                 await this.client.deleteTask(taskId); // Call API to delete task
                 await this.fetchTasks(); // Re-fetch tasks after deletion
@@ -481,7 +481,6 @@ class IndexPage extends BaseClass {
 
         // Event listener for cancellation
         cancelBtn.addEventListener('click', () => {
-            // Close the modal without doing anything
             this.closeModal(modal, overlay);
         });
     }
@@ -521,7 +520,7 @@ class IndexPage extends BaseClass {
             confirmUpdate.addEventListener('click', async () => {
                 // Close modal immediately upon clicking update
                 this.closeModal(modal, overlay);
-                await this.saveUpdatedTask(taskId); // Save the updated task after closing the modal
+                await this.saveUpdatedTask(taskId);
             });
 
             // Add event listener for the cancel button to close the modal
@@ -549,9 +548,9 @@ class IndexPage extends BaseClass {
             this.showMessage('Updating task, Please wait...');
             await this.client.updateTask(taskId, updatedTask); // Call API to update task
             await this.fetchTasks(); // Re-fetch tasks after update
-            const tasks = this.dataStore.get('tasks'); // Get the updated task list
+            const tasks = this.dataStore.get('tasks');
 
-            this.generateNotifications(tasks); // Generate notifications
+            this.generateNotifications(tasks);
             this.showMessage(`Task successfully updated!`);
             this.closeModal(document.getElementById('updateTaskModal'), document.getElementById('modalOverlay'));
         } catch (error) {
@@ -570,13 +569,11 @@ class IndexPage extends BaseClass {
 
             // Check if tasks are retrieved successfully
             const taskListDiv = document.getElementById('taskList');
-            taskListDiv.innerHTML = ''; // Clear any existing task data
+            taskListDiv.innerHTML = '';
 
             if (taskList.length === 0) {
-                // Display the message if no tasks are available
                 const noTasksMessage = document.createElement('p');
                 noTasksMessage.textContent = "There are currently no tasks...";
-                // Styling for the message
                 noTasksMessage.style.fontSize = '30px';
                 noTasksMessage.style.marginTop = '50px';
                 noTasksMessage.style.textAlign = 'center';
@@ -584,7 +581,6 @@ class IndexPage extends BaseClass {
                 noTasksMessage.style.marginBottom = '50px';
                 taskListDiv.appendChild(noTasksMessage);
             } else {
-                // Populate the taskList div with tasks
                 taskList.forEach(task => {
                     const taskItem = document.createElement('div');
                     taskItem.classList.add('task-item');
@@ -602,8 +598,6 @@ class IndexPage extends BaseClass {
 
                 this.showMessage("Tasks successfully retrieved!");
             }
-
-            // Show the modal with populated tasks
             const retrieveTasksModal = document.getElementById('retrieveTasksModal');
             retrieveTasksModal.style.display = 'flex';
         } catch (error) {

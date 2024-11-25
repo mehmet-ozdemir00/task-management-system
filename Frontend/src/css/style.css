@@ -147,6 +147,10 @@ body {
 
 #interface h4 {
     margin-left: 30px;
+    margin-top: 7px;
+    font-size: 18px;
+    color: red;
+    text-decoration: underline;
 }
 
 /* -------------- Notification Section Starts -------------- */
@@ -254,7 +258,7 @@ body {
 .i-name {
     color: #030304;
     padding: 50px 30px 0 30px;
-    font-size: 35px;
+    font-size: 37px;
     font-weight: 700;
     margin-top: 75px;
 }
@@ -262,7 +266,6 @@ body {
 /* -------------- Interface Section Ends -------------- */
 
 
-/* Task Summary */
 .task-summary {
     margin: 17px;
     padding: 44px;
@@ -277,12 +280,9 @@ body {
     text-align: center;
 }
 
-/* Style for task count number */
 .task-count {
-    color: red; /* Change the color to red */
+    color: red;
 }
-
-
 
 /* -------------- Dashboard Starts -------------- */
 
@@ -368,6 +368,11 @@ body {
 
 .no-tasks i {
     font-size: 20px;
+}
+
+.no-tasks .add-task-text {
+    color: #007BFF;
+    cursor:pointer;
 }
 
 .no-tasks .add-button {
@@ -618,6 +623,7 @@ label {
 
 .tabular--wrapper h3 {
     font-size: 18px;
+    margin-left: 8px;
     margin-bottom: 10px;
     display: inline-block;
 }
