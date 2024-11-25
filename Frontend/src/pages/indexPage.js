@@ -61,98 +61,7 @@ class IndexPage extends BaseClass {
         this.addEventListeners();
     }
 
-    renderCalendar() {
-        const daysContainer = document.querySelector(".days");
-        const month = document.querySelector(".month");
-        const todayBtn = document.querySelector(".today-btn");
 
-        // Get current date
-        const today = new Date();
-
-        // Function to render days
-        const date = new Date(this.currentYear, this.currentMonth, 1);
-        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-
-        const lastDayIndex = lastDay.getDay();
-        const lastDayDate = lastDay.getDate();
-
-        const prevLastDay = new Date(this.currentYear, this.currentMonth, 0);
-        const prevLastDayDate = prevLastDay.getDate();
-
-        const nextDays = 7 - lastDayIndex - 1;
-
-        // Update current year and month in header
-        this.month.innerHTML = `${this.months[this.currentMonth]} ${
-      this.currentYear
-    }`;
-
-        // Update days html
-        let days = "";
-
-        // Prev days html
-        for (let x = firstDay.getDay(); x > 0; x--) {
-            days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
-        }
-
-        // Current month days
-        for (let i = 1; i <= lastDayDate; i++) {
-            // Check if the date matches today's date
-            if (
-            i === today.getDate() &&
-            this.currentMonth === today.getMonth() &&
-            this.currentYear === today.getFullYear()
-            ) {
-                days += `<div class="day today">${i}</div>`;
-            } else {
-                days += `<div class="day">${i}</div>`;
-            }
-        }
-
-        // Next month days
-        for (let j = 1; j <= nextDays; j++) {
-            days += `<div class="day next">${j}</div>`;
-        }
-
-        this.daysContainer.innerHTML = days;
-        this.hideTodayBtn(this.todayBtn);
-    }
-
-    nextMonth() {
-        this.currentMonth++;
-        if (this.currentMonth > 11) {
-            this.currentMonth = 0;
-            this.currentYear++;
-        }
-        this.renderCalendar();
-    }
-
-    prevMonth() {
-        this.currentMonth--;
-        if (this.currentMonth < 0) {
-            this.currentMonth = 11;
-            this.currentYear--;
-        }
-        this.renderCalendar();
-    }
-
-    goToToday() {
-        const today = new Date();
-        this.currentMonth = today.getMonth();
-        this.currentYear = today.getFullYear();
-        this.renderCalendar();
-    }
-
-    hideTodayBtn(todayBtn) {
-        if (
-        this.currentMonth === new Date().getMonth() &&
-        this.currentYear === new Date().getFullYear()
-        ) {
-            todayBtn.style.display = "none";
-        } else {
-            todayBtn.style.display = "flex";
-        }
-    }
 
     /**
      * Fetch all tasks and update the task counts.
@@ -251,6 +160,103 @@ class IndexPage extends BaseClass {
     }
 
     /**
+    * Render the calendar in the UI by dynamically generating the days of the current month,
+    * including days from the previous and next months for proper alignment.
+    * Highlights today's date and updates the month and year displayed in the header.
+    * Adjusts the visibility of the "Today" button based on the current view.
+    */
+    renderCalendar() {
+        const daysContainer = document.querySelector(".days");
+        const month = document.querySelector(".month");
+        const todayBtn = document.querySelector(".today-btn");
+
+        // Get current date
+        const today = new Date();
+
+        // Function to render days
+        const date = new Date(this.currentYear, this.currentMonth, 1);
+        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+
+        const lastDayIndex = lastDay.getDay();
+        const lastDayDate = lastDay.getDate();
+
+        const prevLastDay = new Date(this.currentYear, this.currentMonth, 0);
+        const prevLastDayDate = prevLastDay.getDate();
+
+        const nextDays = 7 - lastDayIndex - 1;
+
+        // Update current year and month in header
+        this.month.innerHTML = `${this.months[this.currentMonth]} ${this.currentYear }`;
+
+        // Update days html
+        let days = "";
+
+        // Prev days html
+        for (let x = firstDay.getDay(); x > 0; x--) {
+            days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
+        }
+
+        // Current month days
+        for (let i = 1; i <= lastDayDate; i++) {
+            // Check if the date matches today's date
+            if (
+            i === today.getDate() &&
+            this.currentMonth === today.getMonth() &&
+            this.currentYear === today.getFullYear()
+            ) {
+                days += `<div class="day today">${i}</div>`;
+            } else {
+                days += `<div class="day">${i}</div>`;
+            }
+        }
+
+        // Next month days
+        for (let j = 1; j <= nextDays; j++) {
+            days += `<div class="day next">${j}</div>`;
+        }
+
+        this.daysContainer.innerHTML = days;
+        this.hideTodayBtn(this.todayBtn);
+    }
+
+    nextMonth() {
+        this.currentMonth++;
+        if (this.currentMonth > 11) {
+            this.currentMonth = 0;
+            this.currentYear++;
+        }
+        this.renderCalendar();
+    }
+
+    prevMonth() {
+        this.currentMonth--;
+        if (this.currentMonth < 0) {
+            this.currentMonth = 11;
+            this.currentYear--;
+        }
+        this.renderCalendar();
+    }
+
+    goToToday() {
+        const today = new Date();
+        this.currentMonth = today.getMonth();
+        this.currentYear = today.getFullYear();
+        this.renderCalendar();
+    }
+
+    hideTodayBtn(todayBtn) {
+        if (
+        this.currentMonth === new Date().getMonth() &&
+        this.currentYear === new Date().getFullYear()
+        ) {
+            todayBtn.style.display = "none";
+        } else {
+            todayBtn.style.display = "flex";
+        }
+    }
+
+    /**
      * Render analytics in the UI.
      */
     renderAnalytics() {
@@ -288,7 +294,7 @@ class IndexPage extends BaseClass {
             tableBody.appendChild(noDataRow);
         } else {
             // Render tasks if there are any
-            taskList.forEach((task) => {
+            taskList.forEach((task, index) => {
                 // Determine the color for the status
                 let statusColor = "";
 
@@ -314,6 +320,7 @@ class IndexPage extends BaseClass {
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
+                <td style="text-align: center;">${index + 1}</td>
                 <td><h3 class="task-info">${task.title}</h3></td>
                 <td><h3 class="task-info">${task.description}</h3></td>
                 <td><h3 class="task-info">${task.assignedTo}</h3></td>
@@ -327,12 +334,12 @@ class IndexPage extends BaseClass {
                 <td>
                     <button type="button" class="update-btn" data-task-id="${task.taskId}">
                     <i class="fa fa-pencil-alt"></i> Update
-                </button>
-                <button type="button" class="delete-btn" data-task-id="${task.taskId}">
+                    </button>
+                    <button type="button" class="delete-btn" data-task-id="${task.taskId}">
                     <i class="fa fa-trash"></i> Delete
-                </button>
+                    </button>
                 </td>
-                `;
+            `;
                 tableBody.appendChild(row);
             });
         }
@@ -414,8 +421,7 @@ class IndexPage extends BaseClass {
         }
 
         // Add listener for closing the modal for retrieving tasks
-        const closeRetrieveModalButton =
-        document.getElementById("closeRetrieveModal");
+        const closeRetrieveModalButton = document.getElementById("closeRetrieveModal");
         if (closeRetrieveModalButton) {
             closeRetrieveModalButton.addEventListener("click", () => {
                 const modal = document.getElementById("retrieveTasksModal");
@@ -463,8 +469,7 @@ class IndexPage extends BaseClass {
     // Generate notifications based on task statuses
     generateNotifications(taskList) {
         const notificationList = document.getElementById("notification-list");
-        const dashboardNotificationList =
-        document.getElementById("notificationList");
+        const dashboardNotificationList = document.getElementById("notificationList");
 
         notificationList.innerHTML = "";
         dashboardNotificationList.innerHTML = "";
@@ -487,12 +492,6 @@ class IndexPage extends BaseClass {
                     dashboardNotificationList
                 );
                 dashboardHasDueSoonTasks = true;
-
-                this.addDropdownNotificationItem(
-                    `Task "${task.title}" is approaching its due date.`,
-                    notificationList
-                );
-                notificationCount++;
             }
 
             // Handle completed tasks
@@ -501,9 +500,13 @@ class IndexPage extends BaseClass {
                     `Task "${task.title}" has been completed.`,
                     notificationList
                 );
+                notificationCount++;
+            }
 
+            // Handle canceled tasks
+            if (task.status === "Canceled") {
                 this.addDropdownNotificationItem(
-                    `Task "${task.title}" is approaching its due date.`,
+                    `Task "${task.title}" has been canceled.`,
                     notificationList
                 );
                 notificationCount++;
@@ -552,6 +555,7 @@ class IndexPage extends BaseClass {
         notificationCount.textContent = count > 0 ? count : "";
         notificationCount.style.display = count > 0 ? "inline-block" : "none";
     }
+
 
     /**
      * Handle the creating of a task.
@@ -698,21 +702,20 @@ class IndexPage extends BaseClass {
             modal.style.display = "flex";
             overlay.style.display = "flex";
 
-            // Event listener for confirm update button
-            let confirmUpdate = document.getElementById("confirmUpdate");
+            // Handle confirm update button
+            const confirmUpdate = document.getElementById("confirmUpdate");
 
-            // Remove any existing event listeners to prevent duplication
-            confirmUpdate.replaceWith(confirmUpdate.cloneNode(true));
-            confirmUpdate = document.getElementById("confirmUpdate");
-
+            // Remove existing listeners to prevent duplication
+            confirmUpdate.removeEventListener("click", this.handleUpdateClick);
             confirmUpdate.addEventListener("click", async () => {
                 // Close modal immediately upon clicking update
                 this.closeModal(modal, overlay);
                 await this.saveUpdatedTask(taskId);
             });
 
-            // Add event listener for the cancel button to close the modal
+            // Handle cancel button to close the modal
             const cancelUpdate = document.getElementById("cancelUpdate");
+            cancelUpdate.removeEventListener("click", this.closeModal); // Prevent duplication
             cancelUpdate.addEventListener("click", () =>
             this.closeModal(modal, overlay)
             );
