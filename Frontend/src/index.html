@@ -13,6 +13,7 @@
 </head>
 <body>
 
+<!-- Sidebar -->
 <section id="menu">
     <div class="logo">
         <h2>~ TaskFlow ~</h2>
@@ -29,6 +30,7 @@
     </div>
 </section>
 
+<!-- Main Content -->
 <section id="interface">
     <div class="navigation">
         <div class="n1">
@@ -115,7 +117,7 @@
 
         <!-- Canceled Tasks -->
         <div class="val-box">
-            <i class="fa fa-exclamation-circle" style="color: red;"></i>
+            <i class="fa fa-exclamation-circle" style="color: #FF6347;"></i>
             <div>
                 <span>Canceled</span>
                 <h3 class="task-count">0</h3>
@@ -137,6 +139,15 @@
             <div>
                 <span>Completion Rate</span>
                 <h3 class="task-count completion-rate">0%</h3>
+            </div>
+        </div>
+
+        <!-- Overdue Tasks -->
+        <div class="val-box">
+            <i class="fa fa-calendar-times" style="color: crimson;"></i>
+            <div>
+                <span>Overdue</span>
+                <h3 class="task-count overdue-tasks">0</h3>
             </div>
         </div>
 
@@ -166,7 +177,7 @@
             <table>
                 <thead>
                 <tr>
-                    <th>No</th>
+                    <th>Id</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Assigned To</th>

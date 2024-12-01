@@ -7,25 +7,9 @@ class IndexPage extends BaseClass {
         super();
         this.bindClassMethods(
             [
-                "mount",
-                "fetchTasks",
-                "updateTaskCounts",
-                "setupSearch",
-                "performSearch",
-                "renderTasks",
-                "onDeleteTask",
-                "onUpdateTask",
-                "saveUpdatedTask",
-                "closeModal",
-                "onCreateTask",
-                "renderAnalytics",
-                "onGetAllTasks",
-                "updateDailyTaskContainer",
-                "renderCalendar",
-                "nextMonth",
-                "prevMonth",
-                "goToToday",
-                "hideTodayBtn",
+                "mount", "fetchTasks", "updateTaskCounts", "setupSearch", "performSearch", "renderTasks", "onDeleteTask", "onUpdateTask",
+                "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer",
+                "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn"
             ],
             this
         );
@@ -61,8 +45,6 @@ class IndexPage extends BaseClass {
         this.addEventListeners();
     }
 
-
-
     /**
      * Fetch all tasks and update the task counts.
      */
@@ -76,14 +58,13 @@ class IndexPage extends BaseClass {
 
             // Calculate analytics
             const totalTasks = taskList.length;
-            const completedTasks = taskList.filter(
-                (task) => task.status === "Completed"
-            ).length;
-            const incompleteTasks = taskList.filter(
-                (task) => task.status === "Incomplete"
-            ).length;
-            const completionRate =
-            totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(2) : 0;
+            const completedTasks = taskList.filter((task) => task.status === "Completed").length;
+            const incompleteTasks = taskList.filter((task) => task.status === "Incomplete").length;
+            const completionRate = totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(2) : 0;
+
+            // Calculate overdue tasks
+            const overdueTasks = taskList.filter((task) =>
+            new Date(task.taskDueDate) < new Date() && task.status === "In Progress").length;
 
             // Save analytics data in DataStore
             this.dataStore.set("analytics", {
@@ -91,16 +72,27 @@ class IndexPage extends BaseClass {
                 completedTasks,
                 incompleteTasks,
                 completionRate,
+                overdueTasks
             });
 
             this.updateDailyTaskContainer(dailyTasks); // Update the daily task container
             this.generateNotifications(taskList); // Generate notifications for tasks
             this.updateTaskCounts(taskList); // Update task counts based on the fetched tasks
+            this.updateOverdueTasksCount(overdueTasks); // Update overdue tasks count
             this.renderTasks(taskList); // Call renderTasks to display tasks in the table
             this.renderAnalytics(); // Render analytics
         } catch (error) {
             console.error("Error fetching tasks:", error);
         }
+    }
+
+
+    /**
+    * Update the overdue tasks count in the HTML.
+    * @param {number} overdueCount - The number of overdue tasks.
+    */
+    updateOverdueTasksCount(overdueCount) {
+        document.querySelector(".val-box:nth-child(6) .overdue-tasks").textContent = overdueCount;
     }
 
     /**
@@ -151,12 +143,9 @@ class IndexPage extends BaseClass {
             }
         });
 
-        document.querySelector(".val-box:nth-child(1) .task-count").textContent =
-        completedCount;
-        document.querySelector(".val-box:nth-child(2) .task-count").textContent =
-        inProgressCount;
-        document.querySelector(".val-box:nth-child(3) .task-count").textContent =
-        canceledCount;
+        document.querySelector(".val-box:nth-child(1) .task-count").textContent = completedCount;
+        document.querySelector(".val-box:nth-child(2) .task-count").textContent = inProgressCount;
+        document.querySelector(".val-box:nth-child(3) .task-count").textContent = canceledCount;
     }
 
     /**
@@ -287,7 +276,7 @@ class IndexPage extends BaseClass {
             // If there are no tasks, display a message in the table
             const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `
-                <td colspan="7" style="text-align: center; font-style: italic; color: gray; font-size: 15px;">
+                <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 15px;">
                     All caught up! No tasks for today. 🎉
                 </td>
             `;

@@ -276,7 +276,7 @@ body {
     line-height: 1.5;
     font-weight: bold;
     text-align: center;
-    margin-left : 27px;
+    margin-left : 35px;
     border-radius: 20px;
     background: #e0cdf6;
     border: 1px solid #ddd;
@@ -294,7 +294,7 @@ body {
     margin: 15px;
     max-width: 450px;
     min-width: 350px;
-    margin-left: 125px;
+    margin-left: 185px;
     display: inline-block !important;
 }
 
@@ -733,6 +733,7 @@ label {
     background: #fff;
     padding: 1rem;
     position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tabular--wrapper h3 {
@@ -749,6 +750,7 @@ label {
 
 table {
     width: 100%;
+    overflow: hidden;
     border-collapse: collapse;
 }
 
