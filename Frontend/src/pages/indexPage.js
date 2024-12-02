@@ -14,7 +14,6 @@ class IndexPage extends BaseClass {
             this
         );
 
-        this.toggleNotificationDropdown =
         this.toggleNotificationDropdown.bind(this);
         this.dataStore = new DataStore();
 
@@ -53,8 +52,13 @@ class IndexPage extends BaseClass {
             const taskList = await this.client.getAllTasks(); // Fetch all tasks
             this.dataStore.set("tasks", taskList);
 
-            const today = new Date().toISOString().split("T")[0];
-            const dailyTasks = taskList.filter((task) => task.taskDueDate === today);
+            // Get today's date in local timezone
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayString = today.toISOString().split("T")[0];
+
+            // Filter daily tasks based on the correctly formatted date
+            const dailyTasks = taskList.filter((task) => task.taskDueDate === todayString);
 
             // Calculate analytics
             const totalTasks = taskList.length;
@@ -62,37 +66,22 @@ class IndexPage extends BaseClass {
             const incompleteTasks = taskList.filter((task) => task.status === "Incomplete").length;
             const completionRate = totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(2) : 0;
 
-            // Calculate overdue tasks
-            const overdueTasks = taskList.filter((task) =>
-            new Date(task.taskDueDate) < new Date() && task.status === "In Progress").length;
-
             // Save analytics data in DataStore
             this.dataStore.set("analytics", {
                 totalTasks,
                 completedTasks,
                 incompleteTasks,
                 completionRate,
-                overdueTasks
             });
 
             this.updateDailyTaskContainer(dailyTasks); // Update the daily task container
             this.generateNotifications(taskList); // Generate notifications for tasks
             this.updateTaskCounts(taskList); // Update task counts based on the fetched tasks
-            this.updateOverdueTasksCount(overdueTasks); // Update overdue tasks count
             this.renderTasks(taskList); // Call renderTasks to display tasks in the table
             this.renderAnalytics(); // Render analytics
         } catch (error) {
             console.error("Error fetching tasks:", error);
         }
-    }
-
-
-    /**
-    * Update the overdue tasks count in the HTML.
-    * @param {number} overdueCount - The number of overdue tasks.
-    */
-    updateOverdueTasksCount(overdueCount) {
-        document.querySelector(".val-box:nth-child(6) .overdue-tasks").textContent = overdueCount;
     }
 
     /**
@@ -134,9 +123,7 @@ class IndexPage extends BaseClass {
         taskList.forEach((task) => {
             if (task.status === "Completed") {
                 completedCount++;
-            } else if (
-            ["In Progress", "In Review", "Pending"].includes(task.status)
-            ) {
+            } else if (["In Progress", "In Review", "Pending"].includes(task.status)) {
                 inProgressCount++;
             } else if (task.status === "Canceled") {
                 canceledCount++;
@@ -147,6 +134,7 @@ class IndexPage extends BaseClass {
         document.querySelector(".val-box:nth-child(2) .task-count").textContent = inProgressCount;
         document.querySelector(".val-box:nth-child(3) .task-count").textContent = canceledCount;
     }
+
 
     /**
     * Render the calendar in the UI by dynamically generating the days of the current month,
@@ -309,14 +297,12 @@ class IndexPage extends BaseClass {
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                <td style="text-align: center;">${index + 1}</td>
+                <td><h3 class="task-info">${index + 1}</h3></td>
                 <td><h3 class="task-info">${task.title}</h3></td>
                 <td><h3 class="task-info">${task.description}</h3></td>
                 <td><h3 class="task-info">${task.assignedTo}</h3></td>
                 <td style="text-align: center;">
-                    <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;">
-                        ${task.status}
-                    </span>
+                    <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;"> ${task.status}</span>
                 </td>
                 <td><h3 class="task-info">${task.priority}</h3></td>
                 <td><h3 class="task-info">${task.taskDueDate}</h3></td>
@@ -439,17 +425,12 @@ class IndexPage extends BaseClass {
 
     // Toggle notification dropdown visibility
     toggleNotificationDropdown() {
-        const notificationDropdown = document.getElementById(
-            "notification-dropdown"
-        );
+        const notificationDropdown = document.getElementById("notification-dropdown");
         notificationDropdown.classList.toggle("active");
 
         const notificationIcon = document.getElementById("notification-icon");
         document.addEventListener("click", (event) => {
-            if (
-            !notificationIcon.contains(event.target) &&
-            !notificationDropdown.contains(event.target)
-            ) {
+            if (!notificationIcon.contains(event.target) && !notificationDropdown.contains(event.target)) {
                 notificationDropdown.classList.remove("active");
             }
         });
@@ -476,38 +457,26 @@ class IndexPage extends BaseClass {
             // Handle 'In Progress' tasks that are due soon
             if (task.status === "In Progress" && deadlineSoon) {
                 // Add to dashboard notifications only
-                this.addDashboardNotificationItem(
-                    `Task "${task.title}" is approaching its due date.`,
-                    dashboardNotificationList
-                );
+                this.addDashboardNotificationItem(`Task "${task.title}" is approaching its due date.`, dashboardNotificationList);
                 dashboardHasDueSoonTasks = true;
             }
 
             // Handle completed tasks
             if (task.status === "Completed") {
-                this.addDropdownNotificationItem(
-                    `Task "${task.title}" has been completed.`,
-                    notificationList
-                );
+                this.addDropdownNotificationItem(`Task "${task.title}" has been completed.`, notificationList);
                 notificationCount++;
             }
 
             // Handle canceled tasks
             if (task.status === "Canceled") {
-                this.addDropdownNotificationItem(
-                    `Task "${task.title}" has been canceled.`,
-                    notificationList
-                );
+                this.addDropdownNotificationItem(`Task "${task.title}" has been canceled.`, notificationList);
                 notificationCount++;
             }
         });
 
         // If no due soon tasks, show "No available task due soon" in the dashboard
         if (!dashboardHasDueSoonTasks) {
-            this.addDashboardNotificationItem(
-                "No available task due soon",
-                dashboardNotificationList
-            );
+            this.addDashboardNotificationItem("No available task due soon", dashboardNotificationList);
         }
 
         // If no notifications, display "There are currently no notifications" message in the dropdown
@@ -552,7 +521,7 @@ class IndexPage extends BaseClass {
      */
     async onCreateTask(event) {
         // Prevent the page from refreshing on form submit
-        if (event) event.preventDefault();
+        event.preventDefault();
 
         const modal = document.getElementById("addTaskModal");
         const overlay = document.getElementById("modalOverlay");
@@ -586,8 +555,7 @@ class IndexPage extends BaseClass {
         try {
             // Retrieve task details from input fields
             const taskName = document.getElementById("addTaskTitle").value;
-            const taskDescription =
-            document.getElementById("addTaskDescription").value;
+            const taskDescription = document.getElementById("addTaskDescription").value;
             const assignedTo = document.getElementById("addTaskAssignedTo").value;
             const status = document.getElementById("addTaskStatus").value;
             const priority = document.getElementById("addTaskPriority").value;
@@ -632,6 +600,9 @@ class IndexPage extends BaseClass {
      * @param {Event} event - The click event on the delete button.
      */
     async onDeleteTask(event) {
+        // Prevent the page from refreshing on form submit
+        event.preventDefault();
+
         // Get taskId from the button's data attribute
         const taskId = event.target.getAttribute("data-task-id");
 
@@ -671,6 +642,9 @@ class IndexPage extends BaseClass {
      * @param {Event} event - The click event on the update button.
      */
     async onUpdateTask(event) {
+        // Prevent the page from refreshing on form submit
+        event.preventDefault();
+
         // Get taskId from the button's data attribute
         const taskId = event.target.getAttribute("data-task-id");
         const taskList = this.dataStore.get("tasks");
@@ -747,7 +721,8 @@ class IndexPage extends BaseClass {
      * Fetch all tasks from the Client and update the UI.
      */
     async onGetAllTasks(event) {
-        if (event) event.preventDefault();
+        // Prevent the page from refreshing on form submit
+        event.preventDefault();
 
         try {
             const taskList = await this.client.getAllTasks();

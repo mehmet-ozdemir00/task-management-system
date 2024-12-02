@@ -419,13 +419,13 @@ body {
     justify-content: flex-start;
     align-items: center;
     box-sizing: border-box;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds a light shadow */
-    transition: transform 0.3s ease, background-color 0.3s ease; /* Hover effects */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .values .val-box:hover {
-    transform: translateY(-5px); /* Hover lift effect */
-    background-color: #d0b2ff; /* Lighter background on hover */
+    transform: translateY(-5px);
+    background-color: #d0b2ff;
 }
 
 .values .val-box i {
