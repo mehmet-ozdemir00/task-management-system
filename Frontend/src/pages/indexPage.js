@@ -119,20 +119,35 @@ class IndexPage extends BaseClass {
         let completedCount = 0;
         let inProgressCount = 0;
         let canceledCount = 0;
+        let overdueCount = 0;
 
         taskList.forEach((task) => {
+            const taskDueDate = new Date(task.taskDueDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Get the date string in the format YYYY-MM-DD
+            const taskDueDateString = taskDueDate.toISOString().split("T")[0];
+            const todayString = today.toISOString().split("T")[0];
+
             if (task.status === "Completed") {
                 completedCount++;
             } else if (["In Progress", "In Review", "Pending"].includes(task.status)) {
                 inProgressCount++;
+
+                if (taskDueDateString < todayString) {
+                    overdueCount++;
+                }
             } else if (task.status === "Canceled") {
                 canceledCount++;
             }
         });
 
+        // Update the counts in the HTML
         document.querySelector(".val-box:nth-child(1) .task-count").textContent = completedCount;
         document.querySelector(".val-box:nth-child(2) .task-count").textContent = inProgressCount;
         document.querySelector(".val-box:nth-child(3) .task-count").textContent = canceledCount;
+        document.querySelector(".val-box:nth-child(6) .task-count").textContent = overdueCount;
     }
 
 
@@ -264,35 +279,47 @@ class IndexPage extends BaseClass {
             // If there are no tasks, display a message in the table
             const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `
-                <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 15px;">
-                    All caught up! No tasks for today. 🎉
-                </td>
-            `;
+            <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 15px;">
+                All caught up! No tasks for today. 🎉
+            </td>
+        `;
             tableBody.appendChild(noDataRow);
         } else {
             // Render tasks if there are any
             taskList.forEach((task, index) => {
-                // Determine the color for the status
                 let statusColor = "";
+                let statusText = task.status;
 
-                switch (task.status) {
-                    case "Completed":
-                        statusColor = "#4CAF50"; // Green
-                        break;
-                    case "In Progress":
-                        statusColor = "#FFA500"; // Yellow
-                        break;
-                    case "Canceled":
-                        statusColor = "#dc3545"; // Red
-                        break;
-                    case "In Review":
-                        statusColor = "#0056b3"; // Blue
-                        break;
-                    case "Pending":
-                        statusColor = "#808080"; // Default gray
-                        break;
-                    default:
-                        statusColor = "#808080"; // Default gray
+                const taskDueDate = new Date(task.taskDueDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const taskDueDateString = taskDueDate.toISOString().split("T")[0];
+                const todayString = today.toISOString().split("T")[0];
+
+                if ((task.status === "In Progress" || task.status === "Pending" || task.status === "In Review") && taskDueDateString < todayString) {
+                    statusColor = "#B52A37";  // Red
+                    statusText = `Task-Overdue`;
+                }  else {
+                    switch (task.status) {
+                        case "Completed":
+                            statusColor = "#4CAF50"; // Green
+                            break;
+                        case "In Progress":
+                            statusColor = "#FFC107"; // Gold
+                            break;
+                        case "Canceled":
+                            statusColor = "#FF6347"; // Orange
+                            break;
+                        case "In Review":
+                            statusColor = "#0056b3"; // Blue
+                            break;
+                        case "Pending":
+                            statusColor = "#808080"; // Default gray
+                            break;
+                        default:
+                            statusColor = "#808080"; // Default gray
+                    }
                 }
 
                 const row = document.createElement("tr");
@@ -302,7 +329,7 @@ class IndexPage extends BaseClass {
                 <td><h3 class="task-info">${task.description}</h3></td>
                 <td><h3 class="task-info">${task.assignedTo}</h3></td>
                 <td style="text-align: center;">
-                    <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;"> ${task.status}</span>
+                    <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;"> ${statusText}</span>
                 </td>
                 <td><h3 class="task-info">${task.priority}</h3></td>
                 <td><h3 class="task-info">${task.taskDueDate}</h3></td>

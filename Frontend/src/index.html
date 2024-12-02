@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script type="text/javascript" src="indexPage.js" defer></script>
+    <script src="indexPage.js" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -94,7 +94,6 @@
             </div>
         </div>
     </div>
-    </div>
 
     <div class="values">
         <!-- Completed Tasks -->
@@ -139,6 +138,15 @@
             <div>
                 <span>Completion Rate</span>
                 <h3 class="task-count completion-rate">0%</h3>
+            </div>
+        </div>
+
+        <!-- Overdue Tasks -->
+        <div class="val-box">
+            <i class="fa fa-calendar-times" style="color: crimson;"></i>
+            <div>
+                <span>Overdue</span>
+                <h3 class="task-count overdue-tasks">0</h3>
             </div>
         </div>
 
