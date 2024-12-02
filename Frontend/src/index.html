@@ -21,8 +21,6 @@
     <div class="items">
         <ul class="menu-list">
             <li><a href="index.html"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
-            <li><a href="viewIncompleteTasks.html"><i class="fa fa-hourglass-half"></i> Incomplete Tasks </a></li>
-            <li><a href="viewCompletedTasks.html"><i class="fa fa-check-circle"></i> Completed Tasks </a></li>
             <li><a href="#"><i class="fa fa-folder-open"></i> Projects</a></li>
             <li><a href="#"><i class="fa fa-chart-bar"></i> Reports</a></li>
             <li><a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a></li>
@@ -170,9 +168,9 @@
     <div class="tabular--wrapper">
         <h3 class="main--title">Task Management Board</h3>
         <div class="table-container">
-            <button id="retrieveTasksBtn" class="retrieve-btn">
-                <i class="fa fa-tasks"></i> List All Tasks
-            </button>
+            <button id="retrieveTasksBtn" class="retrieve-button"><i class="fa fa-file-text"></i> List All Tasks</button>
+            <button id="completedTasksBtn" class="completed-button"><i class="fa fa-trophy"></i> Completed Tasks</button>
+            <button id="incompleteTasksBtn" class="incomplete-button"><i class="fa fa-clipboard-list"></i> Unfinished Tasks</button>
             <table>
                 <thead>
                 <tr>

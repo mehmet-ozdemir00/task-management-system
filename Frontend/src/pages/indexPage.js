@@ -9,7 +9,7 @@ class IndexPage extends BaseClass {
             [
                 "mount", "fetchTasks", "updateTaskCounts", "setupSearch", "performSearch", "renderTasks", "onDeleteTask", "onUpdateTask",
                 "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer",
-                "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn"
+                "onGetCompletedTasks", "onGetIncompleteTasks", "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn"
             ],
             this
         );
@@ -389,11 +389,9 @@ class IndexPage extends BaseClass {
     addEventListeners() {
         // Add listener for the notification bell
         const notificationIcon = document.getElementById("notification-icon");
-        const notificationDropdown = document.getElementById(
-            "notification-dropdown"
-        );
-        if (notificationIcon) {
-            notificationIcon.addEventListener("click", () => {
+        const notificationDropdown = document.getElementById("notification-dropdown");
+
+        if (notificationIcon) {notificationIcon.addEventListener("click", () => {
                 this.toggleNotificationDropdown();
             });
         }
@@ -420,6 +418,18 @@ class IndexPage extends BaseClass {
         const retrieveTasksButton = document.getElementById("retrieveTasksBtn");
         if (retrieveTasksButton) {
             retrieveTasksButton.addEventListener("click", this.onGetAllTasks);
+        }
+
+        // Add listener for Completed Tasks button
+        const completedTasksButton = document.getElementById("completedTasksBtn");
+        if (completedTasksButton) {
+            completedTasksButton.addEventListener("click", this.onGetCompletedTasks);
+        }
+
+        // Add listener for Incomplete Tasks button
+        const incompleteTasksButton = document.getElementById("incompleteTasksBtn");
+        if (incompleteTasksButton) {
+            incompleteTasksButton.addEventListener("click", this.onGetIncompleteTasks);
         }
 
         // Add listener for closing the modal for retrieving tasks
@@ -471,21 +481,34 @@ class IndexPage extends BaseClass {
         notificationList.innerHTML = "";
         dashboardNotificationList.innerHTML = "";
 
-        const now = new Date();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayString = today.toISOString().split("T")[0];
+
         let notificationCount = 0;
         let dashboardHasDueSoonTasks = false;
 
         // Loop through tasks to generate notifications
         taskList.forEach((task) => {
-            const dueDate = new Date(task.taskDueDate);
-            const timeLeft = dueDate - now;
-            const deadlineSoon = timeLeft <= 2 * 24 * 60 * 60 * 1000; // 2 days threshold
+            const taskDueDateString = task.taskDueDate;
+            const isOverdue = taskDueDateString < todayString;
 
-            // Handle 'In Progress' tasks that are due soon
-            if (task.status === "In Progress" && deadlineSoon) {
-                // Add to dashboard notifications only
-                this.addDashboardNotificationItem(`Task "${task.title}" is approaching its due date.`, dashboardNotificationList);
-                dashboardHasDueSoonTasks = true;
+            // Handle 'In Progress' tasks
+            if (task.status === "In Progress") {
+                if (!isOverdue) {
+                    const dueDate = new Date(taskDueDateString);
+                    const timeLeft = dueDate - today;
+
+                    if (timeLeft <= 2 * 24 * 60 * 60 * 1000) {
+                        // Due soon tasks
+                        this.addDashboardNotificationItem(`Task "${task.title}" is approaching its due date.`, dashboardNotificationList);
+                        dashboardHasDueSoonTasks = true;
+                    }
+                } else {
+                    // Overdue tasks
+                    this.addDropdownNotificationItem(`Task "${task.title}" is overdue.`, notificationList);
+                    notificationCount++;
+                }
             }
 
             // Handle completed tasks
@@ -633,17 +656,17 @@ class IndexPage extends BaseClass {
         // Get taskId from the button's data attribute
         const taskId = event.target.getAttribute("data-task-id");
 
-        // Show the modal and overlay
+        // Display confirmation modal
         const modal = document.getElementById("confirmationModal");
         const overlay = document.getElementById("modalOverlay");
         modal.style.display = "flex";
         overlay.style.display = "flex";
 
-        // Get the confirmation and cancel buttons
+        // Confirm and cancel buttons in the modal
         const confirmBtn = document.getElementById("confirmDelete");
         const cancelBtn = document.getElementById("cancelDelete");
 
-        // Event listener for confirmation
+        // Confirm delete handler
         confirmBtn.addEventListener("click", async () => {
             this.closeModal(modal, overlay);
             try {
@@ -795,6 +818,109 @@ class IndexPage extends BaseClass {
         } catch (error) {
             this.showMessage("There was an error retrieving tasks.");
             console.error("Error fetching tasks:", error);
+        }
+    }
+
+    /**
+    * Fetch and display completed tasks.
+    * @param {Event} event - The event triggered by the button click.
+    */
+    async onGetCompletedTasks(event) {
+        // Prevent default form submission behavior
+        event.preventDefault();
+
+        try {
+            const completedTasks = await this.client.getCompletedTasks(this.errorHandler);
+
+            // Get the container where tasks will be displayed
+            const taskListDiv = document.getElementById("taskList");
+            taskListDiv.innerHTML = "";
+
+            if (completedTasks.length === 0) {
+                // Display a message if no completed tasks are available
+                const noTasksMessage = document.createElement("p");
+                noTasksMessage.textContent = "No completed tasks available.";
+                noTasksMessage.style.fontSize = "30px";
+                noTasksMessage.style.marginTop = "50px";
+                noTasksMessage.style.textAlign = "center";
+                noTasksMessage.style.fontStyle = "italic";
+                noTasksMessage.style.marginBottom = "50px";
+                taskListDiv.appendChild(noTasksMessage);
+            } else {
+                // Populate the container with completed tasks
+                completedTasks.forEach((task) => {
+                    const taskItem = document.createElement("div");
+                    taskItem.classList.add("task-item");
+                    taskItem.innerHTML = `
+                    <p><strong>Title:</strong> ${task.title}</p>
+                    <p><strong>Description:</strong> ${task.description}</p>
+                    <p><strong>Assigned To:</strong> ${task.assignedTo}</p>
+                    <p><strong>Status:</strong> ${task.status}</p>
+                    <p><strong>Priority:</strong> ${task.priority}</p>
+                    <p><strong>Due Date:</strong> ${task.taskDueDate}</p>
+                    <hr>
+                `;
+                    taskListDiv.appendChild(taskItem);
+                });
+
+                this.showMessage("Completed tasks successfully retrieved!");
+            }
+
+            // Show the modal with completed tasks
+            const retrieveTasksModal = document.getElementById("retrieveTasksModal");
+            retrieveTasksModal.style.display = "flex";
+        } catch (error) {
+            this.showMessage("There was an error retrieving completed tasks.");
+            console.error("Error fetching completed tasks:", error);
+        }
+    }
+
+    /**
+     * Fetch and display incomplete tasks.
+     */
+    async onGetIncompleteTasks(event) {
+        // Prevent default form submission behavior
+        event.preventDefault();
+
+        try {
+            const incompleteTasks = await this.client.getIncompleteTasks(this.errorHandler);
+
+            const taskListDiv = document.getElementById("taskList");
+            taskListDiv.innerHTML = "";
+
+            if (incompleteTasks.length === 0) {
+                const noTasksMessage = document.createElement("p");
+                noTasksMessage.textContent = "No incomplete tasks available.";
+                noTasksMessage.style.fontSize = "30px";
+                noTasksMessage.style.marginTop = "50px";
+                noTasksMessage.style.textAlign = "center";
+                noTasksMessage.style.fontStyle = "italic";
+                noTasksMessage.style.marginBottom = "50px";
+                taskListDiv.appendChild(noTasksMessage);
+            } else {
+                incompleteTasks.forEach((task) => {
+                    const taskItem = document.createElement("div");
+                    taskItem.classList.add("task-item");
+                    taskItem.innerHTML = `
+                    <p><strong>Title:</strong> ${task.title}</p>
+                    <p><strong>Description:</strong> ${task.description}</p>
+                    <p><strong>Assigned To:</strong> ${task.assignedTo}</p>
+                    <p><strong>Status:</strong> ${task.status}</p>
+                    <p><strong>Priority:</strong> ${task.priority}</p>
+                    <p><strong>Due Date:</strong> ${task.taskDueDate}</p>
+                    <hr>
+                `;
+                    taskListDiv.appendChild(taskItem);
+                });
+
+                this.showMessage("Incomplete tasks successfully retrieved!");
+            }
+
+            const retrieveTasksModal = document.getElementById("retrieveTasksModal");
+            retrieveTasksModal.style.display = "flex";
+        } catch (error) {
+            this.showMessage("There was an error retrieving incomplete tasks.");
+            console.error("Error fetching incomplete tasks:", error);
         }
     }
 

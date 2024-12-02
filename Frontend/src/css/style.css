@@ -659,24 +659,6 @@ label {
     font-style: italic;
 }
 
-.retrieve-button {
-    background-color: #0056b3;
-    color: white;
-    font-style: italic;
-}
-
-.completed-button {
-    background-color: #4CAF50;
-    color: white;
-    font-style: italic;
-}
-
-.incomplete-button {
-    background-color: #FFA500;
-    color: white;
-    font-style: italic;
-}
-
 .save-button:hover {
     background-color: #218838;
     transform: scale(1.05);
@@ -692,28 +674,7 @@ label {
     transform: scale(1.05);
 }
 
-.retrieve-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-.completed-button:hover {
-    background-color: #388E3C;
-    transform: scale(1.05);
-}
-
-.incomplete-button:hover {
-    background-color: #FFA500;
-    transform: scale(1.05);
-}
-
-.button-container {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.save-button, .cancel-button, .delete-button, .retrieve-button, .completed-button, .incomplete-button {
+.save-button, .cancel-button, .delete-button {
     font-size: 15px;
     padding: 12px 19px;
     border: none;
@@ -737,15 +698,14 @@ label {
 }
 
 .tabular--wrapper h3 {
-    font-size: 18px;
-    margin-left: 8px;
+    margin-left: 4px;
     margin-bottom: 10px;
     display: inline-block;
 }
 
 .table-container {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.1rem;
 }
 
 table {
@@ -780,10 +740,6 @@ table td h3 {
 
 tr:nth-child(even) {
     background: #fff;
-}
-
-th {
-    font-size: 18px;
 }
 
 tfoot {
@@ -842,39 +798,39 @@ tfoot td {
 
 /* Modal Background and Overlay */
 .modal, .modal-overlay {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
-    z-index: 1000; /* To be on top */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     align-items: center;
     justify-content: center;
-    display: flex; /* Centering modal in the middle */
+    display: flex;
 }
 
 .content {
     background-color: #fff;
     padding: 30px;
     width: 330px;
-    text-align: center; /* Align text to the left */
+    text-align: center;
     border-radius: 20px;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
 }
 
 .modal-content {
     background-color: #fff;
     padding: 30px;
     width: 500px;
-    text-align: left; /* Align text to the left */
+    text-align: left;
     border-radius: 20px;
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
-    overflow: hidden; /* Hide any overflow outside the modal boundary */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
 }
 
-/* Styling for task items within the modal */
+/********* Styling for task items within the modal ************/
 #taskList {
     max-height: 60vh; /* Set a max height for the task list */
     overflow-y: auto; /* Enable vertical scrolling */
@@ -883,7 +839,7 @@ tfoot td {
 
 .modal-content h2 {
     text-align: center;
-    font-size: 30px; /* Adjust for consistency */
+    font-size: 30px;
     margin-bottom: 20px;
 }
 
@@ -891,7 +847,7 @@ tfoot td {
     font-weight: bold;
 }
 
-/* Styling for task items within the modal */
+/******** Styling for task items within the modal ********/
 .task-item {
     margin-bottom: 15px;
 }
@@ -936,12 +892,10 @@ tfoot td {
     color: white;
 }
 
-/* Confirm Button (Green) Hover */
 .confirm:hover {
     background-color: #4CAF50;
 }
 
-/* Cancel Button (Red) Hover */
 .cancel:hover {
     background-color: #f44336;
 }
@@ -949,7 +903,7 @@ tfoot td {
 label {
     display: block;
     margin-bottom: 7px; /* Space between label and input */
-    font-weight: bold; /* Make labels stand out */
+    font-weight: bold;
 }
 
 .modal input,
@@ -962,10 +916,10 @@ label {
     font-size: 15px;
 }
 
-/* Update Task Modal Specific Styles */
+/********* Update Task Modal Specific Styles ********/
 
 #updateTaskModal button {
-    width: 40%; /* Make buttons fit next to each other */
+    width: 40%;
     margin-top: 10px;
     padding: 10px;
     border-radius: 5px;
@@ -983,20 +937,16 @@ label {
     color: white;
 }
 
-/* Aligning the button to the right of the table */
 #retrieveTasksBtn {
-    position: absolute;
-    padding: 10px 20px;
+    padding: 10px 10px;
     background-color: #007bff;
     color: white;
     text-decoration: none;
     border: none;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
-    right: 25px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    top: 10px; /* Pushes the button upwards from its default position */
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 #retrieveTasksBtn:hover {
@@ -1004,7 +954,42 @@ label {
     transform: scale(1.05);
 }
 
-/* Center the button by targeting its ID */
+#completedTasksBtn {
+    padding: 10px 10px;
+    margin-bottom: 7px;
+    background-color: #388E3C;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#completedTasksBtn:hover {
+    background-color: #388E3C;
+    transform: scale(1.05);
+}
+
+#incompleteTasksBtn {
+    padding: 10px 10px;
+    margin-bottom: 7px;
+    background-color: #FFA500;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#incompleteTasksBtn:hover {
+    background-color: #FFA500;
+    transform: scale(1.05);
+}
+
 #closeRetrieveModal {
     margin: auto;
     cursor: pointer;
@@ -1013,13 +998,11 @@ label {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Styling for the Cancel button */
 #closeRetrieveModal.cancel {
     background-color: #f44336;
     color: white;
 }
 
-/* Hover effect for the button */
 #closeRetrieveModal:hover {
     transform: scale(1.05);
 }

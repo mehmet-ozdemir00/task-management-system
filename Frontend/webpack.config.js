@@ -10,8 +10,6 @@ module.exports = {
   },
   entry: {
     indexPage: path.resolve(__dirname, 'src', 'pages', 'indexPage.js'),
-    viewCompletedTasksPage: path.resolve(__dirname, 'src', 'pages', 'viewCompletedTasksPage.js'),
-    viewIncompleteTasksPage: path.resolve(__dirname, 'src', 'pages', 'viewIncompleteTasksPage.js'),
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -35,16 +33,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: 'index.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/viewCompletedTasks.html',
-      filename: 'viewCompletedTasks.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/viewIncompleteTasks.html',
-      filename: 'viewIncompleteTasks.html',
       inject: false
     }),
     new CopyPlugin({
