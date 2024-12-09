@@ -64,14 +64,12 @@ class IndexPage extends BaseClass {
             const totalTasks = taskList.length;
             const completedTasks = taskList.filter((task) => task.status === "Completed").length;
             const incompleteTasks = taskList.filter((task) => task.status === "Incomplete").length;
-            const completionRate = totalTasks > 0 ? ((completedTasks / totalTasks) * 100).toFixed(2) : 0;
 
             // Save analytics data in DataStore
             this.dataStore.set("analytics", {
                 totalTasks,
                 completedTasks,
                 incompleteTasks,
-                completionRate,
             });
 
             this.updateDailyTaskContainer(dailyTasks); // Update the daily task container
@@ -93,19 +91,18 @@ class IndexPage extends BaseClass {
         const container = document.getElementById("daily-task-container");
         if (container) {
             // Filter tasks for today that are "In Progress"
-            const inProgressTasks = dailyTasks.filter(
-                (task) => task.status === "In Progress"
-            );
+            const inProgressTasks = dailyTasks.filter((task) => task.status === "In Progress");
 
             if (inProgressTasks.length > 0) {
                 container.innerHTML = `
                 <p>Hello! Mehmet</p>
-                <p>You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today..</p>
+                <p>You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today ..</p>
             `;
             } else {
                 container.innerHTML = `
                 <p>Hello! Mehmet</p>
-                <p>You have no tasks today.. Enjoy your day.. 🙂☕</p>
+                <p>You have no tasks today .. </p>
+                <p>Enjoy your day .. 🙂☕</p>
             `;
             }
         }
@@ -133,10 +130,11 @@ class IndexPage extends BaseClass {
             if (task.status === "Completed") {
                 completedCount++;
             } else if (["In Progress", "In Review", "Pending"].includes(task.status)) {
-                inProgressCount++;
-
+                // If task is "In Progress" and is overdue, count it in overdue count and exclude from in-progress
                 if (taskDueDateString < todayString) {
                     overdueCount++;
+                } else {
+                    inProgressCount++;
                 }
             } else if (task.status === "Canceled") {
                 canceledCount++;
@@ -147,7 +145,56 @@ class IndexPage extends BaseClass {
         document.querySelector(".val-box:nth-child(1) .task-count").textContent = completedCount;
         document.querySelector(".val-box:nth-child(2) .task-count").textContent = inProgressCount;
         document.querySelector(".val-box:nth-child(3) .task-count").textContent = canceledCount;
-        document.querySelector(".val-box:nth-child(6) .task-count").textContent = overdueCount;
+        document.querySelector(".val-box:nth-child(5) .task-count").textContent = overdueCount;
+
+        // Calculate total tasks for progress bar logic
+        const totalTasks = completedCount + inProgressCount + canceledCount + overdueCount;
+
+        // Logic for progress bars
+        const completedBar = document.querySelector(".progress-bar.completed");
+        const inProgressBar = document.querySelector(".progress-bar.in-progress");
+        const canceledBar = document.querySelector(".progress-bar.canceled");
+        const overdueBar = document.querySelector(".progress-bar.overdue");
+
+        // Set default gray background for 0% bars
+        if (totalTasks === 0) {
+            completedBar.style.width = "0%";
+            completedBar.querySelector(".progress-text").textContent = "0%";
+            completedBar.classList.add("default");
+
+            inProgressBar.style.width = "0%";
+            inProgressBar.querySelector(".progress-text").textContent = "0%";
+            inProgressBar.classList.add("default");
+
+            canceledBar.style.width = "0%";
+            canceledBar.querySelector(".progress-text").textContent = "0%";
+            canceledBar.classList.add("default");
+
+            overdueBar.style.width = "0%";
+            overdueBar.querySelector(".progress-text").textContent = "0%";
+            overdueBar.classList.add("default");
+        } else {
+            const completedPercentage = Math.round((completedCount / totalTasks) * 100);
+            const inProgressPercentage = Math.round((inProgressCount / totalTasks) * 100);
+            const canceledPercentage = Math.round((canceledCount / totalTasks) * 100);
+            const overduePercentage = Math.round((overdueCount / totalTasks) * 100);
+
+            completedBar.style.width = `${completedPercentage}%`;
+            completedBar.querySelector(".progress-text").textContent = `${completedPercentage}%`;
+            completedBar.classList.remove("default");
+
+            inProgressBar.style.width = `${inProgressPercentage}%`;
+            inProgressBar.querySelector(".progress-text").textContent = `${inProgressPercentage}%`;
+            inProgressBar.classList.remove("default");
+
+            canceledBar.style.width = `${canceledPercentage}%`;
+            canceledBar.querySelector(".progress-text").textContent = `${canceledPercentage}%`;
+            canceledBar.classList.remove("default");
+
+            overdueBar.style.width = `${overduePercentage}%`;
+            overdueBar.querySelector(".progress-text").textContent = `${overduePercentage}%`;
+            overdueBar.classList.remove("default");
+        }
     }
 
 
@@ -255,14 +302,9 @@ class IndexPage extends BaseClass {
         const analytics = this.dataStore.get("analytics");
         if (analytics) {
             const totalTasksElement = document.querySelector(".total-tasks");
-            const completionRateElement = document.querySelector(".completion-rate");
 
             if (totalTasksElement) {
                 totalTasksElement.textContent = analytics.totalTasks;
-            }
-
-            if (completionRateElement) {
-                completionRateElement.textContent = `${analytics.completionRate}%`;
             }
         }
     }

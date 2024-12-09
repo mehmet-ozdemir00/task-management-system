@@ -58,41 +58,43 @@
     <h3 class="i-name">Dashboard</h3>
     <h4>Home - Task Report</h4>
 
-    <div id="daily-task-container" class="task-summary"></div>
-        <!-- Dynamic content will be injected here -->
-
-    <!-- Calendar Section -->
-    <div class="container">
-        <div class="calendar">
-            <div class="header">
-                <div class="month"></div>
-                <div class="btns">
-                    <div class="btn today-btn">
-                        <i class="fas fa-calendar-day"></i>
-                    </div>
-                    <div class="btn prev-btn">
-                        <i class="fas fa-chevron-left"></i>
-                    </div>
-                    <div class="btn next-btn">
-                        <i class="fas fa-chevron-right"></i>
+    <div class="parent-container">
+        <div id="daily-task-container" class="task-summary"></div>
+        <div class="container">
+            <div class="calendar">
+                <div class="header">
+                    <div class="month"></div>
+                    <div class="btns">
+                        <div class="btn today-btn">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="btn prev-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </div>
+                        <div class="btn next-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="weekdays">
-                <div class="day">Sun</div>
-                <div class="day">Mon</div>
-                <div class="day">Tue</div>
-                <div class="day">Wed</div>
-                <div class="day">Thu</div>
-                <div class="day">Fri</div>
-                <div class="day">Sat</div>
-            </div>
-            <div class="days">
-                <!-- Days will generate dynamically here -->
+                <div class="weekdays">
+                    <div class="day">Sun</div>
+                    <div class="day">Mon</div>
+                    <div class="day">Tue</div>
+                    <div class="day">Wed</div>
+                    <div class="day">Thu</div>
+                    <div class="day">Fri</div>
+                    <div class="day">Sat</div>
+                </div>
+                <div class="days">
+                    <!-- Days will generate dynamically here -->
+                </div>
             </div>
         </div>
     </div>
 
+    <h3 class="title">Task Performance Metrics</h3>
+
+    <!-- Task Metrics Dashboard -->
     <div class="values">
         <!-- Completed Tasks -->
         <div class="val-box">
@@ -130,15 +132,6 @@
             </div>
         </div>
 
-        <!-- Completion Rate -->
-        <div class="val-box">
-            <i class="fa fa-chart-line" style="color: #ab49d2;"></i>
-            <div>
-                <span>Completion Rate</span>
-                <h3 class="task-count completion-rate">0%</h3>
-            </div>
-        </div>
-
         <!-- Overdue Tasks -->
         <div class="val-box">
             <i class="fa fa-calendar-times" style="color: crimson;"></i>
@@ -158,6 +151,41 @@
             </div>
         </div>
     </div>
+
+    <h3 class="title">Task Progress Summary</h3>
+
+    <!-- Completed Progress -->
+    <div class="progress-bar-container">
+        <label>Tasks Finished</label>
+        <div class="progress-bar completed">
+            <span class="progress-text">0%</span>
+        </div>
+    </div>
+
+    <!-- In Progress -->
+    <div class="progress-bar-container">
+        <label>Ongoing Tasks</label>
+        <div class="progress-bar in-progress">
+            <span class="progress-text">0%</span>
+        </div>
+    </div>
+
+    <!-- Canceled Progress -->
+    <div class="progress-bar-container">
+        <label>Tasks Abandoned</label>
+        <div class="progress-bar canceled">
+            <span class="progress-text">0%</span>
+        </div>
+    </div>
+
+    <!-- Overdue Progress -->
+    <div class="progress-bar-container">
+        <label>Tasks Missed Deadlines</label>
+        <div class="progress-bar overdue">
+            <span class="progress-text">0%</span>
+        </div>
+    </div>
+
 
     <!-- New message and button section -->
     <div class="no-tasks">

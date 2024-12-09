@@ -97,6 +97,7 @@ body {
     border-bottom: 15px solid rgba(113, 99, 186, 255);
     position: fixed;
     width: calc(100% - 300px);
+    z-index: 1000; /* Ensures it stays on top */
 }
 
 #interface .navigation .search {
@@ -146,11 +147,12 @@ body {
 }
 
 #interface h4 {
-    margin-left: 30px;
-    margin-top: 7px;
-    font-size: 18px;
-    color: orangered;
-    text-decoration: underline;
+    margin-left: 40px;
+    margin-top: 10px;
+    font-size: 19px;
+    color: #0056b3;
+    letter-spacing: 1.2px;
+    border-bottom: 2px solid #0056b3;
 }
 
 /* -------------- Notification Section Starts -------------- */
@@ -257,7 +259,7 @@ body {
 
 .i-name {
     color: #030304;
-    padding: 50px 30px 0 30px;
+    padding: 50px 30px 0 40px;
     font-size: 37px;
     font-weight: 700;
     margin-top: 75px;
@@ -265,22 +267,33 @@ body {
 
 /* -------------- Interface Section Ends -------------- */
 
+.parent-container {
+    display: flex; /* Use flexbox to align children */
+    justify-content: center; /* Center items horizontally */
+    align-items: flex-start; /* Align items at the start vertically */
+    margin: 30px auto; /* Center the parent container itself */
+    max-width: 1000px; /* Optional: Set a max width for the parent container */
+    gap: 30px; /* Add gap between child elements */
+}
 
 .task-summary {
-    display: inline-block !important; /* Ensure task-summary aligns with the calendar */
-    vertical-align: top !important; /* Align both sections at the top */
-    width: 450px;
-    margin: 15px;
-    padding: 100px 35px;
-    font-size: 30px;
+    display: flex; /* Use flexbox to center content */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+    width: 450px; /* Ensure consistent width */
+    min-height: 335px; /* Allow the calendar to expand for extra rows */
+    margin: 17px;
+    padding: 30px; /* Adjust padding to fit content without altering size */
+    font-size: 27px;
     line-height: 1.5;
     font-weight: bold;
-    text-align: center;
-    margin-left : 35px;
-    border-radius: 20px;
+    text-align: center; /* Center text */
+    border-radius: 15px;
     background: #e0cdf6;
     border: 1px solid #ddd;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Include padding in width/height */
 }
 
 .task-count {
@@ -290,19 +303,20 @@ body {
 /* -------------- Calendar Section Starts -------------- */
 
 .container {
-    flex: 1;
-    margin: 15px;
-    max-width: 450px;
-    min-width: 350px;
-    margin-left: 185px;
-    display: inline-block !important;
+    flex: 1; /* Allow the container to grow */
+    margin: 17px;
+    max-width: 450px; /* Ensure consistent width */
+    min-width: 350px; /* Ensure minimum width */
 }
 
 .calendar {
+    width: 450px; /* Match task-summary width */
+    min-height: 330px; /* Allow the calendar to expand for extra rows */
     padding: 15px;
-    border-radius: 15px;
+    border-radius: 15px; /* Match task-summary border-radius */
     background-color: #f1f1fb;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box; /* Include padding in width/height */
 }
 
 .calendar .header {
@@ -412,7 +426,7 @@ body {
 .values .val-box {
     background: #e0cdf6;
     width: 330px;
-    padding: 40px 50px;
+    padding: 50px 50px;
     border-radius: 20px;
     display: flex;
     cursor: pointer;
@@ -449,6 +463,8 @@ body {
     font-size: 23px;
     font-weight: 600;
     color: #444;
+    margin-bottom: 10px;
+    display: block;
 }
 
 .val-box div {
@@ -462,11 +478,14 @@ body {
     list-style-type: none;
 }
 
+#notificationList li {
+    margin-bottom: 5px;
+}
+
 #notificationList li::before {
     content: "✔️";
     margin-right: 8px;
     font-size: 1em;
-
 }
 
 .no-tasks {
@@ -506,6 +525,79 @@ body {
 .no-tasks .add-button:hover {
     background-color: #0056b3;
     transform: scale(1.05);
+}
+
+/* Task Progress Summary Title */
+.title {
+    margin-left: 35px;
+    margin-top: 10px;
+    font-size: 20px;
+    padding-bottom: 10px;
+    color: #0056b3;
+    letter-spacing: 1.2px;
+    border-bottom: 2px solid #0056b3;
+}
+
+
+/* General styling for the progress bar container */
+.progress-bar-container {
+    margin: 30px 20px; /* Space between progress bar containers */
+    background-color: #e0cdf6; /* Background color for the container */
+    border-radius: 20px; /* Rounded corners */
+    padding: 20px; /* Padding inside the container */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-right : 35px;
+    margin-left : 30px;
+}
+
+/* Label styling */
+.progress-bar-container label {
+    font-size: 24px; /* Font size for the label */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #333; /* Dark color for the label */
+    margin-bottom: 12px; /* Space between label and progress bar */
+}
+
+/* Progress bar styling */
+.progress-bar {
+    height: 22px; /* Height of the progress bar */
+    border-radius: 35px; /* Rounded corners for the progress bar */
+    position: relative; /* Positioning context for the inner progress */
+    background-color: #f0f0f0; /* Default background for empty progress bar */
+}
+
+/* Inner progress styling */
+.progress-bar .progress {
+    height: 100%; /* Full height of the progress bar */
+    transition: width 0.4s ease; /* Smooth transition for width changes */
+}
+
+/* Progress text styling */
+.progress-text {
+    position: absolute; /* Positioning for centering */
+    top: 50%; /* Align vertically at the center */
+    left: 50%; /* Start the text slightly to the right */
+    transform: translateY(-50%); /* Adjust vertical alignment */
+    color: #000; /* Text color */
+    font-size: 18px; /* Font size for the text */
+    font-weight: bold; /* Bold text for emphasis */
+}
+
+/* Progress bar color changes based on status */
+.completed {
+    background-color: #4CAF50; /* Green for Completed */
+}
+
+.in-progress {
+    background-color: #FFC107; /* Gold for In Progress */
+}
+
+.canceled {
+    background-color: #FF6347; /* Red for Canceled */
+}
+
+.overdue {
+    background-color: crimson; /* Crimson for Overdue */
 }
 
 /* ----------------   Dashboard Ends    ---------------- */
