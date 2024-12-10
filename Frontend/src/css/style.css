@@ -97,7 +97,7 @@ body {
     border-bottom: 15px solid rgba(113, 99, 186, 255);
     position: fixed;
     width: calc(100% - 300px);
-    z-index: 1000; /* Ensures it stays on top */
+    z-index: 1000;
 }
 
 #interface .navigation .search {
@@ -114,6 +114,7 @@ body {
     border: none;
     outline: none;
     cursor: pointer;
+    padding-left: 15px;
     background-color: #f4dbfb;
     font-family: 'Times New Roman', Times, serif;
 }
@@ -146,10 +147,11 @@ body {
     border-radius: 50%;
 }
 
-#interface h4 {
-    margin-left: 40px;
-    margin-top: 10px;
-    font-size: 19px;
+#interface .title {
+    margin-left: 35px;
+    margin-top: 25px;
+    font-size: 20px;
+    padding-bottom: 10px;
     color: #0056b3;
     letter-spacing: 1.2px;
     border-bottom: 2px solid #0056b3;
@@ -229,7 +231,7 @@ body {
 #notification-icon {
     cursor: pointer;
     font-size: 34px;
-    margin-right: 35px;
+    margin-right: 40px;
     position: relative;
     margin-top: 5px;
 }
@@ -259,7 +261,7 @@ body {
 
 .i-name {
     color: #030304;
-    padding: 50px 30px 0 40px;
+    padding: 50px 30px 0 35px;
     font-size: 37px;
     font-weight: 700;
     margin-top: 75px;
@@ -268,32 +270,32 @@ body {
 /* -------------- Interface Section Ends -------------- */
 
 .parent-container {
-    display: flex; /* Use flexbox to align children */
-    justify-content: center; /* Center items horizontally */
-    align-items: flex-start; /* Align items at the start vertically */
-    margin: 30px auto; /* Center the parent container itself */
-    max-width: 1000px; /* Optional: Set a max width for the parent container */
-    gap: 30px; /* Add gap between child elements */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 30px auto;
+    max-width: 1000px;
+    gap: 30px;
 }
 
 .task-summary {
-    display: flex; /* Use flexbox to center content */
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     width: 450px; /* Ensure consistent width */
     min-height: 335px; /* Allow the calendar to expand for extra rows */
     margin: 17px;
-    padding: 30px; /* Adjust padding to fit content without altering size */
+    padding: 30px;
     font-size: 27px;
     line-height: 1.5;
     font-weight: bold;
-    text-align: center; /* Center text */
+    text-align: center;
     border-radius: 15px;
     background: #e0cdf6;
     border: 1px solid #ddd;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box; /* Include padding in width/height */
+    box-sizing: border-box;
 }
 
 .task-count {
@@ -305,18 +307,18 @@ body {
 .container {
     flex: 1; /* Allow the container to grow */
     margin: 17px;
-    max-width: 450px; /* Ensure consistent width */
-    min-width: 350px; /* Ensure minimum width */
+    max-width: 450px;
+    min-width: 350px;
 }
 
 .calendar {
     width: 450px; /* Match task-summary width */
     min-height: 330px; /* Allow the calendar to expand for extra rows */
     padding: 15px;
-    border-radius: 15px; /* Match task-summary border-radius */
+    border-radius: 15px;
     background-color: #f1f1fb;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box; /* Include padding in width/height */
+    box-sizing: border-box;
 }
 
 .calendar .header {
@@ -527,17 +529,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Task Progress Summary Title */
-.title {
-    margin-left: 35px;
-    margin-top: 10px;
-    font-size: 20px;
-    padding-bottom: 10px;
-    color: #0056b3;
-    letter-spacing: 1.2px;
-    border-bottom: 2px solid #0056b3;
-}
-
 
 /* General styling for the progress bar container */
 .progress-bar-container {
@@ -601,95 +592,6 @@ body {
 }
 
 /* ----------------   Dashboard Ends    ---------------- */
-
-
-
-/* ------------ Responsive Section Starts -------------- */
-
-@media (max-width:769px) {
-    #menu {
-        width: 270px;
-        left: -270px;
-        position: fixed;
-        transition: 0.5s ease;
-    }
-
-    #menu.active {
-        left: 0px;
-    }
-
-    #menu-btn {
-        display: initial;
-    }
-
-    #interface {
-        width: 100%;
-        margin-left: 0px;
-        display: inline-block;
-        transition: 0.5s ease;
-    }
-
-    #menu.active~#interface {
-        width: calc(100% - 270px);
-        margin-left: 270px;
-        transition: 0.5s ease;
-    }
-
-    #interface .navigation {
-        width: 100%;
-    }
-
-    .values {
-        padding: 30px 30px 0 30px;
-        justify-content: flex-start;
-    }
-
-    .values .val-box {
-        padding: 30px 40px;
-        margin: 10px 20px 10px 0;
-    }
-
-    .board {
-        width: 92%;
-        padding: 0;
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-}
-
-@media (max-width:477px) {
-    #interface .navigation {
-        padding: 15px;
-    }
-
-    #interface .navigation .search input {
-        width: 150px;
-    }
-
-    .i-name {
-        padding: 30px 15px 0 15px;
-    }
-
-    .values {
-        padding: 15px 15px 0 15px;
-    }
-
-    .values .val-box {
-        width: 100%;
-        margin: 8px 0;
-    }
-
-    .board {
-        margin: 30px 15px 30px 15px;
-    }
-}
-
-/* ------------ Responsive Section Ends -------------- */
-
 
 
 /* --------------  Task Section Starts --------------- */
@@ -783,7 +685,7 @@ label {
 /* ********** tabular section starts ******** */
 
 .tabular--wrapper {
-    background: #fff;
+    background-color: #f4e0fc;
     padding: 1rem;
     position: relative;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -793,6 +695,15 @@ label {
     margin-left: 4px;
     margin-bottom: 10px;
     display: inline-block;
+}
+
+.main--title {
+    margin-left: 20px;
+    font-size: 24px;
+    padding-bottom: 10px;
+    color: #0056b3;
+    letter-spacing: 1.2px;
+    border-bottom: 2px solid #0056b3;
 }
 
 .table-container {
@@ -924,9 +835,9 @@ tfoot td {
 
 /********* Styling for task items within the modal ************/
 #taskList {
-    max-height: 60vh; /* Set a max height for the task list */
-    overflow-y: auto; /* Enable vertical scrolling */
-    padding-right: 10px; /* Add padding to prevent scroll bar overlap */
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .modal-content h2 {
@@ -966,7 +877,7 @@ tfoot td {
     border: none;
     cursor: pointer;
     border-radius: 5px;
-    width: 45%; /* Ensure buttons have equal width */
+    width: 45%;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
@@ -994,7 +905,7 @@ tfoot td {
 
 label {
     display: block;
-    margin-bottom: 7px; /* Space between label and input */
+    margin-bottom: 7px;
     font-weight: bold;
 }
 
@@ -1098,3 +1009,462 @@ label {
 #closeRetrieveModal:hover {
     transform: scale(1.05);
 }
+
+.loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+/* -------------- Dark Mode Section Starts -------------- */
+
+/* Dark Mode Button Styles */
+.dark-mode-btn {
+    background-color: rgba(113, 99, 186, 255);
+    color: white;
+    font-size: 14px;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin-right: 35px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.dark-mode-btn:hover {
+    background-color: #9f6baf;
+    color: #333;
+    transform: scale(1.1);
+}
+
+.dark-mode-btn:active {
+    transform: scale(1.05);
+}
+
+body.dark-mode #menu {
+    background-color: black;
+}
+
+body.dark-mode #menu .logo h2 {
+    color: white;
+}
+
+body.dark-mode #menu .items .menu-list li a {
+    color: white;
+}
+
+body.dark-mode #menu .items .menu-list li a:hover {
+    color: white;
+}
+
+#menu .items .menu-list li a:hover {
+    background-color: #333;
+}
+
+body.dark-mode {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode .dark-mode-btn {
+    background-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .dark-mode-btn:hover {
+    background-color: #777;
+    color: white;
+}
+
+body.dark-mode #interface .navigation {
+    background-color: black;
+    border-bottom: 15px solid #424242;
+}
+
+body.dark-mode #interface .navigation .search {
+    border-color: #555;
+}
+
+body.dark-mode #interface .navigation .search input {
+    background-color: #333;
+    color: #e0e0e0;
+}
+
+/* Notification Dropdown Adjustments */
+body.dark-mode .notification-dropdown {
+    background-color: #222;
+    border-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .notification-dropdown h5 {
+    background-color: black;
+    color: white;
+}
+
+body.dark-mode .notification-dropdown li {
+    color: #e0e0e0;
+}
+
+body.dark-mode .notification-dropdown li:hover {
+    background-color: #333;
+    transform: scale(1.05);
+}
+
+body.dark-mode .task-summary {
+    background-color: #e0e0e0;
+    color: white;
+}
+
+body.dark-mode .container .calendar {
+    background-color: #e0e0e0;
+    color: white;
+}
+
+body.dark-mode .weekdays {
+    color: black;
+}
+
+body.dark-mode .days .day.today {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+body.dark-mode .days .day:not(.next):not(.prev):hover {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+body.dark-mode .calendar .header .btns .btn {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+body.dark-mode .calendar .header .btns .btn:hover {
+    background-color: #333;
+}
+
+body.dark-mode .val-box {
+    background-color: #e0e0e0;
+    color: white;
+}
+
+body.dark-mode .val-box:hover {
+    background-color: #e0e0e0;
+    color: white;
+}
+
+body.dark-mode .progress-bar-container {
+    background-color: #e0e0e0;
+    color: white;
+}
+
+body.dark-mode .task-section {
+    background-color: black;
+    color: #e0e0e0;
+}
+
+body.dark-mode .task-section input[type="text"],
+body.dark-mode .task-section input[type="date"],
+body.dark-mode .task-section select {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+}
+
+/* Modal Background and Overlay */
+body.dark-mode .modal,
+body.dark-mode .modal-overlay {
+    background-color: #1e1e1e;
+}
+
+/* Loading Spinner */
+body.dark-mode .loading-spinner {
+    color: #2591d9;
+}
+
+/* Dark Mode Styles */
+body.dark-mode .tabular--wrapper {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode .table-container {
+    position: relative;
+    z-index: 1;
+}
+
+body.dark-mode .table-container table {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+body.dark-mode .table-container th,
+body.dark-mode .table-container td {
+    border: 1px solid #444;
+    padding: 8px;
+    text-align: left;
+}
+
+body.dark-mode .table-container tbody td {
+    color: #e0e0e0;
+}
+
+.text-black {
+    color: black;
+}
+
+body.dark-mode .main--title {
+    color: #fff;
+    border-bottom: 2px solid  #fff;
+}
+
+body.dark-mode .i-name {
+    color: #fff;
+}
+
+body.dark-mode .no-tasks p {
+    color: #fff;
+}
+
+body.dark-mode #interface .title {
+    color: #fff;
+    border-bottom: 2px solid  #fff;
+}
+
+body.dark-mode .modal label {
+    color: black;
+}
+
+body.dark-mode .modal .content h3 {
+    color: black;
+}
+
+body.dark-mode .modal .modal-content h2 {
+    color: black;
+}
+
+body.dark-mode .no-tasks-message {
+    color: black;
+}
+
+#notificationList {
+    color: black;
+}
+
+.no-tasks-message {
+    text-align: center;
+    font-style: italic;
+    color: gray;
+    font-size: 15px;
+}
+
+/* -------------- Dark Mode Section Ends -------------- */
+
+
+
+/* ------------ Responsive Section Starts -------------- */
+
+@media (max-width:769px) {
+    #menu {
+        width: 270px;
+        left: -270px;
+        position: fixed;
+        transition: 0.5s ease;
+    }
+
+    #menu.active {
+        left: 0px;
+    }
+
+    #menu-btn {
+        display: initial;
+    }
+
+    #interface {
+        width: 100%;
+        margin-left: 0px;
+        display: inline-block;
+        transition: 0.5s ease;
+    }
+
+    #menu.active~#interface {
+        width: calc(100% - 270px);
+        margin-left: 270px;
+        transition: 0.5s ease;
+    }
+
+    #interface .navigation {
+        width: 100%;
+    }
+
+    .values {
+        padding: 30px 30px 0 30px;
+        justify-content: flex-start;
+    }
+
+    .values .val-box {
+        padding: 30px 40px;
+        margin: 10px 20px 10px 0;
+    }
+
+    .board {
+        width: 92%;
+        padding: 0;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .parent-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .task-summary {
+        width: 100%;
+        max-width: 400px;
+        margin-left: 80px;
+        margin-right: auto;
+    }
+
+    .calendar {
+        width: 100%;
+        max-width: 400px;
+        margin-left: 60px;
+        margin-right: auto;
+    }
+
+
+    .calendar .header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .calendar .header .btns {
+        justify-content: space-between;
+        gap: 5px;
+        width: 100%;
+    }
+
+    .calendar .header .month {
+        font-size: 18px;
+    }
+
+    .calendar .header .btns .btn {
+        width: 30px;
+        height: 30px;
+        font-size: 10px;
+    }
+
+    .weekdays .day {
+        font-size: 10px;
+    }
+
+    .days .day {
+        font-size: 11px;
+    }
+}
+
+@media (max-width:477px) {
+    #interface .navigation {
+        padding: 15px;
+    }
+
+    #interface .navigation .search input {
+        width: 150px;
+    }
+
+    .i-name {
+        padding: 30px 15px 0 15px;
+    }
+
+    .values {
+        padding: 15px 15px 0 15px;
+    }
+
+    .values .val-box {
+        width: 100%;
+        margin: 8px 0;
+    }
+
+    .board {
+        margin: 30px 15px 30px 15px;
+    }
+
+    .parent-container {
+        flex-direction: column;
+        margin: 20px 1px;
+    }
+
+    .task-summary, .calendar {
+        width: 100%;
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .task-summary {
+        max-width: 50%;
+    }
+
+    .calendar .header {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .calendar .header .btns {
+        justify-content: space-between;
+        gap: 5px;
+        width: 100%;
+    }
+
+    .calendar .header .month {
+        font-size: 16px;
+    }
+
+    .calendar .header .btns .btn {
+        width: 25px;
+        height: 25px;
+        font-size: 10px;
+    }
+
+    .weekdays .day {
+        font-size: 10px;
+    }
+
+    .days .day {
+        font-size: 9px;
+        height: 30px;
+    }
+
+    .days .day:not(.next):not(.prev):hover {
+        font-size: 10px;
+    }
+}
+
+/* ------------ Responsive Section Ends -------------- */

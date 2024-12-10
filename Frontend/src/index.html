@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Manage tasks effectively with TaskFlow, a comprehensive task management app.">
+    <meta name="keywords" content="task management, productivity, projects, TaskFlow">
+
     <title>Task Management App</title>
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- JavaScript -->
     <script src="indexPage.js" defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -22,7 +31,6 @@
         <ul class="menu-list">
             <li><a href="index.html"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
             <li><a href="#"><i class="fa fa-folder-open"></i> Projects</a></li>
-            <li><a href="#"><i class="fa fa-chart-bar"></i> Reports</a></li>
             <li><a href="#"><i class="fa fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </div>
@@ -42,21 +50,29 @@
         </div>
 
         <div class="profile">
+            <!-- Dark Mode Toggle Button -->
+            <button id="darkModeToggle" class="dark-mode-btn" aria-label="Toggle Dark Mode">🌙 Dark Mode</button>
+
+            <!-- Notification Icon -->
             <i class="fa-solid fa-bell" id="notification-icon">
                 <span id="notification-count" class="notification-count">0</span>
             </i>
+
+            <!-- Notification Dropdown -->
             <div class="notification-dropdown" id="notification-dropdown">
                 <h5>Notifications</h5>
                 <ul id="notification-list">
                     <!-- Notifications will be populated here -->
                 </ul>
             </div>
-            <img src="images/image.png" alt="">
+
+            <!-- Profile Image -->
+            <img src="images/image.png" alt="Profile Picture">
         </div>
     </div>
 
     <h3 class="i-name">Dashboard</h3>
-    <h4>Home - Task Report</h4>
+    <h3 class="title">Daily Task Planner & Calendar</h3>
 
     <div class="parent-container">
         <div id="daily-task-container" class="task-summary"></div>
@@ -193,8 +209,8 @@
         <a class="add-button" id="addTaskButton"><i class="fa fa-plus"></i> Add Task </a>
     </div>
 
+    <h3 class="main--title">Task Management Board</h3>
     <div class="tabular--wrapper">
-        <h3 class="main--title">Task Management Board</h3>
         <div class="table-container">
             <button id="retrieveTasksBtn" class="retrieve-button"><i class="fa fa-file-text"></i> List All Tasks</button>
             <button id="completedTasksBtn" class="completed-button"><i class="fa fa-trophy"></i> Completed Tasks</button>
@@ -333,6 +349,11 @@
             <button id="cancelUpdate" class="modal-btn cancel">Cancel</button>
         </div>
     </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
 </div>
 
 <script>

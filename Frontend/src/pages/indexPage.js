@@ -8,14 +8,14 @@ class IndexPage extends BaseClass {
         this.bindClassMethods(
             [
                 "mount", "fetchTasks", "updateTaskCounts", "setupSearch", "performSearch", "renderTasks", "onDeleteTask", "onUpdateTask",
-                "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer",
-                "onGetCompletedTasks", "onGetIncompleteTasks", "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn"
+                "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer", "onGetCompletedTasks",
+                "onGetIncompleteTasks", "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn", "toggleDarkMode"
             ],
             this
         );
 
-        this.toggleNotificationDropdown.bind(this);
         this.dataStore = new DataStore();
+        this.toggleNotificationDropdown.bind(this);
 
         // Calendar variables
         this.daysContainer = document.querySelector(".days");
@@ -37,18 +37,27 @@ class IndexPage extends BaseClass {
      */
     async mount() {
         this.client = new Client();
-        await this.fetchTasks();
+        this.applyDarkModePreference();
         this.setupSearch();
         this.renderAnalytics();
         this.renderCalendar();
+        await this.fetchTasks();
         this.addEventListeners();
     }
 
     /**
-     * Fetch all tasks and update the task counts.
-     */
+    * Fetch all tasks and update the task counts.
+    */
     async fetchTasks() {
+        const spinner = document.getElementById("loadingSpinner"); // Reference the spinner
+
         try {
+            // Show the spinner
+            spinner.style.display = "block";
+
+            // Simulate a delay
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+
             const taskList = await this.client.getAllTasks(); // Fetch all tasks
             this.dataStore.set("tasks", taskList);
 
@@ -79,6 +88,9 @@ class IndexPage extends BaseClass {
             this.renderAnalytics(); // Render analytics
         } catch (error) {
             console.error("Error fetching tasks:", error);
+            this.showMessage("Something went wrong while fetching the tasks. Please try again later..");
+        } finally {
+            spinner.style.display = "none";
         }
     }
 
@@ -95,14 +107,14 @@ class IndexPage extends BaseClass {
 
             if (inProgressTasks.length > 0) {
                 container.innerHTML = `
-                <p>Hello! Mehmet</p>
-                <p>You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today ..</p>
+                <p class="text-black">Hello! Mehmet</p>
+                <p class="text-black">You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today ..</p>
             `;
             } else {
                 container.innerHTML = `
-                <p>Hello! Mehmet</p>
-                <p>You have no tasks today .. </p>
-                <p>Enjoy your day .. 🙂☕</p>
+                <p class="text-black">Hello! Mehmet</p>
+                <p class="text-black">You have no task(s) today .. </p>
+                <p class="text-black">Enjoy your day .. 🙂☕</p>
             `;
             }
         }
@@ -318,11 +330,14 @@ class IndexPage extends BaseClass {
         tableBody.innerHTML = "";
 
         if (taskList.length === 0) {
+            // Check if dark mode is active
+            const isDarkMode = document.body.classList.contains("dark-mode");
+
             // If there are no tasks, display a message in the table
             const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `
-            <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 15px;">
-                All caught up! No tasks for today. 🎉
+            <td colspan="8" style="text-align: center; font-style: italic; color: ${isDarkMode ? 'black' : 'gray'}; font-size: 20px;">
+                All caught up! No tasks for today.. 🎉
             </td>
         `;
             tableBody.appendChild(noDataRow);
@@ -366,24 +381,20 @@ class IndexPage extends BaseClass {
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                <td><h3 class="task-info">${index + 1}</h3></td>
-                <td><h3 class="task-info">${task.title}</h3></td>
-                <td><h3 class="task-info">${task.description}</h3></td>
-                <td><h3 class="task-info">${task.assignedTo}</h3></td>
-                <td style="text-align: center;">
-                    <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;"> ${statusText}</span>
-                </td>
-                <td><h3 class="task-info">${task.priority}</h3></td>
-                <td><h3 class="task-info">${task.taskDueDate}</h3></td>
-                <td>
-                    <button type="button" class="update-btn" data-task-id="${task.taskId}">
-                    <i class="fa fa-pencil-alt"></i> Update
-                    </button>
-                    <button type="button" class="delete-btn" data-task-id="${task.taskId}">
-                    <i class="fa fa-trash"></i> Delete
-                    </button>
-                </td>
-            `;
+                     <td><h3 class="task-info text-black">${index + 1}</h3></td>
+                     <td><h3 class="task-info text-black">${task.title}</h3></td>
+                     <td><h3 class="task-info text-black">${task.description}</h3></td>
+                     <td><h3 class="task-info text-black">${task.assignedTo}</h3></td>
+                     <td style="text-align: center;">
+                         <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;">${statusText}</span>
+                     </td>
+                     <td><h3 class="task-info text-black">${task.priority}</h3></td>
+                     <td><h3 class="task-info text-black">${task.taskDueDate}</h3></td>
+                     <td>
+                          <button type="button" class="update-btn" data-task-id="${task.taskId}"><i class="fa fa-pencil-alt"></i> Update</button>
+                          <button type="button" class="delete-btn" data-task-id="${task.taskId}"><i class="fa fa-trash"></i> Delete</button>
+                     </td>
+                `;
                 tableBody.appendChild(row);
             });
         }
@@ -484,6 +495,12 @@ class IndexPage extends BaseClass {
             });
         }
 
+        // Add listener for Dark Mode toggle button
+        const darkModeToggle = document.getElementById("darkModeToggle");
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener("click", this.toggleDarkMode);
+        }
+
         // Add calendar navigation listeners
         const nextBtn = document.querySelector(".next-btn");
         const prevBtn = document.querySelector(".prev-btn");
@@ -513,6 +530,48 @@ class IndexPage extends BaseClass {
                 notificationDropdown.classList.remove("active");
             }
         });
+    }
+
+    /**
+     * Apply the saved dark mode preference
+     */
+    applyDarkModePreference() {
+        const isDarkMode = localStorage.getItem("darkMode") === "true";
+        const body = document.body;
+
+        if (isDarkMode) {
+            body.classList.add("dark-mode");
+        } else {
+            body.classList.remove("dark-mode");
+        }
+
+        // Update button text
+        const darkModeToggle = document.getElementById("darkModeToggle");
+        if (darkModeToggle) {
+            darkModeToggle.textContent = isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode";
+        }
+    }
+
+    /**
+     * Toggle Dark Mode
+     */
+    toggleDarkMode() {
+        const body = document.body;
+        const isDarkMode = body.classList.toggle("dark-mode");
+
+        // Update button text
+        const darkModeToggle = document.getElementById("darkModeToggle");
+        darkModeToggle.textContent = isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode";
+
+        // Show appropriate message
+        if (isDarkMode) {
+            this.showMessage("Dark Mode is on");
+        } else {
+            this.showMessage("Light Mode is on");
+        }
+
+        // Save dark mode preference in localStorage
+        localStorage.setItem("darkMode", isDarkMode);
     }
 
     // Generate notifications based on task statuses
@@ -645,6 +704,8 @@ class IndexPage extends BaseClass {
     // Method to handle task submission
     async handleSubmitTask() {
         try {
+            this.loadingSpinner(true);
+
             // Retrieve task details from input fields
             const taskName = document.getElementById("addTaskTitle").value;
             const taskDescription = document.getElementById("addTaskDescription").value;
@@ -683,7 +744,9 @@ class IndexPage extends BaseClass {
             await this.fetchTasks();
         } catch (error) {
             console.error("Error creating task:", error);
-            this.showMessage("There was an error creating the task.");
+            this.showMessage("Something went wrong while creating the task. Please try again later..");
+        } finally {
+            this.loadingSpinner(false);
         }
     }
 
@@ -712,15 +775,18 @@ class IndexPage extends BaseClass {
         confirmBtn.addEventListener("click", async () => {
             this.closeModal(modal, overlay);
             try {
+                this.loadingSpinner(true);
                 this.showMessage("Deleting task, Please wait...");
                 await this.client.deleteTask(taskId); // Call API to delete task
                 await this.fetchTasks(); // Re-fetch tasks after deletion
                 this.showMessage("Task successfully deleted!");
             } catch (error) {
-                this.showMessage("Error deleting task. Please try again.");
+                this.showMessage("Something went wrong while deleting the task. Please try again later..");
                 console.error("Error deleting task:", error);
+            } finally {
+                this.loadingSpinner(false);
+                this.closeModal(modal, overlay);
             }
-            this.closeModal(modal, overlay);
         });
 
         // Event listener for cancellation
@@ -793,6 +859,7 @@ class IndexPage extends BaseClass {
         };
 
         try {
+            this.loadingSpinner(true);
             this.showMessage("Updating task, Please wait...");
             await this.client.updateTask(taskId, updatedTask); // Call API to update task
             await this.fetchTasks(); // Re-fetch tasks after update
@@ -805,7 +872,9 @@ class IndexPage extends BaseClass {
                 document.getElementById("modalOverlay")
             );
         } catch (error) {
-            console.error("Error updating task:", error);
+            console.error("Something went wrong while updating the task. Please try again later..");
+        } finally {
+            this.loadingSpinner(false);
         }
     }
 
@@ -858,7 +927,7 @@ class IndexPage extends BaseClass {
             const retrieveTasksModal = document.getElementById("retrieveTasksModal");
             retrieveTasksModal.style.display = "flex";
         } catch (error) {
-            this.showMessage("There was an error retrieving tasks.");
+            this.showMessage("Something went wrong while retrieving the tasks. Please try again later..");
             console.error("Error fetching tasks:", error);
         }
     }
@@ -912,7 +981,7 @@ class IndexPage extends BaseClass {
             const retrieveTasksModal = document.getElementById("retrieveTasksModal");
             retrieveTasksModal.style.display = "flex";
         } catch (error) {
-            this.showMessage("There was an error retrieving completed tasks.");
+            this.showMessage("Something went wrong while retrieving completed tasks.");
             console.error("Error fetching completed tasks:", error);
         }
     }
@@ -961,7 +1030,7 @@ class IndexPage extends BaseClass {
             const retrieveTasksModal = document.getElementById("retrieveTasksModal");
             retrieveTasksModal.style.display = "flex";
         } catch (error) {
-            this.showMessage("There was an error retrieving incomplete tasks.");
+            this.showMessage("Something went wrong while retrieving incomplete tasks.");
             console.error("Error fetching incomplete tasks:", error);
         }
     }
@@ -990,6 +1059,15 @@ class IndexPage extends BaseClass {
         modal.style.display = "none";
         overlay.style.display = "none";
     }
+
+    loadingSpinner(show) {
+        const spinner = document.getElementById("loadingSpinner");
+        if (show) {
+            spinner.style.display = "block";
+        } else {
+            spinner.style.display = "none";
+        }
+    }
 }
 
 /**
@@ -1007,6 +1085,7 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("updateTaskModal").style.display = "none";
     document.getElementById("addTaskModal").style.display = "none";
     document.getElementById("retrieveTasksModal").style.display = "none";
+    document.getElementById("loadingSpinner").style.display = "none";
 });
 
 window.addEventListener("DOMContentLoaded", main);
