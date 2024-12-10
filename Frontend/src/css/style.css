@@ -532,10 +532,10 @@ body {
 
 /* General styling for the progress bar container */
 .progress-bar-container {
-    margin: 30px 20px; /* Space between progress bar containers */
+    margin: 20px 20px; /* Space between progress bar containers */
     background-color: #e0cdf6; /* Background color for the container */
     border-radius: 20px; /* Rounded corners */
-    padding: 20px; /* Padding inside the container */
+    padding: 15px; /* Padding inside the container */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     margin-right : 35px;
     margin-left : 30px;
@@ -546,13 +546,13 @@ body {
     font-size: 24px; /* Font size for the label */
     font-weight: bold; /* Bold text for emphasis */
     color: #333; /* Dark color for the label */
-    margin-bottom: 12px; /* Space between label and progress bar */
+    margin-bottom: 8px; /* Space between label and progress bar */
 }
 
 /* Progress bar styling */
 .progress-bar {
-    height: 22px; /* Height of the progress bar */
-    border-radius: 35px; /* Rounded corners for the progress bar */
+    height: 21px; /* Height of the progress bar */
+    border-radius: 30px; /* Rounded corners for the progress bar */
     position: relative; /* Positioning context for the inner progress */
     background-color: #f0f0f0; /* Default background for empty progress bar */
 }
@@ -570,7 +570,7 @@ body {
     left: 50%; /* Start the text slightly to the right */
     transform: translateY(-50%); /* Adjust vertical alignment */
     color: #000; /* Text color */
-    font-size: 18px; /* Font size for the text */
+    font-size: 17px; /* Font size for the text */
     font-weight: bold; /* Bold text for emphasis */
 }
 
@@ -580,15 +580,15 @@ body {
 }
 
 .in-progress {
-    background-color: #FFC107; /* Gold for In Progress */
+    background-color: #faa60e; /* Gold for In Progress */
 }
 
 .canceled {
-    background-color: #FF6347; /* Red for Canceled */
+    background-color: #FF6347; /* Orange for Canceled */
 }
 
 .overdue {
-    background-color: crimson; /* Crimson for Overdue */
+    background-color: #d01339; /* Red for Overdue */
 }
 
 /* ----------------   Dashboard Ends    ---------------- */
@@ -1010,6 +1010,8 @@ label {
     transform: scale(1.05);
 }
 
+/***************** Loading Spinner ***************/
+
 .loading-spinner {
     position: fixed;
     top: 50%;
@@ -1249,6 +1251,7 @@ body.dark-mode .no-tasks p {
 
 body.dark-mode #interface .title {
     color: #fff;
+    margin-bottom: 25px;
     border-bottom: 2px solid  #fff;
 }
 
@@ -1268,6 +1271,23 @@ body.dark-mode .no-tasks-message {
     color: black;
 }
 
+body.dark-mode .chart-container {
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode #myChart {
+    max-width: 700px;
+    max-height: 350px;
+    height: auto;
+    margin: 0 auto;
+    background-color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 #notificationList {
     color: black;
 }
@@ -1281,7 +1301,20 @@ body.dark-mode .no-tasks-message {
 
 /* -------------- Dark Mode Section Ends -------------- */
 
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    padding: 20px;
+}
 
+#myChart {
+    max-width: 700px; /* Set a maximum width */
+    max-height: 350px; /* Set a maximum height for the canvas */
+    height: auto;
+    margin: 0 auto;
+}
 
 /* ------------ Responsive Section Starts -------------- */
 

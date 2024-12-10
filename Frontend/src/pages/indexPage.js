@@ -7,7 +7,7 @@ class IndexPage extends BaseClass {
         super();
         this.bindClassMethods(
             [
-                "mount", "fetchTasks", "updateTaskCounts", "setupSearch", "performSearch", "renderTasks", "onDeleteTask", "onUpdateTask",
+                "mount", "fetchTasks", "updateTaskCounts", "setupSearch", "performSearch", "renderTasks", "onDeleteTask", "onUpdateTask", "initializeChart",
                 "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer", "onGetCompletedTasks",
                 "onGetIncompleteTasks", "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn", "toggleDarkMode"
             ],
@@ -42,6 +42,7 @@ class IndexPage extends BaseClass {
         this.renderAnalytics();
         this.renderCalendar();
         await this.fetchTasks();
+        this.initializeChart();
         this.addEventListeners();
     }
 
@@ -73,12 +74,20 @@ class IndexPage extends BaseClass {
             const totalTasks = taskList.length;
             const completedTasks = taskList.filter((task) => task.status === "Completed").length;
             const incompleteTasks = taskList.filter((task) => task.status === "Incomplete").length;
+            const inProgressTasks = taskList.filter((task) => task.status === "In Progress").length;
+            const canceledTasks = taskList.filter((task) => task.status === "Canceled").length;
+            const inReviewTasks = taskList.filter((task) => task.status === "In Review").length;
+            const pendingTasks = taskList.filter((task) => task.status === "Pending").length;
 
             // Save analytics data in DataStore
             this.dataStore.set("analytics", {
                 totalTasks,
                 completedTasks,
                 incompleteTasks,
+                inProgressTasks,
+                canceledTasks,
+                inReviewTasks,
+                pendingTasks
             });
 
             this.updateDailyTaskContainer(dailyTasks); // Update the daily task container
@@ -186,10 +195,39 @@ class IndexPage extends BaseClass {
             overdueBar.querySelector(".progress-text").textContent = "0%";
             overdueBar.classList.add("default");
         } else {
-            const completedPercentage = Math.round((completedCount / totalTasks) * 100);
-            const inProgressPercentage = Math.round((inProgressCount / totalTasks) * 100);
-            const canceledPercentage = Math.round((canceledCount / totalTasks) * 100);
-            const overduePercentage = Math.round((overdueCount / totalTasks) * 100);
+            let completedPercentage = (completedCount / totalTasks) * 100;
+            let inProgressPercentage = (inProgressCount / totalTasks) * 100;
+            let canceledPercentage = (canceledCount / totalTasks) * 100;
+            let overduePercentage = (overdueCount / totalTasks) * 100;
+
+            // Round percentages to one decimal place
+            completedPercentage = parseFloat(completedPercentage.toFixed(1));
+            inProgressPercentage = parseFloat(inProgressPercentage.toFixed(1));
+            canceledPercentage = parseFloat(canceledPercentage.toFixed(1));
+            overduePercentage = parseFloat(overduePercentage.toFixed(1));
+
+            // Calculate the total of the rounded percentages
+            const totalPercentage = completedPercentage + inProgressPercentage + canceledPercentage + overduePercentage;
+
+            const adjustment = 100 - totalPercentage;
+
+            if (adjustment !== 0) {
+                // Adjust the last percentage based on the counts
+                if (overdueCount > 0) {
+                    overduePercentage += adjustment;
+                } else if (canceledCount > 0) {
+                    canceledPercentage += adjustment;
+                } else if (inProgressCount > 0) {
+                    inProgressPercentage += adjustment;
+                } else {
+                    completedPercentage += adjustment;
+                }
+            }
+
+            completedPercentage = parseFloat(completedPercentage.toFixed(1));
+            inProgressPercentage = parseFloat(inProgressPercentage.toFixed(1));
+            canceledPercentage = parseFloat(canceledPercentage.toFixed(1));
+            overduePercentage = parseFloat(overduePercentage.toFixed(1));
 
             completedBar.style.width = `${completedPercentage}%`;
             completedBar.querySelector(".progress-text").textContent = `${completedPercentage}%`;
@@ -209,6 +247,144 @@ class IndexPage extends BaseClass {
         }
     }
 
+    initializeChart() {
+        const analytics = this.dataStore.get("analytics");
+
+        if (!analytics) {
+            console.error("Analytics data is not available.");
+            return;
+        }
+
+        // Prepare the task data
+        const taskData = [
+            { label: 'Completed', value: analytics.completedTasks || 0, color: '#90ee90' },
+            { label: 'In Progress', value: analytics.inProgressTasks || 0, color: '#ffd700' },
+            { label: 'Canceled', value: analytics.canceledTasks || 0, color: '#FF6347' },
+            { label: 'In Review', value: analytics.inReviewTasks || 0, color: '#6cace4' },
+            { label: 'Pending', value: analytics.pendingTasks || 0, color: '#808080' }
+        ];
+
+        // Filter out tasks with a value of 0
+        const filteredTasks = taskData.filter(task => task.value > 0);
+
+        // Extract the labels, data, and colors for the chart
+        const labels = filteredTasks.map(task => task.label);
+        const data = filteredTasks.map(task => task.value);
+        const backgroundColors = filteredTasks.map(task => task.color);
+
+        // Check if there's any data to display
+        if (data.length === 0) {
+            console.warn("No tasks to display on the chart.");
+            return;
+        }
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+
+        const chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const taskType = tooltipItem.label;
+                                const taskCount = tooltipItem.raw;
+                                const total = tooltipItem.dataset.data.reduce((acc, val) => acc + val, 0);
+                                const percentage = ((taskCount / total) * 100).toFixed(1);
+                                const totalPercentage = 100;
+                                return `${taskType}: ${taskCount} tasks (${percentage}% of ${totalPercentage}%)`;
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Task Completion Overview',
+                        font: {
+                            size: 20,
+                            family: 'Arial, Helvetica, sans-serif',
+                            weight: 'bold'
+                        }
+                    },
+                    subtitle: {
+                        display: true,
+                        text: 'Visual representation of task completion status',
+                        font: {
+                            size: 14,
+                            family: 'Arial, Helvetica, sans-serif',
+                            style: 'italic'
+                        },
+                        padding: {
+                            top: 5,
+                            bottom: 10
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1750,
+                    easing: 'easeInOutQuint',
+                }
+            },
+            plugins: [
+                // Custom Plugin for Center Text
+                {
+                    id: 'centerLabel',
+                    beforeDraw: function (chart) {
+                        const { ctx, width, height } = chart;
+                        const total = chart.data.datasets[0].data.reduce((acc, val) => acc + val, 0);
+                        const text = `Total: ${total} tasks`;
+                        ctx.save();
+                        ctx.fillText(text, width / 2, height / 2);
+                        ctx.restore();
+                    }
+                },
+                // Plugin to Display Percentages Inside Segments
+                {
+                    id: 'percentageLabels',
+                    afterDatasetsDraw: function (chart) {
+                        const { ctx, data } = chart;
+                        const total = data.datasets[0].data.reduce((acc, val) => acc + val, 0);
+
+                        if (total === 0) return;
+
+                        let percentages = data.datasets[0].data.map(value => ((value / total) * 100).toFixed(1));
+                        const sumOfPercentages = percentages.reduce((acc, val) => acc + parseFloat(val), 0);
+
+                        if (sumOfPercentages !== 100) {
+                            const difference = 100 - sumOfPercentages;
+                            percentages[percentages.length - 1] = (parseFloat(percentages[percentages.length - 1]) + difference).toFixed(1);
+                        }
+
+                        data.datasets[0].data.forEach((value, index) => {
+                            const { x, y } = chart.getDatasetMeta(0).data[index].tooltipPosition();
+
+                            ctx.save();
+                            ctx.font = '14px sans-serif';
+                            ctx.fillStyle = 'black';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(`${percentages[index]}%`, x, y);
+                            ctx.restore();
+                        });
+                    }
+                }
+            ]
+        });
+    }
 
     /**
     * Render the calendar in the UI by dynamically generating the days of the current month,
