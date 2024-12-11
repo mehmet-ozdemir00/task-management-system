@@ -50,7 +50,11 @@ class IndexPage extends BaseClass {
     * Fetch all tasks and update the task counts.
     */
     async fetchTasks() {
-        const spinner = document.getElementById("loadingSpinner"); // Reference the spinner
+        const chart = document.getElementById("myChart");
+        const spinner = document.getElementById("loadingSpinner");
+        const noDataMessage = document.getElementById("no-data-message");
+
+        noDataMessage.style.display = "none";
 
         try {
             // Show the spinner
@@ -90,11 +94,21 @@ class IndexPage extends BaseClass {
                 pendingTasks
             });
 
+            // Update UI components
             this.updateDailyTaskContainer(dailyTasks); // Update the daily task container
             this.generateNotifications(taskList); // Generate notifications for tasks
             this.updateTaskCounts(taskList); // Update task counts based on the fetched tasks
             this.renderTasks(taskList); // Call renderTasks to display tasks in the table
             this.renderAnalytics(); // Render analytics
+
+            // Handle chart visibility based on task data
+            if (totalTasks > 0) {
+                chart.style.display = "block";
+                noDataMessage.style.display = "none";
+            } else {
+                chart.style.display = "none";
+                noDataMessage.style.display = "flex";
+            }
         } catch (error) {
             console.error("Error fetching tasks:", error);
             this.showMessage("Something went wrong while fetching the tasks. Please try again later..");
@@ -247,13 +261,12 @@ class IndexPage extends BaseClass {
         }
     }
 
+    /**
+    * Initialize or update the task percentage chart dynamically.
+    * @param {Array} analytics - The analytics of tasks fetched from the server.
+    */
     initializeChart() {
         const analytics = this.dataStore.get("analytics");
-
-        if (!analytics) {
-            console.error("Analytics data is not available.");
-            return;
-        }
 
         // Prepare the task data
         const taskData = [
@@ -272,12 +285,9 @@ class IndexPage extends BaseClass {
         const data = filteredTasks.map(task => task.value);
         const backgroundColors = filteredTasks.map(task => task.color);
 
-        // Check if there's any data to display
-        if (data.length === 0) {
-            console.warn("No tasks to display on the chart.");
-            return;
-        }
-
+        const chartContainer = document.getElementById('chart-container');
+        const canvas = document.getElementById('myChart');
+        const noDataMessage = document.getElementById('no-data-message');
         const ctx = document.getElementById('myChart').getContext('2d');
 
         const chart = new Chart(ctx, {
@@ -313,7 +323,7 @@ class IndexPage extends BaseClass {
                     },
                     title: {
                         display: true,
-                        text: 'Task Completion Overview',
+                        text: 'Task Status Overview',
                         font: {
                             size: 20,
                             family: 'Arial, Helvetica, sans-serif',
@@ -322,7 +332,7 @@ class IndexPage extends BaseClass {
                     },
                     subtitle: {
                         display: true,
-                        text: 'Visual representation of task completion status',
+                        text: 'Visual representation of task status distribution',
                         font: {
                             size: 14,
                             family: 'Arial, Helvetica, sans-serif',
@@ -340,23 +350,11 @@ class IndexPage extends BaseClass {
                 }
             },
             plugins: [
-                // Custom Plugin for Center Text
-                {
-                    id: 'centerLabel',
-                    beforeDraw: function (chart) {
-                        const { ctx, width, height } = chart;
-                        const total = chart.data.datasets[0].data.reduce((acc, val) => acc + val, 0);
-                        const text = `Total: ${total} tasks`;
-                        ctx.save();
-                        ctx.fillText(text, width / 2, height / 2);
-                        ctx.restore();
-                    }
-                },
                 // Plugin to Display Percentages Inside Segments
                 {
                     id: 'percentageLabels',
                     afterDatasetsDraw: function (chart) {
-                        const { ctx, data } = chart;
+                        const { ctx, data, chartArea } = chart;
                         const total = data.datasets[0].data.reduce((acc, val) => acc + val, 0);
 
                         if (total === 0) return;
@@ -369,8 +367,20 @@ class IndexPage extends BaseClass {
                             percentages[percentages.length - 1] = (parseFloat(percentages[percentages.length - 1]) + difference).toFixed(1);
                         }
 
+                        // Loop through the slices and draw the percentage in the center
                         data.datasets[0].data.forEach((value, index) => {
-                            const { x, y } = chart.getDatasetMeta(0).data[index].tooltipPosition();
+                            const isSingleSlice = data.datasets[0].data.length === 1;
+                            const sliceMeta = chart.getDatasetMeta(0).data[index];
+                            let x, y;
+
+                            // If it's a single slice, center the text in the middle of the pie
+                            if (isSingleSlice) {
+                                x = chartArea.left + (chartArea.right - chartArea.left) / 2;
+                                y = chartArea.top + (chartArea.bottom - chartArea.top) / 2;
+                            } else {
+                                // For multiple slices, use the tooltipPosition
+                                ({ x, y } = sliceMeta.tooltipPosition());
+                            }
 
                             ctx.save();
                             ctx.font = '14px sans-serif';
@@ -671,6 +681,15 @@ class IndexPage extends BaseClass {
             });
         }
 
+        // Add listener for Refresh button
+        const refreshButton = document.getElementById("refresh-button");
+        if (refreshButton) {
+            refreshButton.addEventListener("click", () => {
+                this.fetchTasks();
+                this.showMessage("No task data available to display", "info");
+            });
+        }
+
         // Add listener for Dark Mode toggle button
         const darkModeToggle = document.getElementById("darkModeToggle");
         if (darkModeToggle) {
@@ -914,7 +933,7 @@ class IndexPage extends BaseClass {
             await this.client.createTask(newTask);
 
             // After task is created, hide the loading message
-            this.showMessage("Task successfully created!");
+            this.showMessage("Task created successfully!");
 
             // Refresh tasks after task is created
             await this.fetchTasks();
@@ -955,7 +974,7 @@ class IndexPage extends BaseClass {
                 this.showMessage("Deleting task, Please wait...");
                 await this.client.deleteTask(taskId); // Call API to delete task
                 await this.fetchTasks(); // Re-fetch tasks after deletion
-                this.showMessage("Task successfully deleted!");
+                this.showMessage("Task deleted successfully!");
             } catch (error) {
                 this.showMessage("Something went wrong while deleting the task. Please try again later..");
                 console.error("Error deleting task:", error);
@@ -1042,7 +1061,7 @@ class IndexPage extends BaseClass {
             const tasks = this.dataStore.get("tasks");
 
             this.generateNotifications(tasks);
-            this.showMessage(`Task successfully updated!`);
+            this.showMessage("Task updated successfully!");
             this.closeModal(
                 document.getElementById("updateTaskModal"),
                 document.getElementById("modalOverlay")
