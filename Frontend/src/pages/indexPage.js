@@ -8,13 +8,15 @@ class IndexPage extends BaseClass {
         this.bindClassMethods(
             [
                 "mount", "fetchTasks", "updateTaskCounts", "setupSearch", "performSearch", "renderTasks", "onDeleteTask", "onUpdateTask", "initializeChart",
-                "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer", "onGetCompletedTasks",
-                "onGetIncompleteTasks", "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn", "toggleDarkMode"
+                "saveUpdatedTask", "closeModal", "onCreateTask", "renderAnalytics", "onGetAllTasks", "updateDailyTaskContainer", "onGetCompletedTasks", "onGetIncompleteTasks",
+                "renderCalendar", "nextMonth", "prevMonth", "goToToday", "hideTodayBtn", "toggleDarkMode", "changePage", "updatePaginationControls", "attachTaskRowEventListeners"
             ],
             this
         );
 
         this.dataStore = new DataStore();
+        this.currentPage = 1;
+        this.tasksPerPage = 10;
         this.toggleNotificationDropdown.bind(this);
 
         // Calendar variables
@@ -515,6 +517,9 @@ class IndexPage extends BaseClass {
         const tableBody = document.querySelector(".table-container tbody");
         tableBody.innerHTML = "";
 
+        // Sort tasks by taskDueDate
+        taskList.sort((a, b) => new Date(a.taskDueDate) - new Date(b.taskDueDate));
+
         if (taskList.length === 0) {
             // Check if dark mode is active
             const isDarkMode = document.body.classList.contains("dark-mode");
@@ -528,8 +533,12 @@ class IndexPage extends BaseClass {
         `;
             tableBody.appendChild(noDataRow);
         } else {
+            const start = (this.currentPage - 1) * this.tasksPerPage;
+            const end = start + this.tasksPerPage;
+            const tasksToRender = taskList.slice(start, end);
+
             // Render tasks if there are any
-            taskList.forEach((task, index) => {
+            tasksToRender.forEach((task, index) => {
                 let statusColor = "";
                 let statusText = task.status;
 
@@ -583,7 +592,43 @@ class IndexPage extends BaseClass {
                 `;
                 tableBody.appendChild(row);
             });
+            this.attachTaskRowEventListeners();
         }
+        this.updatePaginationControls();
+    }
+
+    updatePaginationControls() {
+        const prevButton = document.getElementById("prev-btn");
+        const nextButton = document.getElementById("next-btn");
+        const pageInfo = document.getElementById("page-info");
+
+        // Calculate total pages and ensure it is at least 1
+        const totalTasks = this.dataStore.get("tasks").length;
+        const totalPages = Math.max(1, Math.ceil(totalTasks / this.tasksPerPage));
+
+        prevButton.disabled = this.currentPage === 1;
+        nextButton.disabled = this.currentPage === totalPages;
+
+        pageInfo.textContent = `Page ${this.currentPage} of ${totalPages}`;
+    }
+
+    changePage(offset) {
+        this.currentPage += offset;
+        this.renderTasks(this.dataStore.get("tasks"));
+    }
+
+    attachTaskRowEventListeners() {
+        // Add listeners for delete buttons
+        const deleteButtons = document.querySelectorAll(".delete-btn");
+        deleteButtons.forEach((button) => {
+            button.addEventListener("click", this.onDeleteTask);
+        });
+
+        // Add listeners for update buttons
+        const updateButtons = document.querySelectorAll(".update-btn");
+        updateButtons.forEach((button) => {
+            button.addEventListener("click", this.onUpdateTask);
+        });
     }
 
     /**
@@ -626,6 +671,14 @@ class IndexPage extends BaseClass {
      * Add event listeners method
      */
     addEventListeners() {
+
+        // Add listener for the pages buttons
+        const prevButton = document.getElementById("prev-btn");
+        const nextButton = document.getElementById("next-btn");
+
+        prevButton.addEventListener("click", () => this.changePage(-1));
+        nextButton.addEventListener("click", () => this.changePage(1));
+
         // Add listener for the notification bell
         const notificationIcon = document.getElementById("notification-icon");
         const notificationDropdown = document.getElementById("notification-dropdown");

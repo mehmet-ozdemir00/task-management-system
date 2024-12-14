@@ -11,6 +11,7 @@ body {
     display: flex;
     position: relative;
     background-color: #f4e0fc;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* -------------- Menu Section Starts -------------- */
@@ -21,36 +22,29 @@ body {
     width: 300px;
     height: 100%;
     position: fixed;
-    background: rgba(113, 99, 186, 255);
+    background: #9f6baf;
 }
 
-#menu .logo {
-    display: flex;
-    align-items: center;
-    padding: 30px 0 0 30px;
-    margin-top: 7px;
-}
-
-.logo h2 {
-    font-size: 40px;
-    font-weight: bold;
-    color: #F3F4F6;
-    margin: 0;
+#menu .logo h2 {
+    padding: 25px;
+    font-size: 55px;
+    margin-top: 15px;
     font-family: 'Lucida Handwriting', cursive;
-}
-
-#menu .items {
-    margin-top: 40px;
+    background: linear-gradient(to right, red, blue, white);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
 #menu .items li {
     padding: 15px 0;
     list-style: none;
-    transition: 0.5s ease;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 #menu .items li:hover {
-    background: #253047;
+    background: #384869;
     cursor: pointer;
 }
 
@@ -64,17 +58,11 @@ body {
     margin: 0 10px 0 25px;
 }
 
-#menu .items li:hover i,
-#menu .items li:hover a {
-    color: #F3F4F6;
-}
-
 #menu .items li a {
     color: #F3F4F6;
-    text-decoration: none;
-    transition: 0.5s ease;
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 700;
+    text-decoration: none;
 }
 
 /* ----------------   Menu Section Ends  ---------------- */
@@ -92,9 +80,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f4dbfb;
+    background-color: #9f6baf;
     padding: 20px 30px;
-    border-bottom: 15px solid rgba(113, 99, 186, 255);
+    border-bottom: 15px solid #d8c3ef;
     position: fixed;
     width: calc(100% - 300px);
     z-index: 1000;
@@ -115,8 +103,13 @@ body {
     outline: none;
     cursor: pointer;
     padding-left: 15px;
-    background-color: #f4dbfb;
+    background-color: #dca5ec;
     font-family: 'Times New Roman', Times, serif;
+}
+
+#interface .navigation .search input::placeholder {
+    color: black;
+    opacity: 1;
 }
 
 #interface .navigation .search i {
@@ -124,14 +117,6 @@ body {
     cursor: pointer;
     font-size: 20px;
     transition: transform 0.5s ease;
-}
-
-#interface .navigation .search i:hover {
-    transform: scale(1.2);
-}
-
-#interface .navigation .search i:active {
-    transform: scale(1.2);
 }
 
 #interface .navigation .profile {
@@ -165,7 +150,6 @@ body {
     top: 87px;
     right: 0;
     background-color: #f4e0fc;
-    border: 1px solid #ddd;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 375px;
     overflow-y: auto;
@@ -179,19 +163,6 @@ body {
 .notification-dropdown.active {
     opacity: 1;
     transform: translateX(0);
-}
-
-.notification-count {
-    display: none;
-    position: absolute;
-    top: -12px;
-    right: -12px;
-    background-color: red;
-    color: white;
-    font-size: 17px;
-    padding: 3px 7px;
-    border-radius: 50%;
-    font-weight: bold;
 }
 
 .notification-dropdown h5 {
@@ -216,16 +187,14 @@ body {
     padding: 10px;
     border-bottom: 1px solid #eee;
     font-size: 15px;
-    color: #333;
     cursor: pointer;
 }
 
 .notification-dropdown li:hover {
+    background-color: rgba(91, 91, 175, 0.5);
+    color: #222;
     transform: scale(1.05);
-}
-
-.notification-dropdown li:last-child {
-    border-bottom: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 #notification-icon {
@@ -241,6 +210,18 @@ body {
     transform: scale(1.05);
 }
 
+.notification-count {
+    display: none;
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background-color: red;
+    color: white;
+    font-size: 17px;
+    padding: 3px 7px;
+    border-radius: 50%;
+    font-weight: bold;
+}
 
 /* -------------- Notification Section Ends -------------- */
 
@@ -260,11 +241,15 @@ body {
 }
 
 .i-name {
-    color: #030304;
     padding: 50px 30px 0 35px;
     font-size: 37px;
     font-weight: 700;
     margin-top: 75px;
+    background: linear-gradient(to right, red, blue, white);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
 /* -------------- Interface Section Ends -------------- */
@@ -283,8 +268,8 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 450px; /* Ensure consistent width */
-    min-height: 335px; /* Allow the calendar to expand for extra rows */
+    width: 450px;
+    min-height: 335px;
     margin: 17px;
     padding: 30px;
     font-size: 27px;
@@ -305,15 +290,11 @@ body {
 /* -------------- Calendar Section Starts -------------- */
 
 .container {
-    flex: 1; /* Allow the container to grow */
+    flex: 1;
     margin: 17px;
-    max-width: 450px;
-    min-width: 350px;
 }
 
 .calendar {
-    width: 450px; /* Match task-summary width */
-    min-height: 330px; /* Allow the calendar to expand for extra rows */
     padding: 15px;
     border-radius: 15px;
     background-color: #f1f1fb;
@@ -353,7 +334,7 @@ body {
     color: #fff;
     font-size: 12px;
     cursor: pointer;
-    background: rgba(113, 99, 186, 255);
+    background: #9f6baf;
     transition: all 0.5s ease;
 }
 
@@ -397,13 +378,13 @@ body {
 
 .days .day:not(.next):not(.prev):hover {
     color: #fff;
-    background: rgba(113, 99, 186, 255);
+    background: #9f6baf;
     transform: scale(1.05);
 }
 
 .days .day.today {
     color: #fff;
-    background: rgba(113, 99, 186, 255);
+    background: #9f6baf;
 }
 
 .days .day.next,
@@ -440,7 +421,7 @@ body {
 }
 
 .values .val-box:hover {
-    transform: translateY(-5px);
+    transform: translateY(5px);
     background-color: #d0b2ff;
 }
 
@@ -489,46 +470,6 @@ body {
     margin-right: 8px;
     font-size: 1em;
 }
-
-.no-tasks {
-    text-align: center;
-    margin-top: 100px;
-}
-
-.no-tasks p {
-    font-size: 22px;
-    font-weight: bold;
-    color: black;
-}
-
-.no-tasks i {
-    font-size: 20px;
-}
-
-.no-tasks .add-task-text {
-    color: #007BFF;
-    cursor:pointer;
-}
-
-.no-tasks .add-button {
-    margin-top: 20px;
-    margin-bottom: 50px;
-    padding: 11px 16px;
-    background-color: #007BFF;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    display: inline-block;
-    font-size: 20px;
-    cursor:pointer;
-    transition: background-color 0.4s ease, transform 0.3s ease;
-}
-
-.no-tasks .add-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
 
 /* General styling for the progress bar container */
 .progress-bar-container {
@@ -591,6 +532,44 @@ body {
     background-color: #d01339; /* Red for Overdue */
 }
 
+.no-tasks {
+    text-align: center;
+    margin-top: 70px;
+}
+
+.no-tasks p {
+    font-size: 23px;
+    font-weight: bold;
+    color: black;
+}
+
+.no-tasks i {
+    font-size: 20px;
+}
+
+.no-tasks .add-task-text {
+    color: #3498db;
+}
+
+.no-tasks .add-button {
+    margin-top: 20px;
+    margin-bottom: 50px;
+    padding: 11px 16px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 17px;
+    cursor:pointer;
+    transition: background-color 0.4s ease, transform 0.3s ease;
+}
+
+.no-tasks .add-button:hover {
+    background-color: #2181c2;
+    transform: scale(1.05);
+}
+
 /* ----------------   Dashboard Ends    ---------------- */
 
 
@@ -635,67 +614,10 @@ label {
     font-family: 'Times New Roman', Times, serif;
 }
 
-.save-button {
-    background-color: #28a745;
-    color: white;
-    font-style: italic;
-}
-
-.cancel-button {
-    background-color: #dc3545;
-    color: white;
-    font-style: italic;
-}
-
-.delete-button {
-    background-color: #0056b3;
-    color: white;
-    font-style: italic;
-}
-
-.save-button:hover {
-    background-color: #218838;
-    transform: scale(1.05);
-}
-
-.cancel-button:hover {
-    background-color: #c82333;
-    transform: scale(1.05);
-}
-
-.delete-button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-.save-button, .cancel-button, .delete-button {
-    font-size: 15px;
-    padding: 12px 19px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Times New Roman', Times, serif;
-    font-weight: bold;
-    transition: background-color 0.5s ease;
-}
-
 /* -----------------   Task Section Ends   ------------------- */
 
 
 /* ********** tabular section starts ******** */
-
-.tabular--wrapper {
-    background-color: #f4e0fc;
-    padding: 1rem;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.tabular--wrapper h3 {
-    margin-left: 4px;
-    margin-bottom: 10px;
-    display: inline-block;
-}
 
 .main--title {
     margin-left: 20px;
@@ -704,6 +626,13 @@ label {
     color: #0056b3;
     letter-spacing: 1.2px;
     border-bottom: 2px solid #0056b3;
+}
+
+.tabular--wrapper {
+    background-color: #f4e0fc;
+    padding: 0.7rem;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .table-container {
@@ -718,7 +647,7 @@ table {
 }
 
 thead {
-    background: rgba(113, 99, 186, 255);
+    background: #9f6baf;
     color: #fff;
 }
 
@@ -738,21 +667,11 @@ th, td {
 }
 
 table td h3 {
-    font-weight: normal;
+    font-weight: 200;
 }
 
-tr:nth-child(even) {
-    background: #fff;
-}
-
-tfoot {
-    background: rgba(113, 99, 186, 255);
-    font-weight: bold;
-    color: #fff;
-}
-
-tfoot td {
-    padding: 15px;
+th {
+    padding: 8px ;
 }
 
 .update-btn {
@@ -765,7 +684,7 @@ tfoot td {
     border-radius: 4px;
     cursor: pointer;
     font-family: 'Times New Roman', Times, serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
@@ -785,7 +704,7 @@ tfoot td {
     border-radius: 4px;
     cursor: pointer;
     font-family: 'Times New Roman', Times, serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
@@ -795,6 +714,78 @@ tfoot td {
     transform: scale(1.05);
 }
 
+.task-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.task-buttons-container button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(113, 99, 186, 255);
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.task-buttons-container button:hover {
+    background-color: #9f6baf;
+    transform: scale(1.05);
+}
+
+.task-buttons-container button:disabled {
+    background: rgba(113, 99, 186, 255);
+    cursor: not-allowed;
+}
+
+.task-buttons-container button:disabled:hover {
+    transform: none;
+}
+
+/* Center buttons between Previous and Next */
+#retrieveTasksBtn,
+#completedTasksBtn,
+#incompleteTasksBtn {
+    margin: 0 5px;
+}
+
+/* Style for Previous and Next */
+#prev-btn {
+    cursor: pointer;
+    margin-right: auto;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#next-btn {
+    cursor: pointer;
+    margin-left: auto;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#prev-btn:hover,
+#next-btn:hover {
+    background-color: #9f6baf;
+    transform: scale(1.05);
+}
+
+#prev-btn:disabled,
+#next-btn:disabled {
+    background: rgba(113, 99, 186, 255);
+    cursor: not-allowed;
+}
+
+.pagination-controls {
+    text-align: center;
+    margin: 15px;
+}
+
+#page-info {
+    font-weight: bold;
+}
 
 /* **************** tabular section ends ****************** */
 
@@ -940,59 +931,6 @@ label {
     color: white;
 }
 
-#retrieveTasksBtn {
-    padding: 10px 10px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-#retrieveTasksBtn:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
-#completedTasksBtn {
-    padding: 10px 10px;
-    margin-bottom: 7px;
-    background-color: #388E3C;
-    color: white;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-#completedTasksBtn:hover {
-    background-color: #388E3C;
-    transform: scale(1.05);
-}
-
-#incompleteTasksBtn {
-    padding: 10px 10px;
-    margin-bottom: 7px;
-    background-color: #FFA500;
-    color: white;
-    text-decoration: none;
-    border: none;
-    border-radius: 5px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-#incompleteTasksBtn:hover {
-    background-color: #FFA500;
-    transform: scale(1.05);
-}
-
 #closeRetrieveModal {
     margin: auto;
     cursor: pointer;
@@ -1044,7 +982,7 @@ label {
     font-size: 14px;
     border: none;
     border-radius: 20px;
-    padding: 8px 15px;
+    padding: 5px 10px;
     cursor: pointer;
     margin-right: 35px;
     font-weight: bold;
@@ -1052,13 +990,28 @@ label {
 }
 
 .dark-mode-btn:hover {
-    background-color: #9f6baf;
     color: #333;
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1), -5px -5px 5px  #e0e0e0;
 }
 
 .dark-mode-btn:active {
     transform: scale(1.05);
+}
+
+body.dark-mode .dark-mode-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1), -5px -5px 5px #e0e0e0;
+}
+
+body.dark-mode .dark-mode-btn {
+    background-color: #555;
+    color: #e0e0e0;
+}
+
+body.dark-mode .dark-mode-btn:hover {
+    background-color: #777;
+    color: white;
 }
 
 body.dark-mode #menu {
@@ -1077,23 +1030,9 @@ body.dark-mode #menu .items .menu-list li a:hover {
     color: white;
 }
 
-#menu .items .menu-list li a:hover {
-    background-color: #333;
-}
-
 body.dark-mode {
     background-color: #1e1e1e;
     color: #e0e0e0;
-}
-
-body.dark-mode .dark-mode-btn {
-    background-color: #555;
-    color: #e0e0e0;
-}
-
-body.dark-mode .dark-mode-btn:hover {
-    background-color: #777;
-    color: white;
 }
 
 body.dark-mode #interface .navigation {
@@ -1108,6 +1047,11 @@ body.dark-mode #interface .navigation .search {
 body.dark-mode #interface .navigation .search input {
     background-color: #333;
     color: #e0e0e0;
+}
+
+body.dark-mode #interface .navigation .search input::placeholder {
+    color: #777;
+    opacity: 1;
 }
 
 /* Notification Dropdown Adjustments */
@@ -1221,14 +1165,12 @@ body.dark-mode .table-container table {
     width: 100%;
 }
 
-body.dark-mode .table-container th,
-body.dark-mode .table-container td {
-    border: 1px solid #444;
-    padding: 8px;
-    text-align: left;
+body.dark-mode .table-container tbody td {
+    color: #e0e0e0;
 }
 
-body.dark-mode .table-container tbody td {
+body.dark-mode thead {
+    background: #555;
     color: #e0e0e0;
 }
 
@@ -1241,6 +1183,66 @@ body.dark-mode .main--title {
     border-bottom: 2px solid  #fff;
 }
 
+/* Dark Mode Styles for Task Buttons */
+body.dark-mode .task-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+body.dark-mode .task-buttons-container button {
+    background: #555;
+    color: #e0e0e0;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+body.dark-mode .task-buttons-container button:hover {
+    background: #777;
+    transform: scale(1.05);
+}
+
+body.dark-mode .task-buttons-container button:disabled {
+    background: #444;
+    cursor: not-allowed;
+}
+
+body.dark-mode .task-buttons-container button:disabled:hover {
+    transform: none;
+}
+
+/* Center buttons between Previous and Next in Dark Mode */
+body.dark-mode #retrieveTasksBtn,
+body.dark-mode #completedTasksBtn,
+body.dark-mode #incompleteTasksBtn {
+    margin: 0 5px;
+}
+
+/* Style for Previous and Next in Dark Mode */
+body.dark-mode #prev-btn {
+    cursor: pointer;
+    margin-right: auto;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+body.dark-mode #next-btn {
+    cursor: pointer;
+    margin-left: auto;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+body.dark-mode #prev-btn:hover,
+body.dark-mode #next-btn:hover {
+    background: #777;
+    transform: scale(1.05);
+}
+
+body.dark-mode #prev-btn:disabled,
+body.dark-mode #next-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+}
+
 body.dark-mode .i-name {
     color: #fff;
 }
@@ -1251,7 +1253,6 @@ body.dark-mode .no-tasks p {
 
 body.dark-mode #interface .title {
     color: #fff;
-    margin-bottom: 25px;
     border-bottom: 2px solid  #fff;
 }
 
@@ -1302,8 +1303,8 @@ body.dark-mode #no-data-message {
 }
 
 #myChart {
-    max-width: 700px; /* Set a maximum width */
-    max-height: 350px; /* Set a maximum height for the canvas */
+    max-width: 700px;
+    max-height: 350px;
     height: auto;
     margin: 0 auto;
     display: none;

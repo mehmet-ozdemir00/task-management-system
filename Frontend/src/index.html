@@ -26,7 +26,7 @@
 <!-- Sidebar -->
 <section id="menu">
     <div class="logo">
-        <h2>~ TaskFlow ~</h2>
+        <h2>TaskFlow</h2>
     </div>
     <div class="items">
         <ul class="menu-list">
@@ -46,7 +46,8 @@
             </div>
             <div class="search">
                 <i class="fa fa-search" id="search-icon"></i>
-                <label for="search-input"></label><input type="text" id="search-input" placeholder="Search..." />
+                <label for="search-input"></label>
+                <input type="text" id="search-input" placeholder="Search..." />
             </div>
         </div>
 
@@ -224,9 +225,13 @@
     <h3 class="main--title">Task Management Board</h3>
     <div class="tabular--wrapper">
         <div class="table-container">
-            <button id="retrieveTasksBtn" class="retrieve-button"><i class="fa fa-file-text"></i> List All Tasks</button>
-            <button id="completedTasksBtn" class="completed-button"><i class="fa fa-trophy"></i> Completed Tasks</button>
-            <button id="incompleteTasksBtn" class="incomplete-button"><i class="fa fa-clipboard-list"></i> Unfinished Tasks</button>
+            <div class="task-buttons-container">
+                <button id="prev-btn" disabled>Previous</button>
+                <button id="retrieveTasksBtn" class="retrieve-button"><i class="fa fa-file-text"></i> List All Tasks</button>
+                <button id="completedTasksBtn" class="completed-button"><i class="fa fa-trophy"></i> Completed Tasks</button>
+                <button id="incompleteTasksBtn" class="incomplete-button"><i class="fa fa-clipboard-list"></i> Unfinished Tasks</button>
+                <button id="next-btn" disabled>Next</button>
+            </div>
             <table>
                 <thead>
                 <tr>
@@ -244,6 +249,9 @@
                 <!-- Task rows will be dynamically populated here -->
                 </tbody>
             </table>
+        </div>
+        <div class="pagination-controls">
+            <span id="page-info">Page 1 of 1</span>
         </div>
     </div>
 </section>
