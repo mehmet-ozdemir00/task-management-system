@@ -132,14 +132,14 @@ class IndexPage extends BaseClass {
 
             if (inProgressTasks.length > 0) {
                 container.innerHTML = `
-                <p class="text-black">Hello! Mehmet</p>
-                <p class="text-black">You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today ..</p>
+                <p class="text">Hello! Mehmet</p>
+                <p class="text">You've got <strong class="task-count">${inProgressTasks.length}</strong> task(s) today..</p>
             `;
             } else {
                 container.innerHTML = `
-                <p class="text-black">Hello! Mehmet</p>
-                <p class="text-black">You have no task(s) today .. </p>
-                <p class="text-black">Enjoy your day .. 🙂☕</p>
+                <p class="text">Hello! Mehmet</p>
+                <p class="text">You have no task(s) today.. </p>
+                <p class="text">Enjoy your day..🙂☕</p>
             `;
             }
         }
@@ -684,8 +684,8 @@ class IndexPage extends BaseClass {
         const notificationDropdown = document.getElementById("notification-dropdown");
 
         if (notificationIcon) {notificationIcon.addEventListener("click", () => {
-                this.toggleNotificationDropdown();
-            });
+            this.toggleNotificationDropdown();
+        });
         }
 
         // Add listener for Add Task button

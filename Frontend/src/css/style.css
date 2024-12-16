@@ -272,7 +272,7 @@ body {
     min-height: 335px;
     margin: 17px;
     padding: 30px;
-    font-size: 27px;
+    font-size: 23px;
     line-height: 1.5;
     font-weight: bold;
     text-align: center;
@@ -285,6 +285,15 @@ body {
 
 .task-count {
     color: red;
+}
+
+.text-black {
+    color: black;
+}
+
+.text {
+    color: black;
+    font-family: 'Courier New', monospace;
 }
 
 /* -------------- Calendar Section Starts -------------- */
@@ -469,6 +478,67 @@ body {
     content: "✔️";
     margin-right: 8px;
     font-size: 1em;
+}
+
+
+.chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    padding: 20px;
+    text-align: center;
+}
+
+#myChart {
+    max-width: 700px;
+    max-height: 350px;
+    height: auto;
+    margin: 0 auto;
+    display: none;
+    background-color: #e0cdf6;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#no-data-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #555;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px;
+    padding: 20px;
+    background-color: #e0cdf6;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#no-data-message i {
+    font-size: 24px;
+    color: #6cace4;
+    margin-bottom: 10px;
+}
+
+#no-data-message button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #6cace4;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#no-data-message button:hover {
+    background-color: #518fc7;
+    transform: scale(1.05);
 }
 
 /* General styling for the progress bar container */
@@ -950,26 +1020,41 @@ label {
 
 /***************** Loading Spinner ***************/
 
+/***************** Updated Glow Loading Spinner ***************/
+
 .loading-spinner {
     position: fixed;
     top: 50%;
-    left: 57%;
+    left: 60%;
     transform: translate(-50%, -50%);
     z-index: 1000;
 }
 
 .spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
-    border-radius: 50%;
     width: 50px;
     height: 50px;
-    animation: spin 1s linear infinite;
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    animation: spin 1.2s linear infinite, glow 1.8s ease-in-out infinite alternate;
 }
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Glow animation */
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 10px #3498db, 0 0 20px #3498db, 0 0 30px #3498db;
+    }
+    50% {
+        box-shadow: 0 0 20px #3498db, 0 0 30px #1abc9c, 0 0 40px #9b59b6;
+    }
+    100% {
+        box-shadow: 0 0 30px #3498db, 0 0 40px #1abc9c, 0 0 50px #9b59b6;
+    }
 }
 
 
@@ -1114,7 +1199,7 @@ body.dark-mode .val-box {
 }
 
 body.dark-mode .val-box:hover {
-    background-color: #e0e0e0;
+    background-color: #c5c4c4;
     color: white;
 }
 
@@ -1170,12 +1255,8 @@ body.dark-mode .table-container tbody td {
 }
 
 body.dark-mode thead {
-    background: #555;
+    background: #1e1e1e;
     color: #e0e0e0;
-}
-
-.text-black {
-    color: black;
 }
 
 body.dark-mode .main--title {
@@ -1184,12 +1265,7 @@ body.dark-mode .main--title {
 }
 
 /* Dark Mode Styles for Task Buttons */
-body.dark-mode .task-buttons-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 10px 0;
-}
+
 
 body.dark-mode .task-buttons-container button {
     background: #555;
@@ -1292,66 +1368,6 @@ body.dark-mode #no-data-message {
 }
 
 /* -------------- Dark Mode Section Ends -------------- */
-
-.chart-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-    padding: 20px;
-    text-align: center;
-}
-
-#myChart {
-    max-width: 700px;
-    max-height: 350px;
-    height: auto;
-    margin: 0 auto;
-    display: none;
-    background-color: #f4dbfb;
-    border: 1px solid #444;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-#no-data-message {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #555;
-    font-size: 18px;
-    font-weight: bold;
-    margin: 20px;
-    padding: 20px;
-    background-color: #e0cdf6;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-#no-data-message i {
-    font-size: 24px;
-    color: #6cace4;
-    margin-bottom: 10px;
-}
-
-#no-data-message button {
-    margin-top: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #6cace4;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#no-data-message button:hover {
-    background-color: #518fc7;
-    transform: scale(1.05);
-}
 
 /* ------------ Responsive Section Starts -------------- */
 
