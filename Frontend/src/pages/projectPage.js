@@ -125,7 +125,7 @@ class ProjectPage extends BaseClass {
 
             // Validate input
             if (!taskName.trim() || !taskDescription.trim() || !assignedTo.trim() || !status || !priority || !taskDueDate) {
-                this.errorHandler("All fields must be filled out with valid information..");
+                this.errorHandler("All fields must be completed with valid information.");
                 return;
             }
 
@@ -134,8 +134,8 @@ class ProjectPage extends BaseClass {
             today.setHours(0, 0, 0, 0);
             const todayString = today.toISOString().split("T")[0];
             if (taskDueDate < todayString) {
-                this.errorHandler("Invalid due date. Please enter a valid future date.");
-                this.showWarning("The due date cannot be in the past.");
+                this.errorHandler("Please enter a valid future due date.");
+                this.showWarning("Due dates cannot be in the past.");
                 return;
             }
 
@@ -151,19 +151,19 @@ class ProjectPage extends BaseClass {
 
             // Close the modal after task creation
             this.closeAddTaskModal();
-            this.showMessage("Creating task, Please wait...");
+            this.showMessage("Creating task, please wait..");
 
             // Make an API call to create the task
             await this.client.createTask(newTask);
 
             // After task is created, hide the loading message
-            this.showMessage("Task created successfully!");
+            this.showMessage("The task has been created.");
 
             // Refresh the task list after task is created
             await this.taskUtility.fetchTasks();
         } catch (error) {
             console.error("Error creating task:", error);
-            this.showMessage("Something went wrong while creating the task. Please try again later..");
+            this.showMessage("Something went wrong while creating the task.. Please try again later!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
@@ -239,7 +239,7 @@ class ProjectPage extends BaseClass {
 
         // Validate input
         if (!updatedTask.title || !updatedTask.description || !updatedTask.assignedTo || !updatedTask.status || !updatedTask.priority || !updatedTask.taskDueDate) {
-            this.errorHandler("All fields must be filled out with valid information.");
+            this.errorHandler("All fields must be completed with valid information.");
             return false;
         }
 
@@ -249,14 +249,14 @@ class ProjectPage extends BaseClass {
         const todayString = today.toISOString().split("T")[0];
 
         if (updatedTask.taskDueDate < todayString) {
-            this.errorHandler("Invalid due date. Please enter a valid future date.");
-            this.showWarning("The due date cannot be in the past.");
+            this.errorHandler("Please enter a valid future due date.");
+            this.showWarning("Due dates cannot be in the past.");
             return false;
         }
 
         try {
             this.taskUtility.loadingSpinner(true);
-            this.showMessage("Updating task, Please wait...");
+            this.showMessage("Updating task, please wait..");
             await this.client.updateTask(taskId, updatedTask); // Call API to update task
             await this.taskUtility.fetchTasks();  // Re-fetch tasks after update
 
@@ -264,11 +264,11 @@ class ProjectPage extends BaseClass {
             const tasks = this.dataStore.get("tasks");
             await this.taskUtility.updateNotifications(tasks);
 
-            this.showMessage("Task updated successfully!");
+            this.showMessage("The task has been updated.");
             return true;
         } catch (error) {
             console.error("Something went wrong while updating the task. Please try again later..");
-            this.showMessage("Something went wrong while updating the task. Please try again later..");
+            this.showMessage("Something went wrong while updating the task.. Please try again later!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
@@ -310,14 +310,14 @@ class ProjectPage extends BaseClass {
             this.closeModal(modal, overlay);
             try {
                 this.taskUtility.loadingSpinner(true);
-                this.showMessage("Deleting task, Please wait...");
+                this.showMessage("Deleting task, please wait..");
                 await this.client.deleteTask(taskId); // Call API to delete task
                 await this.taskUtility.fetchTasks(); // Re-fetch tasks after deletion
 
-                this.showMessage("Task deleted successfully!");
+                this.showMessage("The task has been deleted.");
             } catch (error) {
                 console.error("Error deleting task:", error);
-                this.showMessage("Something went wrong while deleting the task. Please try again later..");
+                this.showMessage("Something went wrong while deleting the task.. Please try again later!");
             } finally {
                 this.closeModal(modal, overlay);
                 this.taskUtility.loadingSpinner(false);
@@ -351,10 +351,10 @@ class ProjectPage extends BaseClass {
             // Update notifications based on the fetched tasks using TaskUtility
             this.taskUtility.updateNotifications(taskList);
 
-            this.showMessage("All tasks successfully retrieved!");
+            this.showMessage("All tasks have been retrieved.");
         } catch (error) {
             console.error("Error fetching tasks:", error);
-            this.showMessage("Something went wrong while retrieving the tasks. Please try again later..");
+            this.showMessage("Something went wrong while retrieving the tasks.. Please try again later!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
@@ -405,10 +405,10 @@ class ProjectPage extends BaseClass {
             // Update notifications based on the fetched tasks
             this.taskUtility.updateNotifications(taskList);
 
-            this.showMessage("Canceled tasks successfully retrieved!");
+            this.showMessage("Canceled tasks have been retrieved.");
         } catch (error) {
             console.error("Error fetching canceled tasks:", error);
-            this.showMessage("Something went wrong while retrieving canceled tasks.");
+            this.showMessage("Something went wrong while retrieving canceled tasks!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
@@ -448,10 +448,10 @@ class ProjectPage extends BaseClass {
             // Update notifications based on the fetched tasks
             await this.taskUtility.updateNotifications(await this.client.getAllTasks());
 
-            this.showMessage("Completed tasks successfully retrieved!");
+            this.showMessage("Completed tasks have been retrieved.");
         } catch (error) {
             console.error("Error fetching completed tasks:", error);
-            this.showMessage("Something went wrong while retrieving completed tasks.");
+            this.showMessage("Something went wrong while retrieving completed tasks!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
@@ -479,7 +479,7 @@ class ProjectPage extends BaseClass {
                 const taskDueDate = new Date(task.taskDueDate);
                 const taskDueDateString = taskDueDate.toISOString().split("T")[0];
                 return taskDueDateString >= todayString &&
-                (task.status === "In Progress" || task.status === "Pending" || task.status === "Canceled");
+                (task.status === "In Progress" || task.status === "Pending");
             });
 
             // Clear the current table rows
@@ -503,10 +503,10 @@ class ProjectPage extends BaseClass {
             // Update notifications based on the fetched tasks
             await this.taskUtility.updateNotifications(await this.client.getAllTasks());
 
-            this.showMessage("Incomplete tasks successfully retrieved!");
+            this.showMessage("Incomplete tasks have been retrieved.");
         } catch (error) {
             console.error("Error fetching incomplete tasks:", error);
-            this.showMessage("Something went wrong while retrieving incomplete tasks.");
+            this.showMessage("Something went wrong while retrieving incomplete tasks!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
@@ -557,10 +557,10 @@ class ProjectPage extends BaseClass {
             // Update notifications based on the fetched tasks
             this.taskUtility.updateNotifications(taskList);
 
-            this.showMessage("Overdue tasks successfully retrieved!");
+            this.showMessage("Overdue tasks have been retrieved.");
         } catch (error) {
             console.error("Error fetching overdue tasks:", error);
-            this.showMessage("Something went wrong while retrieving overdue tasks.");
+            this.showMessage("Something went wrong while retrieving overdue tasks!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }

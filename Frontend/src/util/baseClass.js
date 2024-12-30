@@ -22,13 +22,19 @@ export default class BaseClass {
 
     showMessage(message) {
         Toastify({
-            text: message,
+            text: `<div style="display: flex; align-items: center;">
+                   <i class="fas fa-check-circle" style="color: #217526; font-size: 30px;"></i>
+                   <span style="margin-left: 10px;">
+                       <strong> Success</strong><br>${message}
+                   </span>
+               </div>`,
+            escapeMarkup: false,
             duration: 4500,
             gravity: "top",
             position: 'right',
-            close: true,
+            close: false,
             style: {
-                background: "linear-gradient(135deg, #1D976C 0%, #93F9B9 100%)", // Success green gradient
+                background: "linear-gradient(135deg, #71D88A 0%, #FFFFFF 100%)",
                 color: "#000000",
                 borderRadius: "5px",
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3), 0px 2px 4px rgba(0, 0, 0, 0.5)",
@@ -42,19 +48,25 @@ export default class BaseClass {
                 y: 20
             },
             stopOnFocus: true,
-            className: "toastify-custom-progress success-bar" // Unique class for success
+            className: "toastify-custom-progress success-bar"
         }).showToast();
     }
 
     errorHandler(error) {
         Toastify({
-            text: error,
+            text: `<div style="display: flex; align-items: center;">
+                   <i class="fas fa-times-circle" style="color: #b42209; font-size: 30px;"></i>
+                   <span style="margin-left: 10px;">
+                       <strong> Error</strong><br>${error}
+                   </span>
+               </div>`,
+            escapeMarkup: false,
             duration: 4500,
             gravity: "top",
             position: 'right',
-            close: true,
+            close: false,
             style: {
-                background: "linear-gradient(135deg, #D93D3D 0%, #FF9A9A 100%)", // Error red gradient
+                background: "linear-gradient(135deg, #FF8C8C 0%, #FFFFFF 100%)",
                 color: "#000000",
                 borderRadius: "5px",
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3), 0px 2px 4px rgba(0, 0, 0, 0.5)",
@@ -68,19 +80,25 @@ export default class BaseClass {
                 y: 20
             },
             stopOnFocus: true,
-            className: "toastify-custom-progress error-bar" // Unique class for error
+            className: "toastify-custom-progress error-bar"
         }).showToast();
     }
 
     showWarning(message) {
         Toastify({
-            text: message,
+            text: `<div style="display: flex; align-items: center;">
+                   <i class="fas fa-exclamation-triangle" style="color: #d58001; font-size: 30px;"></i>
+                   <span style="margin-left: 10px;">
+                       <strong> Warning</strong><br>${message}
+                   </span>
+               </div>`,
+            escapeMarkup: false,
             duration: 4500,
             gravity: "top",
             position: 'right',
-            close: true,
+            close: false,
             style: {
-                background: "linear-gradient(135deg, #FFB84D 0%, #FFEB99 100%)", // Warning yellow gradient
+                background: "linear-gradient(135deg, #FFE066 0%, #FFFFFF 100%)",
                 color: "#000000",
                 borderRadius: "5px",
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3), 0px 2px 4px rgba(0, 0, 0, 0.5)",
@@ -94,19 +112,25 @@ export default class BaseClass {
                 y: 20
             },
             stopOnFocus: true,
-            className: "toastify-custom-progress warning-bar" // Unique class for warning
+            className: "toastify-custom-progress warning-bar"
         }).showToast();
     }
 
     showInfo(message) {
         Toastify({
-            text: message,
+            text: `<div style="display: flex; align-items: center;">
+                   <i class="fas fa-info-circle" style="color: #0179c9; font-size: 30px;"></i>
+                   <span style="margin-left: 10px;">
+                       <strong> Info</strong><br>${message}
+                   </span>
+               </div>`,
+            escapeMarkup: false,
             duration: 4500,
             gravity: "top",
             position: 'right',
-            close: true,
+            close: false,
             style: {
-                background: "linear-gradient(135deg, #00A9FF 0%, #75E1FF 100%)", // Info blue gradient
+                background: "linear-gradient(135deg, #B8E4FF 0%, #FFFFFF 100%)",
                 color: "#000000",
                 borderRadius: "5px",
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3), 0px 2px 4px rgba(0, 0, 0, 0.5)",
@@ -120,7 +144,7 @@ export default class BaseClass {
                 y: 20
             },
             stopOnFocus: true,
-            className: "toastify-custom-progress info-bar" // Unique class for info
+            className: "toastify-custom-progress info-bar"
         }).showToast();
     }
 }

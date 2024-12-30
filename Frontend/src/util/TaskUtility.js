@@ -320,17 +320,16 @@ export default class TaskUtility extends BaseClass {
     */
     setupSearch() {
         const searchInput = document.getElementById("search-input");
-        const clearIcon = document.querySelector(".clear"); // Select the clear icon
+        const clearIcon = document.querySelector(".clear");
 
         if (searchInput) {
             searchInput.addEventListener("input", (event) => {
                 this.performSearch(event.target.value);
 
-                // Show or hide the clear icon based on input
                 if (event.target.value.length > 0) {
-                    clearIcon.style.display = "block"; // Show the clear icon
+                    clearIcon.style.display = "block";
                 } else {
-                    clearIcon.style.display = "none"; // Hide the clear icon
+                    clearIcon.style.display = "none";
                 }
             });
         }
@@ -338,9 +337,9 @@ export default class TaskUtility extends BaseClass {
         // Clear the search input when the clear icon is clicked
         if (clearIcon) {
             clearIcon.addEventListener("click", () => {
-                searchInput.value = ""; // Clear the input field
-                clearIcon.style.display = "none"; // Hide the clear icon
-                this.performSearch(""); // Perform search with empty query
+                searchInput.value = "";
+                clearIcon.style.display = "none";
+                this.performSearch("");
             });
         }
     }
@@ -362,12 +361,11 @@ export default class TaskUtility extends BaseClass {
             const filteredTasks = taskList.filter(task => {
                 const taskDueDate = new Date(task.taskDueDate);
                 const taskDueDateString = taskDueDate.toISOString().split("T")[0];
-                const isOverdue = taskDueDateString < todayString; // Check if task is overdue
+                const isOverdue = taskDueDateString < todayString;
 
-                // **Override status dynamically based on overdue condition**
-                let effectiveStatus = task.status; // Use the original status from the database
+                let effectiveStatus = task.status;
                 if (isOverdue && task.status !== "Completed") {
-                    effectiveStatus = "Overdue"; // Dynamically treat overdue tasks as 'Overdue'
+                    effectiveStatus = "Overdue";
                 }
 
                 // Match search query against task properties
@@ -375,7 +373,7 @@ export default class TaskUtility extends BaseClass {
                 task.title.toLowerCase().includes(query.toLowerCase()) ||
                 task.description.toLowerCase().includes(query.toLowerCase()) ||
                 task.assignedTo.toLowerCase().includes(query.toLowerCase()) ||
-                effectiveStatus.toLowerCase().includes(query.toLowerCase()); // Use dynamic status here
+                effectiveStatus.toLowerCase().includes(query.toLowerCase());
 
                 // Handle specific status filters based on query
                 if (query.toLowerCase() === "overdue") {
@@ -395,13 +393,17 @@ export default class TaskUtility extends BaseClass {
                     return task.status === "Pending" && !isOverdue;
                 }
 
-                // General search for other queries
                 return matchesQuery;
             });
 
             // Update task counts and render filtered tasks
             this.updateTaskCounts(filteredTasks);
             this.renderTasks(filteredTasks);
+
+            // Show warning if no tasks found
+            if (filteredTasks.length === 0) {
+                this.showWarning("No tasks found matching your search.");
+            }
         }, 300);
     }
 

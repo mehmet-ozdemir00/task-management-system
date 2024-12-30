@@ -140,7 +140,7 @@ class MainPage extends BaseClass {
 
             // Validate input
             if (!taskName.trim() || !taskDescription.trim() || !assignedTo.trim() || !status || !priority || !taskDueDate) {
-                this.errorHandler("All fields must be filled out with valid information..");
+                this.errorHandler("All fields must be completed with valid information.");
                 return;
             }
 
@@ -149,8 +149,8 @@ class MainPage extends BaseClass {
             today.setHours(0, 0, 0, 0);
             const todayString = today.toISOString().split("T")[0];
             if (taskDueDate < todayString) {
-                this.errorHandler("Invalid due date. Please enter a valid future date.");
-                this.showWarning("The due date cannot be in the past.");
+                this.errorHandler("Please enter a valid future due date.");
+                this.showWarning("Due dates cannot be in the past.");
                 return;
             }
 
@@ -172,13 +172,13 @@ class MainPage extends BaseClass {
             await this.client.createTask(newTask);
 
             // After task is created, hide the loading message
-            this.showMessage("Task created successfully!");
+            this.showMessage("The task has been created.");
 
             // Refresh the task list after task is created
             await this.taskUtility.fetchTasks();
         } catch (error) {
             console.error("Error creating task:", error);
-            this.showMessage("Something went wrong while creating the task. Please try again later..");
+            this.showMessage("Something went wrong while creating the task.. Please try again later!");
         } finally {
             this.taskUtility.loadingSpinner(false);
         }

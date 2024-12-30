@@ -35,7 +35,7 @@ class ReportPage extends BaseClass {
 
         // Handle edge case if dropdown or icon does not exist
         if (!notificationDropdown || !notificationIcon) {
-            this.showWarning("Notification dropdown or icon not found!");
+            this.showWarning("Notification dropdown or icon could not be found.");
             return;
         }
 
@@ -83,7 +83,7 @@ class ReportPage extends BaseClass {
     updateTaskCounts(taskList) {
         // Edge case for empty task list
         if (!taskList || taskList.length === 0) {
-            this.showInfo("No task data available to display", "info");
+            this.showInfo("No task data is available to display.");
 
             // Reset task counts to 0
             const emptyCounts = {
