@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Manage tasks effectively with TaskFlow, a comprehensive task management app.">
+  <meta name="keywords" content="task management, productivity, projects, TaskFlow">
+
+  <title>Task Management App</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="mainPage.js" defer></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<!-- Sidebar and Header combined into one wrapper -->
+<section class="sidebar-header-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="sidebar-title">TaskFlow</h2>
+    <nav class="sidebar-nav">
+      <ul class="sidebar-list">
+        <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
+        <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Projects</a></li>
+        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Reports</a></li>
+        <li><a href="#" class="sidebar-link"><i class="fa fa-fw fa-trash"></i> Trash</a></li>
+        <li><a href="#logout" class="sidebar-link"><i class="fa fa-fw fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Header with Search - Notification and Profile -->
+  <header class="header">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search..." class="search-input">
+      <i class="clear fa fa-times" style="display: none;"></i>
+    </div>
+
+    <!-- Right-side elements (Notification Icon & Profile Image) -->
+    <div class="right-side">
+      <!-- Notification Icon -->
+      <div class="notification-container">
+        <i class="fa-solid fa-bell" id="notification-icon">
+          <span id="notification-count" class="notification-count">0</span>
+        </i>
+      </div>
+
+      <!-- Notification Dropdown -->
+      <div class="notification-dropdown" id="notification-dropdown">
+        <h5>Notifications</h5>
+        <ul id="notification-list">
+          <!-- Notifications will be populated here -->
+        </ul>
+      </div>
+
+      <!-- Profile Image -->
+      <img src="image/image.jpeg" alt="Profile" class="profile-image">
+    </div>
+  </header>
+</section>
+
+<!-- Title Section -->
+<div class="title-section">
+  <h1 class="page-title">Dashboard</h1>
+  <h2 class="page-subtitle">Daily Task Planner</h2>
+</div>
+
+
+<!----- Daily Task Summary Section and Messages Section ------>
+<div class="content-wrapper">
+  <div id="daily-task-summary" class="task-summary"></div>
+  <!-- Tasks will be dynamically populated here -->
+
+  <!-- Messages -->
+  <div class="task-summary">
+    <div>
+      <span> 📩 Messages</span>
+      <ul id="messageList">
+        <!-- Messages will be populated here -->
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Section -->
+<div class="add-tasks">
+  <p>Start adding your Tasks by clicking on the <span class="add-task-text">"Add Task"</span> Button</p>
+  <a class="add-button" id="addTaskButton" href="#" role="button"><i class="fa fa-plus"></i> Add Task </a>
+</div>
+
+<!-- Modal Overlay -->
+<div id="modalOverlay" class="modal-overlay" style="display: none;"></div>
+
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <h2>Create Task</h2>
+
+    <label for="addTaskTitle">Title:</label>
+    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="50" />
+
+    <label for="addTaskDescription">Description:</label>
+    <input type="text" id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="100" />
+
+    <label for="addTaskAssignedTo">Assigned To:</label>
+    <input type="text" id="addTaskAssignedTo" name="assignedTo" placeholder="Enter assignee name..." required />
+
+    <label for="addTaskStatus">Status:</label>
+    <select id="addTaskStatus" name="status" required>
+      <option value="" disabled selected>Select Task Status</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+      <option value="Canceled">Canceled</option>
+      <option value="Pending">Pending</option>
+    </select>
+
+    <label for="addTaskPriority">Priority:</label>
+    <select id="addTaskPriority" name="priority" required>
+      <option value="" disabled selected>Select Task Priority</option>
+      <option value="High">High</option>
+      <option value="Normal">Normal</option>
+      <option value="Low">Low</option>
+    </select>
+
+    <label for="addTaskDueDate">Deadline:</label>
+    <input type="date" id="addTaskDueDate" name="taskDueDate" required />
+
+    <div class="modal-actions">
+      <button id="confirmSubmit" class="modal-btn confirm">Submit</button>
+      <button id="confirmCancel" class="modal-btn cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="loading-spinner" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
+</body>
+</html>

@@ -9,7 +9,9 @@ module.exports = {
     usedExports: true
   },
   entry: {
-    indexPage: path.resolve(__dirname, 'src', 'pages', 'indexPage.js'),
+    mainPage: path.resolve(__dirname, 'src', 'pages', 'mainPage.js'),
+    projectPage: path.resolve(__dirname, 'src', 'pages', 'projectPage.js'),
+    reportPage: path.resolve(__dirname, 'src', 'pages', 'reportPage.js'),
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -31,8 +33,18 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',
+      template: './src/main.html',
       filename: 'index.html',
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/project.html',
+      filename: 'project.html',
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/report.html',
+      filename: 'report.html',
       inject: false
     }),
     new CopyPlugin({
@@ -46,8 +58,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve('src/images'),
-          to: path.resolve("dist/images")
+          from: path.resolve('src/image'),
+          to: path.resolve("dist/image")
         }
       ]
     }),

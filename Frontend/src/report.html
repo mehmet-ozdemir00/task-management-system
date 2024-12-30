@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Manage tasks effectively with TaskFlow, a comprehensive task management app.">
+  <meta name="keywords" content="task management, productivity, projects, TaskFlow">
+
+  <title>Reports</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="reportPage.js" defer></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<!-- Sidebar and Header combined into one wrapper -->
+<section class="sidebar-header-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2 class="sidebar-title">TaskFlow</h2>
+    <nav class="sidebar-nav">
+      <ul class="sidebar-list">
+        <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
+        <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Projects</a></li>
+        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Reports</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Header with Search - Notification and Profile -->
+  <header class="header">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search..." class="search-input">
+      <i class="clear fa fa-times" style="display: none;"></i>
+    </div>
+
+    <!-- Right-side elements (Notification Icon & Profile Image) -->
+    <div class="right-side">
+      <!-- Notification Icon -->
+      <div class="notification-container">
+        <i class="fa-solid fa-bell" id="notification-icon">
+          <span id="notification-count" class="notification-count">0</span>
+        </i>
+      </div>
+
+      <!-- Notification Dropdown -->
+      <div class="notification-dropdown" id="notification-dropdown">
+        <h5>Notifications</h5>
+        <ul id="notification-list">
+          <!-- Notifications will be populated here -->
+        </ul>
+      </div>
+
+      <!-- Profile Image -->
+      <img src="image/image.jpeg" alt="Profile" class="profile-image">
+    </div>
+  </header>
+</section>
+
+<!-- Title Section -->
+<div class="title-section">
+  <h1 class="page-title">Dashboard</h1>
+  <h2 class="page-subtitle">Task Performance Metrics</h2>
+</div>
+
+
+<!-- Task Metrics Dashboard for Analytics-->
+<div class="analytics">
+
+  <!-- Completed Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-check-circle" style="color: #04c204;"></span>
+      <h2>Completed</h2>
+      <h3 class="task-count">0</h3>
+    </div>
+    <div class="card-progress">
+      <div class="indicator-bar completed">
+        <span class="progress-text">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- In Progress Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-hourglass-half" style="color: #FFA500;"></span>
+      <h2>In-Progress</h2>
+      <h3 class="task-count">0</h3>
+    </div>
+    <div class="card-progress">
+      <div class="indicator-bar in-progress">
+        <span class="progress-text">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canceled Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-exclamation-circle" style="color: #F8482A;"></span>
+      <h2>Canceled</h2>
+      <h3 class="task-count">0</h3>
+    </div>
+    <div class="card-progress">
+      <div class="indicator-bar canceled">
+        <span class="progress-text">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-clock" style="color: #00BFFF;"></span>
+      <h2>Pending</h2>
+      <h3 class="task-count">0</h3>
+    </div>
+    <div class="card-progress">
+      <div class="indicator-bar pending">
+        <span class="progress-text">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overdue Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-calendar-times" style="color: #b0122a;"></span>
+      <h2>Overdue</h2>
+      <h3 class="task-count">0</h3>
+    </div>
+    <div class="card-progress">
+      <div class="indicator-bar overdue">
+        <span class="progress-text">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Total Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-tasks" style="color: #0451a4; font-size: 2.5rem;"></span>
+      <h1>Total Tasks</h1>
+    </div>
+    <div class="card-body">
+      <h3 class="task-count total-tasks">0</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Title Section -->
+<div class="title-section">
+  <h2 class="page-subtitle">Task Performance Analysis</h2>
+</div>
+
+
+<!-- Chart for Task Performance Analysis -->
+<div class="chart-container">
+  <canvas id="myChart"></canvas>
+  <div id="no-data-message">
+    <i class="fas fa-info-circle"></i>
+    <p>No task data is currently available. Please check back later for updates!</p>
+  </div>
+</div>
+
+
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="loading-spinner" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
+</body>
+</html>
