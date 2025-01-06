@@ -32,8 +32,7 @@
       <ul class="sidebar-list">
         <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
         <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Projects</a></li>
-        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Reports</a></li>
-        <li><a href="#" class="sidebar-link"><i class="fa fa-fw fa-trash"></i> Trash</a></li>
+        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Analytics</a></li>
       </ul>
     </nav>
   </aside>
@@ -77,21 +76,43 @@
 
 <!-- Table Section for CRUD operations -->
 <div class="tabular--wrapper">
-  <div class="task-buttons-container">
-    <button id="prev-btn" disabled>Previous</button>
-    <div class="center-buttons">
-      <button id="retrieveTasksBtn" class="retrieve-button"><i class="fa fa-tasks"></i> All Tasks</button>
-      <button id="completedTasksBtn" class="completed-button"><i class="fa fa-trophy"></i> Completed Tasks</button>
-      <button id="incompleteTasksBtn" class="incomplete-button"><i class="fa fa-clipboard-list"></i> Unfinished Tasks</button>
-      <button id="cancelTasksBtn" class="cancel-button"><i class="fa fa-exclamation-triangle"></i> Canceled Tasks</button>
-      <button id="overdueTasksBtn" class="overdue-button"><i class="fa fa-clock"></i> Overdue Tasks</button>
-    </div>
-    <button id="next-btn" disabled>Next</button>
+  <!-- Filter Section with Title and Description -->
+  <div class="filter-section">
+    <h2>Filter Tasks by Status</h2>
+    <p>Use the buttons below to view tasks based on their current status. Click a category to filter tasks displayed in the table.</p>
   </div>
+
+  <!-- Task Buttons Container -->
+  <div class="task-buttons-container">
+    <div class="buttons">
+      <button id="retrieveTasksBtn" class="retrieve-button" title="View all tasks in the system">
+        <i class="fa fa-tasks"></i> All Tasks
+      </button>
+      <button id="completedTasksBtn" class="completed-button" title="View tasks that are marked as completed">
+        <i class="fa fa-trophy"></i> Completed Tasks
+      </button>
+      <button id="incompleteTasksBtn" class="incomplete-button" title="View tasks that are unfinished">
+        <i class="fa fa-clipboard-list"></i> Ongoing Tasks
+      </button>
+      <button id="cancelTasksBtn" class="cancel-button" title="View tasks that have been canceled">
+        <i class="fa fa-exclamation-triangle"></i> Canceled Tasks
+      </button>
+      <button id="overdueTasksBtn" class="overdue-button" title="View tasks that are past their deadline">
+        <i class="fa fa-clock"></i> Overdue Tasks
+      </button>
+    </div>
+    <button id="bulkDeleteBtn" class="bulk-delete-btn" title="Delete selected tasks">
+      <i class="fa fa-trash"></i> Delete Selected Tasks
+    </button>
+  </div>
+
+
+  <!-- Table Container -->
   <div class="table-container">
     <table>
       <thead>
       <tr>
+        <th><input type="checkbox" id="selectAllCheckbox" /></th>
         <th>Id</th>
         <th>Title</th>
         <th>Description</th>
@@ -119,10 +140,10 @@
     <h2>Create Task</h2>
 
     <label for="addTaskTitle">Title:</label>
-    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="50" />
+    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="20" />
 
     <label for="addTaskDescription">Description:</label>
-    <input type="text" id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="100" />
+    <textarea id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="50"></textarea>
 
     <label for="addTaskAssignedTo">Assigned To:</label>
     <input type="text" id="addTaskAssignedTo" name="assignedTo" placeholder="Enter assignee name..." required />
@@ -131,14 +152,14 @@
     <select id="addTaskStatus" name="status" required>
       <option value="" disabled selected>Select Task Status</option>
       <option value="In Progress">In Progress</option>
-      <option value="Completed">Completed</option>
-      <option value="Canceled">Canceled</option>
       <option value="Pending">Pending</option>
+      <option value="On Hold">On Hold</option>
     </select>
 
     <label for="addTaskPriority">Priority:</label>
     <select id="addTaskPriority" name="priority" required>
       <option value="" disabled selected>Select Task Priority</option>
+      <option value="Critical">Critical</option>
       <option value="High">High</option>
       <option value="Normal">Normal</option>
       <option value="Low">Low</option>
@@ -148,8 +169,8 @@
     <input type="date" id="addTaskDueDate" name="taskDueDate" required />
 
     <div class="modal-actions">
-      <button id="cancelCancel" class="modal-btn cancel">Cancel</button>
       <button id="confirmSubmit" class="modal-btn confirm">Submit</button>
+      <button id="cancelCancel" class="modal-btn cancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -163,7 +184,7 @@
     <input type="text" id="taskTitle" name="title" placeholder="Task Title" required maxlength="50" />
 
     <label for="taskDescription">Description:</label>
-    <input type="text" id="taskDescription" name="description" placeholder="Task Description" required maxlength="100" />
+    <textarea id="taskDescription" name="description" placeholder="Enter task description..." required maxlength="50"></textarea>
 
     <label for="taskAssignedTo">Assigned To:</label>
     <input type="text" id="taskAssignedTo" name="assignedTo" placeholder="Assignee Name" required />
@@ -171,15 +192,17 @@
     <label for="taskStatus">Status:</label>
     <select id="taskStatus" name="status" required>
       <option value="" disabled selected>Select</option>
-      <option value="In Progress">In Progress</option>
       <option value="Completed">Completed</option>
+      <option value="In Progress">In Progress</option>
       <option value="Canceled">Canceled</option>
       <option value="Pending">Pending</option>
+      <option value="On Hold">On Hold</option>
     </select>
 
     <label for="taskPriority">Priority:</label>
     <select id="taskPriority" name="priority" required>
       <option value="" disabled selected>Select</option>
+      <option value="Critical">Critical</option>
       <option value="High">High</option>
       <option value="Normal">Normal</option>
       <option value="Low">Low</option>
@@ -189,8 +212,8 @@
     <input type="date" id="taskDueDate" name="taskDueDate" required />
 
     <div class="modal-actions">
-      <button id="confirmCancel" class="modal-btn cancel">Cancel</button>
       <button id="confirmUpdate" class="modal-btn confirm">Submit</button>
+      <button id="confirmCancel" class="modal-btn cancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -200,8 +223,19 @@
   <div class="content">
     <h3>Are you sure you want to delete this task?</h3>
     <div class="modal-actions">
-      <button id="cancelDelete" class="modal-btn cancel">Cancel</button>
       <button id="confirmDelete" class="modal-btn confirm">Confirm</button>
+      <button id="cancelDelete" class="modal-btn cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Deletion Modal -->
+<div id="deletionModal" class="delete-modal" style="display: none;">
+  <div class="content">
+    <h3>Are you sure you want to delete this task?</h3>
+    <div class="modal-actions">
+      <button id="confirmBulkDelete" class="modal-btn confirm">Confirm</button>
+      <button id="cancelBulkDelete" class="modal-btn cancel">Cancel</button>
     </div>
   </div>
 </div>

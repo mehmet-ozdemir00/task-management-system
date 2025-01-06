@@ -6,9 +6,9 @@ import Client from "../api/client";
 class ProjectPage extends BaseClass {
     constructor() {
         super();
-        this.bindClassMethods(['mount', 'updateNotifications', 'addEventListeners', 'onUpdateTask', 'saveUpdatedTask',
-            'onDeleteTask', 'onGetAllTasks', 'onGetCompletedTasks', 'onGetIncompleteTasks', 'onGetCanceledTasks',
-            'onGetOverdueTasks', 'closeModal', 'onCreateTask', 'handleSubmitTask', 'closeAddTaskModal'], this);
+        this.bindClassMethods(['mount', 'updateNotifications', 'addEventListeners', 'onCreateTask', 'handleSubmitTask', 'onUpdateTask', 'saveUpdatedTask',
+            'onDeleteTask', 'onGetAllTasks', 'onGetCompletedTasks', 'onGetIncompleteTasks', 'onGetCanceledTasks', 'onGetOverdueTasks',
+            'onBulkDeleteTasks', 'closeModal', 'closeAddTaskModal'], this);
         this.dataStore = new DataStore();
         this.taskUtility = new TaskUtility(() => {}, this.onUpdateTask, this.onDeleteTask);
     }
@@ -49,6 +49,13 @@ class ProjectPage extends BaseClass {
         // Prevent dropdown from closing if clicked inside it
         notificationDropdown.addEventListener("click", (event) => { event.stopPropagation(); });
 
+        document.querySelectorAll('.buttons button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
         // Task filter buttons
         const addTaskButton = document.getElementById("addTaskButton");
         if (addTaskButton) addTaskButton.addEventListener("click", this.onCreateTask);
@@ -67,11 +74,20 @@ class ProjectPage extends BaseClass {
 
         const overdueTasksButton = document.getElementById("overdueTasksBtn");
         if (overdueTasksButton) overdueTasksButton.addEventListener("click", this.onGetOverdueTasks);
+
+        document.getElementById("bulkDeleteBtn").addEventListener("click", () => this.onBulkDeleteTasks());
+
+        const selectAllCheckbox = document.getElementById("selectAllCheckbox");
+        selectAllCheckbox.addEventListener("change", () => {
+            const isChecked = selectAllCheckbox.checked;
+            document.querySelectorAll(".task-checkbox").forEach((checkbox) => {
+                checkbox.checked = isChecked;
+            });
+        });
     }
 
     /**
      * Handle the creating of a task.
-     * @param {Event} event - The click event on the submit button.
      */
     async onCreateTask(event) {
         // Prevent the page from refreshing on form submit
@@ -171,7 +187,6 @@ class ProjectPage extends BaseClass {
 
     /**
      * Handle the update of a task.
-     * @param {Event} event - The click event on the update button.
      */
     async onUpdateTask(event) {
         // Prevent the page from refreshing on form submit
@@ -224,7 +239,6 @@ class ProjectPage extends BaseClass {
 
     /**
      * Save the updated task.
-     * @param {string} taskId - The ID of the task to be updated.
     */
     async saveUpdatedTask(taskId) {
         const updatedTask = {
@@ -276,7 +290,6 @@ class ProjectPage extends BaseClass {
 
     /**
      * Handle the deletion of a task.
-     * @param {Event} event - The click event on the delete button.
     */
     async onDeleteTask(event) {
         // Prevent the page from refreshing on form submit
@@ -331,6 +344,74 @@ class ProjectPage extends BaseClass {
     }
 
     /**
+    * Handle bulk deletion of selected tasks.
+    */
+    async onBulkDeleteTasks() {
+        const selectedTasks = [];
+        document.querySelectorAll(".task-checkbox:checked").forEach((checkbox) => {
+            selectedTasks.push(checkbox.getAttribute("data-task-id"));
+        });
+
+        if (selectedTasks.length === 0) {
+            this.showMessage("Please select at least one task to delete!");
+            return;
+        }
+
+        // Show confirmation modal with dynamic message
+        const modal = document.getElementById("deletionModal");
+        const overlay = document.getElementById("modalOverlay");
+
+        // Set the confirmation message with the number of selected tasks
+        const confirmationMessage = `Are you sure you want to delete ${selectedTasks.length} selected task${selectedTasks.length > 1 ? 's' : ''}?`;
+        modal.querySelector('h3').textContent = confirmationMessage;
+
+        // Display modal and overlay
+        modal.style.display = "flex";
+        overlay.style.display = "flex";
+
+        // Close modal when clicking outside
+        overlay.addEventListener("click", () => this.closeModal(modal, overlay));
+
+        // Close modal with Escape key
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                this.closeModal(modal, overlay);
+            }
+        });
+
+        // Get the new confirm and cancel buttons using the updated IDs
+        const confirmBtn = document.getElementById("confirmBulkDelete");
+        const cancelBtn = document.getElementById("cancelBulkDelete");
+
+        const onConfirmBulkDelete = async () => {
+            this.closeModal(modal, overlay);
+            try {
+                this.taskUtility.loadingSpinner(true);
+                this.showMessage("Deleting selected tasks, please wait...");
+
+                // Delete each selected task
+                for (const taskId of selectedTasks) {
+                    await this.client.deleteTask(taskId);
+                }
+
+                await this.taskUtility.fetchTasks();
+                this.showMessage("Selected tasks have been deleted successfully!");
+            } catch (error) {
+                console.error("Error deleting tasks:", error);
+                this.showMessage("Something went wrong while deleting tasks. Please try again later!");
+            } finally {
+                this.taskUtility.loadingSpinner(false);
+            }
+        };
+        // Event listener for confirmation
+        confirmBtn.addEventListener("click", onConfirmBulkDelete);
+
+        cancelBtn.addEventListener("click", () => {
+            this.closeModal(modal, overlay);
+        });
+    }
+
+    /**
     * Fetch all tasks from the Client and update the UI.
     */
     async onGetAllTasks(event) {
@@ -372,17 +453,8 @@ class ProjectPage extends BaseClass {
             // Fetch all tasks
             const taskList = await this.client.getAllTasks();
 
-            // Get today's date in local timezone
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const todayString = today.toISOString().split("T")[0];
-
-            // Filter tasks to only include "Canceled" and NOT overdue
-            const canceledTasks = taskList.filter(task => {
-                const taskDueDate = new Date(task.taskDueDate);
-                const taskDueDateString = taskDueDate.toISOString().split("T")[0];
-                return task.status === "Canceled" && taskDueDateString >= todayString;
-            });
+            // Filter tasks to only include "Canceled" regardless of due date
+            const canceledTasks = taskList.filter(task => task.status === "Canceled");
 
             // Clear the current table rows
             const tableBody = document.querySelector(".table-container tbody");
@@ -392,8 +464,8 @@ class ProjectPage extends BaseClass {
                 // Display message if no canceled tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
-                    No canceled tasks found.. ✅
+                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                    You have no canceled tasks! Everything is on track! 🎉
                 </td>
             `;
                 tableBody.appendChild(noDataRow);
@@ -416,7 +488,6 @@ class ProjectPage extends BaseClass {
 
     /**
     * Fetch and display completed tasks.
-    * @param {Event} event - The event triggered by the button click.
     */
     async onGetCompletedTasks(event) {
         // Prevent default form submission behavior
@@ -435,8 +506,8 @@ class ProjectPage extends BaseClass {
                 // Display message if no completed tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
-                    No completed tasks found.. ❌
+                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                    You have no completed tasks yet! You can add new tasks to get started and track your progress! 📅
                 </td>
             `;
                 tableBody.appendChild(noDataRow);
@@ -479,7 +550,7 @@ class ProjectPage extends BaseClass {
                 const taskDueDate = new Date(task.taskDueDate);
                 const taskDueDateString = taskDueDate.toISOString().split("T")[0];
                 return taskDueDateString >= todayString &&
-                (task.status === "In Progress" || task.status === "Pending");
+                (task.status === "In Progress" || task.status === "Pending" || task.status === "On Hold");
             });
 
             // Clear the current table rows
@@ -490,8 +561,8 @@ class ProjectPage extends BaseClass {
                 // Display message if no incomplete tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
-                    No incomplete tasks found (in progress or pending).. ✍️
+                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                    Looks like you have no ongoing tasks.. Add new tasks to keep your workflow moving! ✏️
                 </td>
             `;
                 tableBody.appendChild(noDataRow);
@@ -533,7 +604,7 @@ class ProjectPage extends BaseClass {
             const overdueTasks = taskList.filter(task => {
                 const taskDueDate = new Date(task.taskDueDate);
                 const taskDueDateString = taskDueDate.toISOString().split("T")[0];
-                return taskDueDateString < todayString && (task.status === "In Progress" || task.status === "Pending" || task.status === "Canceled");
+                return taskDueDateString < todayString && (task.status === "In Progress" || task.status === "Pending");
             });
 
             // Clear the current table rows
@@ -544,8 +615,8 @@ class ProjectPage extends BaseClass {
                 // Display message if no overdue tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="8" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
-                    No overdue tasks found.. 👍
+                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                    Looks like you have no overdue tasks! Everything is on schedule! 👍
                 </td>
             `;
                 tableBody.appendChild(noDataRow);
@@ -571,7 +642,6 @@ class ProjectPage extends BaseClass {
     *  @param {Array} taskList - The list of tasks to update notifications
     */
     updateNotifications(taskList) {
-        // Call the updateNotifications method from TaskUtility
         this.taskUtility.updateNotifications(taskList);
     }
 
@@ -590,11 +660,7 @@ class ProjectPage extends BaseClass {
         document.getElementById("addTaskDueDate").value = "";
     }
 
-    /**
-     * Close the modal.
-     * @param {HTMLElement} modal - The modal element to close.
-     * @param {HTMLElement} overlay - The overlay element to close.
-     */
+    // Close the modal
     closeModal(modal, overlay) {
         modal.style.display = "none";
         overlay.style.display = "none";

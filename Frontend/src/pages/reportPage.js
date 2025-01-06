@@ -6,7 +6,7 @@ import Client from "../api/client";
 class ReportPage extends BaseClass {
     constructor() {
         super();
-        this.bindClassMethods(['mount', 'updateNotifications', 'updateTaskCounts', 'updateTaskCountsBar', 'renderAnalytics', 'initializeChart'], this);
+        this.bindClassMethods(['mount', 'updateNotifications', 'updateTaskCounts', 'updateTaskCountsBar', 'renderAnalytics', 'initializeChart', 'initializeLineChart'], this);
         this.dataStore = new DataStore();
         this.taskUtility = new TaskUtility(
             () => {}, // updateDailyTask
@@ -23,6 +23,7 @@ class ReportPage extends BaseClass {
         this.client = new Client();
         await this.taskUtility.mount();
         this.initializeChart();
+        this.initializeLineChart();
         this.addEventListeners();
     }
 
@@ -91,7 +92,8 @@ class ReportPage extends BaseClass {
                 inProgress: 0,
                 canceled: 0,
                 overdue: 0,
-                pending: 0
+                pending: 0,
+                onHold: 0
             };
 
             // Update HTML counts for empty state
@@ -100,10 +102,11 @@ class ReportPage extends BaseClass {
             document.querySelector(".card:nth-child(3) .task-count").textContent = emptyCounts.canceled;
             document.querySelector(".card:nth-child(4) .task-count").textContent = emptyCounts.pending;
             document.querySelector(".card:nth-child(5) .task-count").textContent = emptyCounts.overdue;
+            document.querySelector(".card:nth-child(6) .task-count").textContent = emptyCounts.onHold;
 
             // Reset progress bars and chart for empty state
-            this.updateTaskCountsBar({ completed: 0, inProgress: 0, canceled: 0, pending: 0, overdue: 0 });
-            this.initializeChart(emptyCounts, { completed: "0.0", inProgress: "0.0", canceled: "0.0", pending: "0.0", overdue: "0.0" });
+            this.updateTaskCountsBar({ completed: 0, inProgress: 0, canceled: 0, pending: 0, overdue: 0, onHold: 0 });
+            this.initializeChart(emptyCounts, { completed: "0.0", inProgress: "0.0", canceled: "0.0", pending: "0.0", overdue: "0.0", onHold: "0.0" });
             return;
         }
 
@@ -113,7 +116,8 @@ class ReportPage extends BaseClass {
             inProgress: 0,
             canceled: 0,
             overdue: 0,
-            pending: 0
+            pending: 0,
+            onHold: 0
         };
 
         // Today's date for comparison
@@ -135,10 +139,13 @@ class ReportPage extends BaseClass {
                     isOverdue ? counts.overdue++ : counts.inProgress++;
                     break;
                 case "Canceled":
-                    isOverdue ? counts.overdue++ : counts.canceled++;
+                    counts.canceled++;
                     break;
                 case "Pending":
                     isOverdue ? counts.overdue++ : counts.pending++;
+                    break;
+                case "On Hold":
+                    counts.onHold++;
                     break;
             }
         });
@@ -155,6 +162,7 @@ class ReportPage extends BaseClass {
         document.querySelector(".card:nth-child(3) .task-count").textContent = counts.canceled;
         document.querySelector(".card:nth-child(4) .task-count").textContent = counts.pending;
         document.querySelector(".card:nth-child(5) .task-count").textContent = counts.overdue;
+        document.querySelector(".card:nth-child(6) .task-count").textContent = counts.onHold;
 
         // Update progress bars
         this.updateTaskCountsBar(percentages);
@@ -173,19 +181,58 @@ class ReportPage extends BaseClass {
      * @param {number} overdueCount - Count of overdue tasks.
     */
     updateTaskCountsBar(percentages) {
-        const updateBar = (selector, percentage) => {
+        const updateBar = (selector, percentage, explanationSelector, explanationText) => {
             const bar = document.querySelector(selector);
             bar.style.width = `${percentage}%`;
             bar.querySelector(".progress-text").textContent = `${percentage}%`;
             bar.classList.toggle("default", percentage === "0.0");
+
+            // Update explanation text dynamically
+            document.querySelector(explanationSelector).textContent = explanationText;
         };
 
-        // Update each bar
-        updateBar(".indicator-bar.completed", percentages.completed);
-        updateBar(".indicator-bar.in-progress", percentages.inProgress);
-        updateBar(".indicator-bar.canceled", percentages.canceled);
-        updateBar(".indicator-bar.pending", percentages.pending);
-        updateBar(".indicator-bar.overdue", percentages.overdue);
+        // Update each bar and explanation text
+        updateBar(
+            ".indicator-bar.completed",
+            percentages.completed,
+            "#completed-explanation",
+            `${percentages.completed}% of tasks are completed.`
+        );
+
+        updateBar(
+            ".indicator-bar.in-progress",
+            percentages.inProgress,
+            "#in-progress-explanation",
+            `${percentages.inProgress}% of tasks are in progress.`
+        );
+
+        updateBar(
+            ".indicator-bar.canceled",
+            percentages.canceled,
+            "#canceled-explanation",
+            `${percentages.canceled}% of tasks are canceled.`
+        );
+
+        updateBar(
+            ".indicator-bar.pending",
+            percentages.pending,
+            "#pending-explanation",
+            `${percentages.pending}% of tasks are pending.`
+        );
+
+        updateBar(
+            ".indicator-bar.overdue",
+            percentages.overdue,
+            "#overdue-explanation",
+            `${percentages.overdue}% of tasks are overdue.`
+        );
+
+        updateBar(
+            ".indicator-bar.on-hold",
+            percentages.onHold,
+            "#on-hold-explanation",
+            `${percentages.onHold}% of tasks are on hold.`
+        );
     }
 
     /**
@@ -202,6 +249,7 @@ class ReportPage extends BaseClass {
             canceled: ((counts.canceled / totalTasks) * 100).toFixed(1),
             pending: ((counts.pending / totalTasks) * 100).toFixed(1),
             overdue: ((counts.overdue / totalTasks) * 100).toFixed(1),
+            onHold: ((counts.onHold / totalTasks) * 100).toFixed(1)
         };
 
         // Adjust percentages to handle rounding errors
@@ -239,6 +287,7 @@ class ReportPage extends BaseClass {
                 canceled: 0,
                 pending: 0,
                 overdue: 0,
+                onHold: 0
             };
 
             // Today's date for comparison
@@ -260,10 +309,13 @@ class ReportPage extends BaseClass {
                         isOverdue ? counts.overdue++ : counts.inProgress++;
                         break;
                     case "Canceled":
-                        isOverdue ? counts.overdue++ : counts.canceled++;
+                        counts.canceled++;
                         break;
                     case "Pending":
                         isOverdue ? counts.overdue++ : counts.pending++;
+                        break;
+                    case "On Hold":
+                        counts.onHold++;
                         break;
                 }
             });
@@ -280,7 +332,8 @@ class ReportPage extends BaseClass {
                 { label: 'In Progress', value: counts.inProgress, color: '#FFA500' },
                 { label: 'Canceled', value: counts.canceled, color: '#FF6347' },
                 { label: 'Pending', value: counts.pending, color: '#00BFFF' },
-                { label: 'Overdue', value: counts.overdue, color: '#8B0000' }
+                { label: 'Overdue', value: counts.overdue, color: '#8B0000' },
+                { label: 'On Hold', value: counts.onHold, color: '#7D7D7D' }
             ];
 
             // Filter out tasks with a value of 0
@@ -351,8 +404,6 @@ class ReportPage extends BaseClass {
                                 top: 10,
                                 bottom: 20
                             },
-                            color: '#333333',
-                            align: 'center'
                         },
                         subtitle: {
                             display: true,
@@ -386,7 +437,10 @@ class ReportPage extends BaseClass {
                             },
                             ticks: {
                                 beginAtZero: true,
-                                font: { size: 12, weight: 'normal' }
+                                font: { size: 12, weight: 'normal' },
+                                callback: function(value) {
+                                    return Number.isInteger(value) ? value : '';
+                                }
                             }
                         }
                     },
@@ -403,7 +457,7 @@ class ReportPage extends BaseClass {
                             const { ctx, data } = chart;
                             const total = data.datasets[0].data.reduce((acc, val) => acc + val, 0);
 
-                            if (total === 0) return; // Skip if no data
+                            if (total === 0) return;
 
                             data.datasets[0].data.forEach((value, index) => {
                                 const barMeta = chart.getDatasetMeta(0).data[index];
@@ -437,7 +491,7 @@ class ReportPage extends BaseClass {
                                     ctx.fillStyle = 'black';
                                     ctx.textAlign = 'center';
                                     ctx.textBaseline = 'bottom';
-                                    ctx.fillText(data, bar.x, bar.y - 5); // Close to bar
+                                    ctx.fillText(data, bar.x, bar.y - 5);
                                     ctx.restore();
                                 });
                             });
@@ -446,6 +500,186 @@ class ReportPage extends BaseClass {
                 ]
             });
         }
+    }
+
+    /**
+    * Renders a line chart for "In Progress" and "Pending" tasks by current date.
+    */
+    initializeLineChart() {
+        const analytics = this.taskUtility.dataStore.get("analytics");
+        const lineChartCanvas = document.getElementById("lineChart");
+        const noDataMessage = document.getElementById("no-data-text");
+
+        // Constants for task statuses
+        const STATUS_IN_PROGRESS = "In Progress";
+        const STATUS_PENDING = "Pending";
+
+        // Handle no data scenario
+        if (!analytics || analytics.totalTasks === 0) {
+            lineChartCanvas.style.display = "none";
+            noDataMessage.style.display = "block";
+            return;
+        } else {
+            lineChartCanvas.style.display = "block";
+            noDataMessage.style.display = "none";
+        }
+
+        // Today's date for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayString = today.toLocaleDateString('en-CA');
+
+        // Initialize counts
+        const taskCountsByDate = {
+            [STATUS_IN_PROGRESS]: {},
+            [STATUS_PENDING]: {}
+        };
+
+        // Group tasks by current date and calculate counts in a single loop
+        analytics.tasks.forEach(task => {
+            const taskDueDate = task.taskDueDate ? new Date(task.taskDueDate + 'T00:00') : null;
+            if (!taskDueDate || isNaN(taskDueDate)) return; // Skip invalid dates
+
+            taskDueDate.setHours(0, 0, 0, 0);
+            const taskDueDateString = taskDueDate.toLocaleDateString('en-CA');
+
+            if (taskDueDateString >= todayString) {
+                if (task.status === STATUS_IN_PROGRESS) {
+                    taskCountsByDate[STATUS_IN_PROGRESS][taskDueDateString] = (taskCountsByDate[STATUS_IN_PROGRESS][taskDueDateString] || 0) + 1;
+                } else if (task.status === STATUS_PENDING) {
+                    taskCountsByDate[STATUS_PENDING][taskDueDateString] = (taskCountsByDate[STATUS_PENDING][taskDueDateString] || 0) + 1;
+                }
+            }
+        });
+
+        // Combine all relevant dates and sort them
+        const allDates = Object.keys({
+            ...taskCountsByDate[STATUS_IN_PROGRESS],
+            ...taskCountsByDate[STATUS_PENDING]
+        }).sort();
+
+        // Prepare data for the chart
+        const inProgressData = allDates.map(date => taskCountsByDate[STATUS_IN_PROGRESS][date] || 0);
+        const pendingData = allDates.map(date => taskCountsByDate[STATUS_PENDING][date] || 0);
+
+        const totalTasksByDate = allDates.map(date =>
+        (taskCountsByDate[STATUS_IN_PROGRESS][date] || 0) +
+        (taskCountsByDate[STATUS_PENDING][date] || 0)
+        );
+
+        const ctx = lineChartCanvas.getContext('2d');
+
+        // Destroy any existing chart instance
+        if (this.lineChart) {
+            this.lineChart.destroy();
+        }
+
+        // Gradient creation function
+        const createGradient = (ctx, color) => {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, `${color}66`);
+            gradient.addColorStop(1, `${color}1A`);
+            return gradient;
+        };
+
+        // Common dataset configuration
+        const commonDatasetConfig = {
+            tension: 0.4,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            fill: true,
+        };
+
+        // Create the line chart
+        this.lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: allDates,
+                datasets: [
+                    {
+                        label: STATUS_IN_PROGRESS,
+                        data: inProgressData,
+                        borderColor: '#FFA500',
+                        backgroundColor: createGradient(ctx, '#FFA500'),
+                        ...commonDatasetConfig,
+                    },
+                    {
+                        label: STATUS_PENDING,
+                        data: pendingData,
+                        borderColor: '#00BFFF',
+                        backgroundColor: createGradient(ctx, '#00BFFF'),
+                        ...commonDatasetConfig,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Current Dates',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        grid: {
+                            color: "rgba(200, 200, 200, 0.3)",
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Task Count',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        grid: {
+                            color: "rgba(200, 200, 200, 0.3)",
+                        },
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return Number.isInteger(value) ? value : '';
+                            }
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 15,
+                            font: {
+                                size: 12,
+                            },
+                        },
+                    },
+                    title: {
+                        display: true,
+                        text: 'Remaining Tasks (In Progress & Pending) Over Time',
+                        font: {
+                            size: 19,
+                            weight: 'bold',
+                            family: 'Arial, Helvetica, sans-serif'
+                        },
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const dataset = tooltipItem.dataset;
+                                const value = Number(tooltipItem.raw) || 0;
+                                const total = totalTasksByDate[tooltipItem.dataIndex] || 1;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${dataset.label}: ${value} Tasks (${percentage}%)`;
+                            },
+                        },
+                    },
+                },
+            }
+        });
     }
 }
 

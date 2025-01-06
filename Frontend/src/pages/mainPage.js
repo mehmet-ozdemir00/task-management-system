@@ -18,6 +18,7 @@ class MainPage extends BaseClass {
         this.client = new Client();
         await this.taskUtility.mount();
         this.addEventListeners();
+        this.setGreetingMessage();
     }
 
     /**
@@ -78,7 +79,7 @@ class MainPage extends BaseClass {
                     <p class="text"><span class="today-icon">📌 Today</span></p>
                     <p class="text">Hello, Mehmet!</p>
                     <p class="text">There are no task(s) in progress for today..</p>
-                    <p class="text">You may also want to consider planning for your upcoming tasks.</p>
+                    <p class="text">You may also want to consider planning for your upcoming tasks.. 📅</p>
                 `;
             }
         }
@@ -181,6 +182,27 @@ class MainPage extends BaseClass {
             this.showMessage("Something went wrong while creating the task.. Please try again later!");
         } finally {
             this.taskUtility.loadingSpinner(false);
+        }
+    }
+
+    /**
+    * Set dynamic greeting message based on the time of day.
+    */
+    setGreetingMessage() {
+        const greetingMessage = document.getElementById('greetingMessage');
+        const hours = new Date().getHours();
+
+        // Display appropriate greeting message based on the time of day
+        if (greetingMessage) {
+            if (hours >= 6 && hours < 12) {
+                greetingMessage.textContent = "Good Morning!";
+            } else if (hours >= 12 && hours < 17) {
+                greetingMessage.textContent = "Good Afternoon!";
+            } else if (hours >= 17 && hours < 24) {
+                greetingMessage.textContent = "Good Evening!";
+            } else {
+                greetingMessage.textContent = "Good Night!";
+            }
         }
     }
 

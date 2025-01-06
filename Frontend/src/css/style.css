@@ -71,14 +71,13 @@ body {
     display: block;
     font-size: 22px;
     padding: 10px 7px;
-    font-style: italic;
     text-decoration: none;
     border-radius: var(--border-radius);
     transition: var(--hover-transition);
 }
 
 .sidebar-link:hover {
-    background-color: #e0e0e0;
+    background-color: #ccc;
     color: var(--text-color);
 }
 
@@ -134,6 +133,17 @@ body {
     display: flex;
     align-items: center;
 }
+
+.greeting-message {
+    font-size: 27px;
+    font-weight: 600;
+    background: linear-gradient(to right, #000000, #0077B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
 /* ------------------ Header Styles Ends ------------------- */
 
 /* -------------- Notification Section Starts -------------- */
@@ -149,8 +159,8 @@ body {
     color: #000000;
     font-size: 43px;
     cursor: pointer;
-    position: relative;
     margin-right: 3px;
+    position: relative;
 }
 
 #notification-icon:hover {
@@ -211,7 +221,6 @@ body {
     padding: 5px 0;
     font-size: 14px;
     cursor: pointer;
-    font-style: italic;
     border-bottom: 1px solid #888;
 }
 
@@ -301,7 +310,8 @@ body {
     margin-left: 250px;
     align-items: flex-start;
     justify-content: space-between;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.4), 0px 1px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.4),
+                0px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .task-summary {
@@ -316,22 +326,23 @@ body {
 
 .task-summary span {
     display: block;
+    font-size: 2rem;
     color:  #000000;
-    font-weight: bold;
-    font-size: 1.5rem;
+    font-weight: 600;
     margin-bottom: 15px;
 }
 
 .text {
-    color: #000000;
-    font-size: 1rem;
+    color: #666;
+    font-weight: 400;
+    font-size: 1.1rem;
     margin-bottom: .2rem;
 }
 
 .task-count {
     color: red;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
 .today-icon {
@@ -353,13 +364,14 @@ body {
 }
 
 #messageList li {
-    color: #000000;
-    font-style: italic;
-    margin-bottom: .3rem;
+    color: #666;
+    font-weight: 400;
+    font-size: 1rem;
+    margin-bottom: .2rem;
     border-bottom: 1px solid #eee;
 }
 
-#messageList li::before {
+#messageList li.with-arrow::before {
     content: "➔";
     margin-right: 5px;
 }
@@ -367,8 +379,7 @@ body {
 .message-item {
     color: #555;
     margin: 5px 0;
-    font-size: 1rem;
-    font-style: italic;
+    font-size: 1.15rem;
 }
 
 .task-summary:last-child {
@@ -383,10 +394,10 @@ body {
 }
 
 .add-tasks p {
+    color: #555;
     padding: 15px;
-    color: #000000;
     margin-left: 7rem;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     text-align: center;
     margin-bottom: 15px;
 }
@@ -455,6 +466,23 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.9);
 }
 
+.delete-modal {
+    top: 50%;
+    left: 50%;
+    opacity: 1;
+    width: 550px;
+    height: auto;
+    z-index: 1000;
+    padding: 30px;
+    max-width: 100%;
+    position: fixed;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: opacity 0.3s ease;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.9);
+}
+
 .modal-content {
     width: 500px;
     display: flex;
@@ -485,6 +513,20 @@ body {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     transition: var(--hover-transition);
+}
+
+.modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    transition: var(--hover-transition);
+    resize: vertical;
+    max-width: 100%;
+    max-height: 200px;
+    min-height: 100px;
 }
 
 .content h3 {
@@ -538,6 +580,15 @@ body {
     justify-content: center;
 }
 
+#deletionModal .modal-btn {
+    width: 27%;
+}
+
+#deletionModal .modal-actions {
+    gap: 45px;
+    justify-content: center;
+}
+
 
 /* ----------------- Modal Overlay Section Ends ----------------- */
 
@@ -547,7 +598,7 @@ body {
 .tabular--wrapper {
     padding: 20px;
     margin-left: 250px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2), 0px 2px 4px rgba(0, 0, 0, 0.7);
+    box-shadow: 2px 6px 12px rgba(0, 0, 0, 0.9);
 }
 
 .table-container {
@@ -577,7 +628,7 @@ body {
 }
 
 .table-container td {
-    padding: 7px;
+    padding: 4px;
     text-align: center;
     border: 1px solid #c0c0c0;
 }
@@ -595,23 +646,14 @@ body {
 
 /* --------------- Task Buttons Section Starts --------------- */
 .task-buttons-container {
-    width: 100%;
     display: flex;
-    margin: 10px 0;
-    align-items: center;
-    justify-content: space-between;
+    margin: 17px 0;
 }
 
 .task-buttons-container button {
-    width: auto;
-    border: none;
-    color: white;
     cursor: pointer;
-    font-size: 14px;
-    min-width: 120px;
-    padding: 8px 16px;
+    padding: 8px 10px;
     border-radius: 4px;
-    box-sizing: border-box;
     transition: var(--hover-transition);
 }
 
@@ -625,17 +667,13 @@ body {
 }
 
 .task-buttons-container button:hover {
-    background: #777;
     transform: scale(1.05);
 }
 
-.task-buttons-container button:disabled {
-    background: #555;
-    cursor: not-allowed;
-}
-
-.task-buttons-container button:disabled:hover {
-    transform: none;
+.buttons button.active {
+    color: white;
+    border-color: #00BFFF;
+    background-color: #00BFFF;
 }
 
 #retrieveTasksBtn,
@@ -644,6 +682,22 @@ body {
 #cancelTasksBtn,
 #overdueTasksBtn {
     margin: 0 5px;
+}
+
+.task-buttons-container .bulk-delete-btn {
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: 4px;
+    margin-left: 18rem;
+    background-color: #dc3545;
+}
+
+.bulk-delete-btn:hover {
+    transform: scale(1.05);
+    background-color: #c82333;
 }
 
 .update-btn, .delete-btn {
@@ -657,10 +711,15 @@ body {
     border-radius: 4px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex;
     box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
     transition: var(--hover-transition);
-    font-family: 'Times New Roman', Times, serif;
+}
+
+.update-btn i, .delete-btn i {
+    font-size: 15px;
+    margin-right: 4px;
 }
 
 .update-btn {
@@ -683,14 +742,70 @@ body {
 
 /* --------------- Table Container Section Ends --------------- */
 
+/* --------------- Filter Section Starts --------------- */
+
+.filter-section {
+    padding: 15px 20px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    background-color: #f0f0f0;
+    border-left: 4px solid #00BFFF;
+    box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-section h2 {
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.filter-section p {
+    margin: 0;
+    color: #555;
+    font-size: 15px;
+    line-height: 1.6;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* --------------- Filter Section Ends --------------- */
+
 /* ----------------- Analytics Section Starts ----------------- */
+.content-section {
+    margin-top: 15px;
+    margin-right: 20px;
+    margin-left: 270px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    border-left: 4px solid #00BFFF;
+    box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content-section h2 {
+    color: #333;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.content-section p {
+    margin: 0;
+    color: #555;
+    font-size: 15px;
+    line-height: 1.6;
+    font-family: 'Roboto', sans-serif;
+}
+
 .analytics {
     display: grid;
     padding: 1rem;
     grid-gap: 1.5rem;
     margin-top: 1rem;
     margin-left: 250px;
-    margin-bottom: 2rem;
+    margin-bottom: 7rem;
     box-sizing: border-box;
     grid-template-columns: repeat(3, 1fr);
 }
@@ -702,7 +817,8 @@ body {
     box-sizing: border-box;
     background-color: #fff;
     transition: var(--hover-transition);
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3), 0px 2px 4px rgba(0, 0, 0, 0.8);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4),
+                0px 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 .card:hover {
@@ -754,7 +870,7 @@ body {
 .card-body .task-count {
     font-size: 2rem;
     margin-top: 0.7rem;
-    margin-left: 8.5rem;
+    margin-left: 8.2rem;
 }
 
 .card-progress {
@@ -811,31 +927,42 @@ body {
     background: #b0122a;
 }
 
+.indicator-bar.on-hold {
+    background: #7d7d7d;
+}
+
+/* --------- Chart Section -------- */
 .chart-container {
     margin: 20px;
     height: 100%;
     display: flex;
     padding: 30px;
     max-width: 700px;
+    margin-top: 2.7rem;
     border-radius: 8px;
+    margin-bottom: 7rem;
     align-items: center;
     justify-content: center;
     border: 2px solid #e1e0e0;
-    background-color: #EDEDED;
+    background-color: #F0F0F0;
     margin-left: calc(250px + 250px);
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4), 0px 2px 4px rgba(0, 0, 0, 1);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4),
+                0px 2px 4px rgba(0, 0, 0, 0.9);
 }
 
-#myChart {
+#myChart,
+#lineChart {
     width: 100%;
     max-width: 700px;
     max-height: 350px;
 }
 
-#no-data-message {
-    color: #555;
+#no-data-message,
+#no-data-text {
+    color: gray;
     display: none;
-    font-size: 1.05rem;
+    font-weight: 400;
+    font-size: 1rem;
     text-align: center;
 }
 
@@ -845,6 +972,11 @@ body {
     margin-bottom: .5rem;
 }
 
+#no-data-text i {
+    color: #FF6347;
+    font-size: 24px;
+    margin-bottom: .5rem;
+}
 /* ------------------ Analytics Section Ends ----------------- */
 
 /* Base progress bar style */
@@ -934,6 +1066,22 @@ body {
 }
 /* ------------------- Glow Loading Spinner Ends -------------------- */
 
+.footer {
+    bottom: 0;
+    width: 100%;
+    color: #fff;
+    padding: 10px;
+    position: fixed;
+    text-align: center;
+    background-color: #777;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 14px;
+    margin-left: calc(70px + 70px);
+}
+
 /* ------------------- Responsive Styles Starts --------------------- */
 
 @media (max-width: 768px) {
@@ -991,8 +1139,25 @@ body {
         flex-direction: row;
     }
 
+    .notification-dropdown {
+        width: 300px;
+        top: 5rem;
+    }
+
+    .notification-dropdown h5 {
+        font-size: 15px;
+    }
+
+    .notification-dropdown ul li {
+        font-size: 12px;
+    }
+
     .search-input {
         width: 75%;
+    }
+
+    .greeting-message {
+        font-size: 1.3rem;
     }
 
     .add-tasks {
@@ -1006,8 +1171,8 @@ body {
     }
 
     .add-button {
-        margin-left: 0;
         padding: 10px;
+        margin-left: 0;
         font-size: 14px;
     }
 
@@ -1060,6 +1225,13 @@ body {
         padding: 12px 16px;
     }
 
+    .task-buttons-container .bulk-delete-btn {
+        width: 100%;
+        margin: 5px 0;
+        font-size: 12px;
+        padding: 12px 16px;
+    }
+
     .modal {
         width: 80%;
         padding: 15px;
@@ -1100,6 +1272,31 @@ body {
         margin-left: 0;
         width: 100%;
         max-width: 100%;
+    }
+
+    .content-section {
+        margin-left: 20px;
+        padding: 10px 15px;
+        margin-right: 10px;
+    }
+
+    .content-section h2 {
+        font-size: 18px;
+    }
+
+    .content-section p {
+        font-size: 14px;
+    }
+
+    .footer {
+        padding: 10px;
+        margin-top: 30px;
+        position: relative;
+    }
+
+    .footer p {
+        font-size: 10px;
+        margin-left: 0;
     }
 }
 

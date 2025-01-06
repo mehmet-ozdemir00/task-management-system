@@ -32,7 +32,7 @@
       <ul class="sidebar-list">
         <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
         <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Projects</a></li>
-        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Reports</a></li>
+        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Analytics</a></li>
       </ul>
     </nav>
   </aside>
@@ -70,9 +70,18 @@
 <!-- Title Section -->
 <div class="title-section">
   <h1 class="page-title">Dashboard</h1>
-  <h2 class="page-subtitle">Task Performance Metrics</h2>
+  <h2 class="page-subtitle">Analytics</h2>
 </div>
 
+<!-- Title Description -->
+<div class="content-section">
+  <h2>Task Progress Overview</h2>
+  <p>
+    Track and monitor task performance efficiently. This dashboard provides an overview of task counts
+    categorized by status—Completed, In-Progress, Pending, Canceled, and Overdue. It also displays
+    the percentage of completion for each category, helping you assess progress and prioritize tasks effectively.
+  </p>
+</div>
 
 <!-- Task Metrics Dashboard for Analytics-->
 <div class="analytics">
@@ -89,12 +98,13 @@
         <span class="progress-text">0%</span>
       </div>
     </div>
+    <p class="task-explanation" id="completed-explanation"></p>
   </div>
 
   <!-- In Progress Tasks -->
   <div class="card">
     <div class="card-head">
-      <span class="fa fa-hourglass-half" style="color: #FFA500;"></span>
+      <span class="fa fa-spinner fa-spin" style="color: #FFA500;"></span>
       <h2>In-Progress</h2>
       <h3 class="task-count">0</h3>
     </div>
@@ -103,12 +113,13 @@
         <span class="progress-text">0%</span>
       </div>
     </div>
+    <p class="task-explanation" id="in-progress-explanation"></p>
   </div>
 
   <!-- Canceled Tasks -->
   <div class="card">
     <div class="card-head">
-      <span class="fa fa-exclamation-circle" style="color: #F8482A;"></span>
+      <span class="fa fa-ban" style="color: #F8482A;"></span>
       <h2>Canceled</h2>
       <h3 class="task-count">0</h3>
     </div>
@@ -117,6 +128,7 @@
         <span class="progress-text">0%</span>
       </div>
     </div>
+    <p class="task-explanation" id="canceled-explanation"></p>
   </div>
 
   <!-- Pending Tasks -->
@@ -131,6 +143,7 @@
         <span class="progress-text">0%</span>
       </div>
     </div>
+    <p class="task-explanation" id="pending-explanation"></p>
   </div>
 
   <!-- Overdue Tasks -->
@@ -145,6 +158,22 @@
         <span class="progress-text">0%</span>
       </div>
     </div>
+    <p class="task-explanation" id="overdue-explanation"></p>
+  </div>
+
+  <!-- On Hold Tasks -->
+  <div class="card">
+    <div class="card-head">
+      <span class="fa fa-pause-circle" style="color: #7d7d7d;"></span>
+      <h2>On-Hold</h2>
+      <h3 class="task-count">0</h3>
+    </div>
+    <div class="card-progress">
+      <div class="indicator-bar on-hold">
+        <span class="progress-text">0%</span>
+      </div>
+    </div>
+    <p class="task-explanation" id="on-hold-explanation"></p>
   </div>
 
   <!-- Total Tasks -->
@@ -160,10 +189,14 @@
 </div>
 
 <!-- Title Section -->
-<div class="title-section">
-  <h2 class="page-subtitle">Task Performance Analysis</h2>
+<div class="content-section">
+  <h2>Task Distribution and Performance Insights</h2>
+  <p>
+    Analyze task performance and status distribution. This chart dynamically displays task counts categorized by
+    status—Completed, In-Progress, Pending, Canceled, and Overdue—along with their percentage contributions.
+    Identify areas needing attention to improve task management efficiency.
+  </p>
 </div>
-
 
 <!-- Chart for Task Performance Analysis -->
 <div class="chart-container">
@@ -171,6 +204,27 @@
   <div id="no-data-message">
     <i class="fas fa-info-circle"></i>
     <p>No task data is currently available. Please check back later for updates!</p>
+  </div>
+</div>
+
+
+<!-- Title Section -->
+<div class="content-section">
+  <h2>Task Status Over Time</h2>
+  <p>
+    Visualize the progress of tasks marked as "In Progress" and "Pending" over time. This line chart dynamically
+    displays task counts grouped by current dates, helping you track how these tasks evolve and progress on a daily
+    basis. Analyze trends, monitor progress, and make informed decisions to address any potential delays or bottlenecks.
+  </p>
+</div>
+
+<!-- Line Chart for Visualize Workflow -->
+<div class="chart-container">
+  <canvas id="lineChart"></canvas>
+  <div id="no-data-text">
+    <i class="fas fa-info-circle"></i>
+    <p>No task data is currently available. To effectively visualize your remaining workflow,
+      please ensure you have tasks marked as 'In Progress' or 'Pending' added to your list. Check back later for updates!</p>
   </div>
 </div>
 

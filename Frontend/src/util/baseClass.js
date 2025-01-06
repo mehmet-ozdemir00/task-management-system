@@ -29,7 +29,7 @@ export default class BaseClass {
                    </span>
                </div>`,
             escapeMarkup: false,
-            duration: 4500,
+            duration: 4000,
             gravity: "top",
             position: 'right',
             close: false,
@@ -61,7 +61,7 @@ export default class BaseClass {
                    </span>
                </div>`,
             escapeMarkup: false,
-            duration: 4500,
+            duration: 4000,
             gravity: "top",
             position: 'right',
             close: false,
@@ -93,7 +93,7 @@ export default class BaseClass {
                    </span>
                </div>`,
             escapeMarkup: false,
-            duration: 4500,
+            duration: 4000,
             gravity: "top",
             position: 'right',
             close: false,
@@ -125,12 +125,12 @@ export default class BaseClass {
                    </span>
                </div>`,
             escapeMarkup: false,
-            duration: 4500,
+            duration: 4000,
             gravity: "top",
             position: 'right',
             close: false,
             style: {
-                background: "linear-gradient(135deg, #B8E4FF 0%, #FFFFFF 100%)",
+                background: "linear-gradient(135deg, #4D9FFF 0%, #FFFFFF 100%)",
                 color: "#000000",
                 borderRadius: "5px",
                 boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3), 0px 2px 4px rgba(0, 0, 0, 0.5)",

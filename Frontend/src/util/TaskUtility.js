@@ -43,29 +43,8 @@ export default class TaskUtility extends BaseClass {
             // Filter daily tasks based on the correctly formatted date
             const dailyTasks = taskList.filter((task) => task.taskDueDate === todayString);
 
-            // Calculate analytics
-            const totalTasks = taskList.length;
-            const completedTasks = taskList.filter((task) => task.status === "Completed").length;
-            const inProgressTasks = taskList.filter((task) => task.status === "In Progress").length;
-            const canceledTasks = taskList.filter((task) => task.status === "Canceled").length;
-            const pendingTasks = taskList.filter((task) => task.status === "Pending").length;
-            // Calculate overdue tasks
-            const overdueTasks = taskList.filter((task) => {
-                const taskDueDate = new Date(task.taskDueDate);
-                const taskDueDateString = taskDueDate.toISOString().split("T")[0];
-                return taskDueDateString < todayString && task.status !== "Completed";
-            }).length;
-
-            // Save analytics data in DataStore
-            this.dataStore.set("analytics", {
-                totalTasks,
-                completedTasks,
-                inProgressTasks,
-                canceledTasks,
-                pendingTasks,
-                overdueTasks,
-                tasks: taskList
-            });
+            // Process analytics
+            this.processAnalytics(taskList);
 
             // Update UI components
             this.updateNotifications(taskList); // Update notifications after fetching tasks
@@ -79,6 +58,31 @@ export default class TaskUtility extends BaseClass {
         } finally {
             this.loadingSpinner(false);
         }
+    }
+
+    /**
+    * Process and store analytics data.
+    * @param {Array} taskList - The list of tasks.
+    */
+    processAnalytics(taskList) {
+        const today = new Date().toISOString().split("T")[0];
+
+        const analytics = {
+            tasks: taskList,
+            totalTasks: taskList.length,
+            completedTasks: taskList.filter((task) => task.status === "Completed").length,
+            inProgressTasks: taskList.filter((task) => task.status === "In Progress").length,
+            canceledTasks: taskList.filter((task) => task.status === "Canceled").length,
+            pendingTasks: taskList.filter((task) => task.status === "Pending").length,
+            onHoldTasks: taskList.filter((task) => task.status === "On Hold").length,
+            overdueTasks: taskList.filter((task) => {
+                const taskDueDate = new Date(task.taskDueDate).toISOString().split("T")[0];
+                return taskDueDate < today && task.status !== "Completed";
+            }).length,
+        };
+
+        // Save analytics data in DataStore
+        this.dataStore.set("analytics", analytics);
     }
 
     /**
@@ -112,8 +116,8 @@ export default class TaskUtility extends BaseClass {
         if (taskList.length === 0) {
             const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `
-                <td colspan="8">
-                    All caught up! No tasks for today.. 🎉
+                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                   You're all caught up! No tasks scheduled for today. 🎉
                 </td>
             `;
             tableBody.appendChild(noDataRow);
@@ -125,11 +129,11 @@ export default class TaskUtility extends BaseClass {
                 const taskDueDateString = taskDueDate.toISOString().split("T")[0];
                 const todayString = today.toISOString().split("T")[0];
 
-                // Get status color and text
                 const { statusColor, statusText } = this.getStatusColorAndText(task.status, taskDueDateString < todayString);
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
+                    <td><input type="checkbox" class="task-checkbox" data-task-id="${task.taskId}" /></td> <!-- Checkbox -->
                     <td><h3 class="task-info text-black">${index + 1}</h3></td>
                     <td><h3 class="task-info text-black">${task.title}</h3></td>
                     <td><h3 class="task-info text-black">${task.description}</h3></td>
@@ -166,15 +170,11 @@ export default class TaskUtility extends BaseClass {
         let statusColor = "";
         let statusText = status;
 
-        // Check if the task is overdue and NOT completed
-        if (isOverdue && status !== "Completed") { // <-- Add this check
-            // Assign red color and update status text for overdue tasks
-            if (status === "In Progress" || status === "Pending") {
-                statusColor = "#B52A37"; // Red for overdue In Progress or Pending tasks
-                statusText = "Task Overdue"; // Update status text
-            } else {
-                statusColor = "#B52A37"; // Red for any other overdue tasks
-                statusText = "Task Overdue"; // Update status text
+        // Check if the task is overdue and NOT completed or canceled
+        if (isOverdue && status !== "Completed" && status !== "Canceled") {
+            if (status === "In Progress" || status === "Pending" || status === "On Hold") {
+                statusColor = "#B52A37"; // Overdue color
+                statusText = "Task Overdue";
             }
         } else {
             // Assign colors based on the status if not overdue
@@ -191,6 +191,9 @@ export default class TaskUtility extends BaseClass {
                 case "Pending":
                     statusColor = "#0056b3"; // Blue
                     break;
+                case "On Hold":
+                    statusColor = "#808080"; // Gray
+                    break;
                 default:
                     statusColor = "#808080"; // Default gray
             }
@@ -203,7 +206,7 @@ export default class TaskUtility extends BaseClass {
     */
     updateNotifications(taskList) {
         const notificationList = document.getElementById("notification-list");
-        const messageList = document.getElementById("messageList"); // Keep this for MainPage
+        const messageList = document.getElementById("messageList");
 
         // Check if the notification list exists
         if (!notificationList) {
@@ -218,16 +221,26 @@ export default class TaskUtility extends BaseClass {
 
         let notificationCount = 0;
 
+        // Sort tasks by taskDueDate
+        taskList.sort((a, b) => new Date(a.taskDueDate) - new Date(b.taskDueDate));
+
         // Loop through tasks to generate notifications
         taskList.forEach((task) => {
             const taskDueDateString = task.taskDueDate;
-            const isOverdue = taskDueDateString < todayString;
+            const taskDueDate = new Date(taskDueDateString);
+            const isOverdue = taskDueDate < today;
 
             // Handle 'In Progress' tasks
             if (task.status === "In Progress") {
-                if (!isOverdue) {
-                    const dueDate = new Date(taskDueDateString);
-                    const timeLeft = dueDate - today;
+                if (taskDueDateString === todayString) {
+                    // Task due today
+                    this.addDropdownNotificationItem(`Task "${task.title}"s due date is today.`, notificationList, true);
+                    notificationCount++;
+                    if (messageList) {
+                        this.addMessageToDashboard(`Task "${task.title}"s due date is today.`, messageList, true);
+                    }
+                } else if (!isOverdue) {
+                    const timeLeft = taskDueDate - today;
 
                     if (timeLeft <= 2 * 24 * 60 * 60 * 1000) {
                         // Due soon tasks
@@ -276,10 +289,21 @@ export default class TaskUtility extends BaseClass {
 
         // Check if there are no messages in the message list
         if (messageList && messageList.children.length === 0) {
-            const noMessagesItem = document.createElement("li");
-            noMessagesItem.classList.add("message-item");
-            noMessagesItem.textContent = "No messages available at this time.";
-            messageList.appendChild(noMessagesItem);
+            // Check if the "No messages" item already exists
+            const existingNoMessagesItem = Array.from(messageList.children).some(item => item.textContent === "No messages available at this time.");
+
+            if (!existingNoMessagesItem) {
+                const noMessagesItem = document.createElement("li");
+                noMessagesItem.classList.add("message-item");
+                noMessagesItem.textContent = "No messages available at this time.";
+
+                // Apply custom styles for "No messages" item
+                noMessagesItem.style.color = "#666";
+                noMessagesItem.style.fontWeight = "400";
+                noMessagesItem.style.fontSize = "1.15rem";
+
+                messageList.appendChild(noMessagesItem);
+            }
         }
 
         // Update the notification count on the dropdown icon
@@ -289,21 +313,49 @@ export default class TaskUtility extends BaseClass {
     /**
     *   Adds a notification item to the dropdown list.
     */
-    addDropdownNotificationItem(message, notificationList) {
+    addDropdownNotificationItem(message, notificationList, isDueToday = false) {
         const dropdownItem = document.createElement("li");
         dropdownItem.classList.add("notification-item");
         dropdownItem.textContent = message;
+
+        // If the task is due today, apply red color
+        if (isDueToday) {
+            dropdownItem.style.color = "red";
+        }
         notificationList.appendChild(dropdownItem);
     }
 
     /**
     *   Adds a message to the dashboard message list.
     */
-    addMessageToDashboard(message, messageList) {
-        const messageItem = document.createElement("li");
-        messageItem.classList.add("message-item");
-        messageItem.textContent = message;
-        messageList.appendChild(messageItem);
+    addMessageToDashboard(message, messageList, isDueToday = false) {
+        // Check if the message already exists in the message list
+        const existingMessage = Array.from(messageList.children).some(item => item.textContent === message);
+
+        if (!existingMessage) {
+            // Remove "No messages" item if it exists
+            const noMessagesItem = Array.from(messageList.children).find(item => item.textContent === "No messages available at this time.");
+            if (noMessagesItem) {
+                messageList.removeChild(noMessagesItem);
+            }
+
+            // Create and add the new message
+            const messageItem = document.createElement("li");
+            messageItem.classList.add("message-item");
+            messageItem.textContent = message;
+
+            if (isDueToday) {
+                messageItem.style.color = "red";
+                messageItem.style.fontWeight = "bold";
+            }
+
+            // Add arrow for normal messages but not for "No messages"
+            if (message !== "No messages available at this time.") {
+                messageItem.classList.add("with-arrow");
+            }
+
+            messageList.appendChild(messageItem);
+        }
     }
 
     /**

@@ -32,9 +32,8 @@
       <ul class="sidebar-list">
         <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
         <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Projects</a></li>
-        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Reports</a></li>
-        <li><a href="#" class="sidebar-link"><i class="fa fa-fw fa-trash"></i> Trash</a></li>
-        <li><a href="#logout" class="sidebar-link"><i class="fa fa-fw fa-sign-out-alt"></i> Logout</a></li>
+        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Analytics</a></li>
+        <li><a href="#" class="sidebar-link"><i class="fa fa-fw fa-sign-out-alt"></i> Logout</a></li>
       </ul>
     </nav>
   </aside>
@@ -48,6 +47,9 @@
 
     <!-- Right-side elements (Notification Icon & Profile Image) -->
     <div class="right-side">
+      <!-- Dynamic Greeting -->
+      <h2 id="greetingMessage" class="greeting-message"></h2>
+
       <!-- Notification Icon -->
       <div class="notification-container">
         <i class="fa-solid fa-bell" id="notification-icon">
@@ -78,8 +80,10 @@
 
 <!----- Daily Task Summary Section and Messages Section ------>
 <div class="content-wrapper">
-  <div id="daily-task-summary" class="task-summary"></div>
-  <!-- Tasks will be dynamically populated here -->
+  <!-- Daily Task Summary -->
+  <div id="daily-task-summary" class="task-summary">
+    <p class="text"><span class="today-icon">📌 Today</span></p>
+  </div>
 
   <!-- Messages -->
   <div class="task-summary">
@@ -107,10 +111,10 @@
     <h2>Create Task</h2>
 
     <label for="addTaskTitle">Title:</label>
-    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="50" />
+    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="20" />
 
     <label for="addTaskDescription">Description:</label>
-    <input type="text" id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="100" />
+    <textarea id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="50"></textarea>
 
     <label for="addTaskAssignedTo">Assigned To:</label>
     <input type="text" id="addTaskAssignedTo" name="assignedTo" placeholder="Enter assignee name..." required />
@@ -119,14 +123,14 @@
     <select id="addTaskStatus" name="status" required>
       <option value="" disabled selected>Select Task Status</option>
       <option value="In Progress">In Progress</option>
-      <option value="Completed">Completed</option>
-      <option value="Canceled">Canceled</option>
       <option value="Pending">Pending</option>
+      <option value="On Hold">On Hold</option>
     </select>
 
     <label for="addTaskPriority">Priority:</label>
     <select id="addTaskPriority" name="priority" required>
       <option value="" disabled selected>Select Task Priority</option>
+      <option value="Critical">Critical</option>
       <option value="High">High</option>
       <option value="Normal">Normal</option>
       <option value="Low">Low</option>
@@ -136,8 +140,8 @@
     <input type="date" id="addTaskDueDate" name="taskDueDate" required />
 
     <div class="modal-actions">
-      <button id="confirmCancel" class="modal-btn cancel">Cancel</button>
       <button id="confirmSubmit" class="modal-btn confirm">Submit</button>
+      <button id="confirmCancel" class="modal-btn cancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -146,6 +150,10 @@
 <div id="loadingSpinner" class="loading-spinner" style="display: none;">
   <div class="spinner"></div>
 </div>
+
+<footer class="footer">
+  <p>&copy; 2025 TaskFlow. All Rights Reserved..</p>
+</footer>
 
 </body>
 </html>
