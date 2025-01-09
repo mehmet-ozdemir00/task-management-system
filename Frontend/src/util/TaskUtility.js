@@ -30,7 +30,7 @@ export default class TaskUtility extends BaseClass {
         const spinner = document.getElementById("loadingSpinner");
         try {
             this.loadingSpinner(true);
-            await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate a delay
+            await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate a delay
 
             const taskList = await this.client.getAllTasks(); // Fetch all tasks
             this.dataStore.set("tasks", taskList);
@@ -116,13 +116,15 @@ export default class TaskUtility extends BaseClass {
         if (taskList.length === 0) {
             const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `
-                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                <td colspan="10" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
                    You're all caught up! No tasks scheduled for today. 🎉
                 </td>
             `;
             tableBody.appendChild(noDataRow);
         } else {
             taskList.forEach((task, index) => {
+                // Format createdAt and taskDueDate
+                const formattedCreatedAt = this.formatDate(new Date(task.createdAt));
                 const taskDueDate = new Date(task.taskDueDate);
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -142,6 +144,7 @@ export default class TaskUtility extends BaseClass {
                         <span class="status-text" style="background-color: ${statusColor}; color: white; padding: 3px 8px; border-radius: 3px;">${statusText}</span>
                      </td>
                     <td><h3 class="task-info text-black">${task.priority}</h3></td>
+                    <td><h3 class="task-info text-black">${formattedCreatedAt}</h3></td>
                     <td><h3 class="task-info text-black">${task.taskDueDate}</h3></td>
                     <td>
                         <button type="button" class="update-btn" data-task-id="${task.taskId}"><i class="fa fa-pencil-alt"></i> Update</button>
@@ -158,6 +161,20 @@ export default class TaskUtility extends BaseClass {
                 btn.addEventListener("click", (event) => this.onDeleteTask(event));
             });
         }
+    }
+
+    // Format date to MM-DD-YYYY HH:mm AM/PM
+    formatDate(date) {
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        };
+
+        return date.toLocaleString('en-US', options).replace(',', '');
     }
 
     /**

@@ -7,7 +7,7 @@ class ProjectPage extends BaseClass {
     constructor() {
         super();
         this.bindClassMethods(['mount', 'updateNotifications', 'addEventListeners', 'onCreateTask', 'handleSubmitTask', 'onUpdateTask', 'saveUpdatedTask',
-            'onDeleteTask', 'onGetAllTasks', 'onGetCompletedTasks', 'onGetIncompleteTasks', 'onGetCanceledTasks', 'onGetOverdueTasks',
+            'onDeleteTask', 'handleConfirmDelete' , 'onGetAllTasks', 'onGetCompletedTasks', 'onGetIncompleteTasks', 'onGetCanceledTasks', 'onGetOverdueTasks',
             'onBulkDeleteTasks', 'closeModal', 'closeAddTaskModal'], this);
         this.dataStore = new DataStore();
         this.taskUtility = new TaskUtility(() => {}, this.onUpdateTask, this.onDeleteTask);
@@ -102,16 +102,6 @@ class ProjectPage extends BaseClass {
         const submitButton = document.getElementById("confirmSubmit");
         const cancelButton = document.getElementById("cancelCancel");
 
-        // Close modal when clicking outside
-        overlay.addEventListener("click", () => this.closeAddTaskModal());
-
-        // Close modal with Escape key
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                this.closeAddTaskModal();
-            }
-        });
-
         // Remove any previous listeners and add new ones
         submitButton.removeEventListener("click", this.handleSubmitTask);
         submitButton.addEventListener("click", async (event) => {
@@ -149,11 +139,14 @@ class ProjectPage extends BaseClass {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayString = today.toISOString().split("T")[0];
+
             if (taskDueDate < todayString) {
-                this.errorHandler("Please enter a valid future due date.");
-                this.showWarning("Due dates cannot be in the past.");
+                this.errorHandler("Due dates must be in the future, please enter a valid date..");
                 return;
             }
+
+            // Automatically set the createdAt field to the current date and time
+            const createdAtFormatted = new Date().toISOString();
 
             // Create the task object
             const newTask = {
@@ -162,6 +155,7 @@ class ProjectPage extends BaseClass {
                 assignedTo: assignedTo,
                 status: status,
                 priority: priority,
+                createdAt: createdAtFormatted,
                 taskDueDate: taskDueDate,
             };
 
@@ -173,7 +167,7 @@ class ProjectPage extends BaseClass {
             await this.client.createTask(newTask);
 
             // After task is created, hide the loading message
-            this.showMessage("The task has been created.");
+            this.showMessageModal("Task created successfully!");
 
             // Refresh the task list after task is created
             await this.taskUtility.fetchTasks();
@@ -211,16 +205,6 @@ class ProjectPage extends BaseClass {
             const overlay = document.getElementById("modalOverlay");
             modal.style.display = "flex";
             overlay.style.display = "flex";
-
-            // Close modal when clicking outside
-            overlay.addEventListener("click", () => this.closeModal(modal, overlay));
-
-            // Close modal with Escape key
-            document.addEventListener("keydown", (event) => {
-                if (event.key === "Escape") {
-                    this.closeModal(modal, overlay);
-                }
-            });
 
             // Confirm update button
             const confirmUpdate = document.getElementById("confirmUpdate");
@@ -263,8 +247,7 @@ class ProjectPage extends BaseClass {
         const todayString = today.toISOString().split("T")[0];
 
         if (updatedTask.taskDueDate < todayString) {
-            this.errorHandler("Please enter a valid future due date.");
-            this.showWarning("Due dates cannot be in the past.");
+            this.errorHandler("Due dates must be in the future, please enter a valid date..");
             return false;
         }
 
@@ -276,9 +259,7 @@ class ProjectPage extends BaseClass {
 
             // Update notifications based on the current state of tasks
             const tasks = this.dataStore.get("tasks");
-            await this.taskUtility.updateNotifications(tasks);
-
-            this.showMessage("The task has been updated.");
+            this.showMessageModal("Task updated successfully!");
             return true;
         } catch (error) {
             console.error("Something went wrong while updating the task. Please try again later..");
@@ -298,117 +279,118 @@ class ProjectPage extends BaseClass {
         // Get taskId from the button's data attribute
         const taskId = event.target.getAttribute("data-task-id");
 
-        // Display confirmation modal
         const modal = document.getElementById("confirmationModal");
         const overlay = document.getElementById("modalOverlay");
-        modal.style.display = "flex";
-        overlay.style.display = "flex";
-
-        // Close modal when clicking outside
-        overlay.addEventListener("click", () => this.closeModal(modal, overlay));
-
-        // Close modal with Escape key
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                this.closeModal(modal, overlay);
-            }
-        });
-
-        // Confirm and cancel buttons in the modal
         const confirmBtn = document.getElementById("confirmDelete");
         const cancelBtn = document.getElementById("cancelDelete");
 
-        // Confirm delete handler
-        confirmBtn.addEventListener("click", async () => {
+        // Create one-time event handlers
+        const handleConfirm = async () => {
             this.closeModal(modal, overlay);
-            try {
-                this.taskUtility.loadingSpinner(true);
-                this.showMessage("Deleting task, please wait..");
-                await this.client.deleteTask(taskId); // Call API to delete task
-                await this.taskUtility.fetchTasks(); // Re-fetch tasks after deletion
+            await this.handleConfirmDelete(taskId);
+            confirmBtn.removeEventListener("click", handleConfirm);
+        };
 
-                this.showMessage("The task has been deleted.");
-            } catch (error) {
-                console.error("Error deleting task:", error);
-                this.showMessage("Something went wrong while deleting the task.. Please try again later!");
-            } finally {
-                this.closeModal(modal, overlay);
-                this.taskUtility.loadingSpinner(false);
-            }
-        });
-
-        // Event listener for cancellation
-        cancelBtn.addEventListener("click", () => {
+        const handleCancel = () => {
             this.closeModal(modal, overlay);
-        });
+            cancelBtn.removeEventListener("click", handleCancel);
+        };
+
+        // Add new listeners
+        confirmBtn.addEventListener("click", handleConfirm);
+        cancelBtn.addEventListener("click", handleCancel);
+
+        modal.style.display = "flex";
+        overlay.style.display = "flex";
+    }
+
+    async handleConfirmDelete(taskId) {
+        try {
+            this.taskUtility.loadingSpinner(true);
+            this.showMessage("Deleting task, please wait...");
+
+            await this.client.deleteTask(taskId); // Call API to delete the task
+            await this.taskUtility.fetchTasks(); // Re-fetch tasks after deletion
+
+            // Show success message after deletion
+            this.showMessageModal("Task deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting task:", error);
+            this.showMessage("Something went wrong while deleting the task.. Please try again later!");
+        } finally {
+            this.taskUtility.loadingSpinner(false);
+            this.cleanupAfterDelete?.();
+        }
     }
 
     /**
     * Handle bulk deletion of selected tasks.
     */
     async onBulkDeleteTasks() {
-        const selectedTasks = [];
-        document.querySelectorAll(".task-checkbox:checked").forEach((checkbox) => {
-            selectedTasks.push(checkbox.getAttribute("data-task-id"));
-        });
+        const selectedTasks = Array.from(document.querySelectorAll(".task-checkbox:checked"))
+            .map(checkbox => checkbox.getAttribute("data-task-id"));
 
         if (selectedTasks.length === 0) {
-            this.showMessage("Please select at least one task to delete!");
+            this.showWarning("Oops! It looks like you haven't selected any tasks to delete.");
             return;
         }
 
         // Show confirmation modal with dynamic message
         const modal = document.getElementById("deletionModal");
         const overlay = document.getElementById("modalOverlay");
+        const confirmBtn = document.getElementById("confirmBulkDelete");
+        const cancelBtn = document.getElementById("cancelBulkDelete");
 
-        // Set the confirmation message with the number of selected tasks
         const confirmationMessage = `Are you sure you want to delete ${selectedTasks.length} selected task${selectedTasks.length > 1 ? 's' : ''}?`;
         modal.querySelector('h3').textContent = confirmationMessage;
+
+        const onConfirmBulkDelete = async () => {
+            confirmBtn.disabled = true;
+            cancelBtn.disabled = true;
+
+            try {
+                this.closeModal(modal, overlay);
+                this.taskUtility.loadingSpinner(true);
+                this.showMessage("Deleting selected tasks, please wait...");
+
+                // Concurrent deletion of tasks
+                const results = await Promise.allSettled(
+                    selectedTasks.map(taskId => this.client.deleteTask(taskId))
+                );
+
+                // Analyze results
+                const succeeded = results.filter(result => result.status === "fulfilled").length;
+                const failed = results.filter(result => result.status === "rejected").length;
+
+                await this.taskUtility.fetchTasks();
+
+                // Provide feedback based on results
+                if (failed > 0) {
+                    this.showMessageModal(`Failed to delete ${failed} task${failed !== 1 ? 's' : ''}.`);
+                } else {
+                    this.showMessageModal(`Selected ${succeeded} task${succeeded !== 1 ? 's' : ''} deleted successfully.`);
+                }
+            } catch (error) {
+                console.error("Unexpected error during deletion:", error);
+                this.showMessage("Something went wrong while deleting tasks. Please try again later!");
+            } finally {
+                this.taskUtility.loadingSpinner(false);
+                confirmBtn.disabled = false;
+                cancelBtn.disabled = false;
+                confirmBtn.removeEventListener("click", onConfirmBulkDelete);
+            }
+        };
+
+        // Attach event listeners with cleanup
+        confirmBtn.addEventListener("click", onConfirmBulkDelete);
+        cancelBtn.addEventListener("click", () => {
+            this.closeModal(modal, overlay);
+            confirmBtn.removeEventListener("click", onConfirmBulkDelete);
+        });
 
         // Display modal and overlay
         modal.style.display = "flex";
         overlay.style.display = "flex";
-
-        // Close modal when clicking outside
-        overlay.addEventListener("click", () => this.closeModal(modal, overlay));
-
-        // Close modal with Escape key
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                this.closeModal(modal, overlay);
-            }
-        });
-
-        // Get the new confirm and cancel buttons using the updated IDs
-        const confirmBtn = document.getElementById("confirmBulkDelete");
-        const cancelBtn = document.getElementById("cancelBulkDelete");
-
-        const onConfirmBulkDelete = async () => {
-            this.closeModal(modal, overlay);
-            try {
-                this.taskUtility.loadingSpinner(true);
-                this.showMessage("Deleting selected tasks, please wait...");
-
-                // Delete each selected task
-                for (const taskId of selectedTasks) {
-                    await this.client.deleteTask(taskId);
-                }
-
-                await this.taskUtility.fetchTasks();
-                this.showMessage("Selected tasks have been deleted successfully!");
-            } catch (error) {
-                console.error("Error deleting tasks:", error);
-                this.showMessage("Something went wrong while deleting tasks. Please try again later!");
-            } finally {
-                this.taskUtility.loadingSpinner(false);
-            }
-        };
-        // Event listener for confirmation
-        confirmBtn.addEventListener("click", onConfirmBulkDelete);
-
-        cancelBtn.addEventListener("click", () => {
-            this.closeModal(modal, overlay);
-        });
     }
 
     /**
@@ -464,7 +446,7 @@ class ProjectPage extends BaseClass {
                 // Display message if no canceled tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                <td colspan="10" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
                     You have no canceled tasks! Everything is on track! 🎉
                 </td>
             `;
@@ -506,7 +488,7 @@ class ProjectPage extends BaseClass {
                 // Display message if no completed tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                <td colspan="10" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
                     You have no completed tasks yet! You can add new tasks to get started and track your progress! 📅
                 </td>
             `;
@@ -561,7 +543,7 @@ class ProjectPage extends BaseClass {
                 // Display message if no incomplete tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                <td colspan="10" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
                     Looks like you have no ongoing tasks.. Add new tasks to keep your workflow moving! ✏️
                 </td>
             `;
@@ -615,7 +597,7 @@ class ProjectPage extends BaseClass {
                 // Display message if no overdue tasks are available
                 const noDataRow = document.createElement("tr");
                 noDataRow.innerHTML = `
-                <td colspan="9" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
+                <td colspan="10" style="text-align: center; font-style: italic; color: gray; font-size: 20px;">
                     Looks like you have no overdue tasks! Everything is on schedule! 👍
                 </td>
             `;
@@ -643,6 +625,31 @@ class ProjectPage extends BaseClass {
     */
     updateNotifications(taskList) {
         this.taskUtility.updateNotifications(taskList);
+    }
+
+    // Function to show the modal with a message
+    showMessageModal(message) {
+        const modal = document.getElementById("messageModal");
+        const overlay = document.getElementById("modalOverlay");
+        const messageTitle = document.getElementById("messageTitle");
+        const closeModalBtn = document.getElementById("closeMessageModal");
+
+        // Set the message text
+        messageTitle.textContent = message;
+
+        // Ensure the overlay has the correct background color and is visible
+        overlay.classList.add('modal-overlay-message');
+        overlay.style.display = "flex";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
+
+        // Display the modal
+        modal.style.display = "flex";
+
+        // Close modal on button click
+        closeModalBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        });
     }
 
     // Method to close the Add Task modal
@@ -675,15 +682,5 @@ const main = async () => {
     const projectPage = new ProjectPage();
     projectPage.mount();
 };
-
-// Ensure the modal is closed when the page reloads or refreshes
-window.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("modalOverlay").style.display = "none";
-    document.getElementById("addTaskModal").style.display = "none";
-    document.getElementById("updateTaskModal").style.display = "none";
-    document.getElementById("confirmationModal").style.display = "none";
-    document.getElementById("loadingSpinner").style.display = "none";
-});
-
 
 window.addEventListener('DOMContentLoaded', main);

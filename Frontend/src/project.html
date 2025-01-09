@@ -112,13 +112,14 @@
     <table>
       <thead>
       <tr>
-        <th><input type="checkbox" id="selectAllCheckbox" /></th>
+        <th><input type="checkbox" id="selectAllCheckbox" name="selectAll" /></th>
         <th>Id</th>
         <th>Title</th>
         <th>Description</th>
         <th>Assigned To</th>
         <th>Status</th>
         <th>Priority</th>
+        <th>Created At</th>
         <th>Deadline</th>
         <th>Action</th>
       </tr>
@@ -236,6 +237,16 @@
     <div class="modal-actions">
       <button id="confirmBulkDelete" class="modal-btn confirm">Confirm</button>
       <button id="cancelBulkDelete" class="modal-btn cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Close Message Modal -->
+<div id="messageModal" class="close-modal" style="display: none;">
+  <div class="modal-content">
+    <h2 id="messageTitle">Message</h2>
+    <div class="modal-actions">
+      <button id="closeMessageModal" class="modal-btn close">Close</button>
     </div>
   </div>
 </div>

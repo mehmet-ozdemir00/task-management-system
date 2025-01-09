@@ -102,16 +102,6 @@ class MainPage extends BaseClass {
         const submitButton = document.getElementById("confirmSubmit");
         const cancelButton = document.getElementById("confirmCancel");
 
-        // Close modal when clicking outside
-        overlay.addEventListener("click", () => this.closeAddTaskModal());
-
-        // Close modal with Escape key
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") {
-                this.closeAddTaskModal();
-            }
-        });
-
         // Remove any previous listeners and add new ones
         submitButton.removeEventListener("click", this.handleSubmitTask);
         submitButton.addEventListener("click", async (event) => {
@@ -149,11 +139,14 @@ class MainPage extends BaseClass {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayString = today.toISOString().split("T")[0];
+
             if (taskDueDate < todayString) {
-                this.errorHandler("Please enter a valid future due date.");
-                this.showWarning("Due dates cannot be in the past.");
+                this.errorHandler("Due dates must be in the future, please enter a valid date..");
                 return;
             }
+
+            // Automatically set the createdAt field to the current date and time
+            const createdAtFormatted = new Date().toISOString();
 
             // Create the task object
             const newTask = {
@@ -162,18 +155,19 @@ class MainPage extends BaseClass {
                 assignedTo: assignedTo,
                 status: status,
                 priority: priority,
+                createdAt: createdAtFormatted,
                 taskDueDate: taskDueDate,
             };
 
             // Close the modal after task creation
             this.closeAddTaskModal();
-            this.showMessage("Creating task, Please wait...");
+            this.showMessage("Creating task, please wait..");
 
             // Make an API call to create the task
             await this.client.createTask(newTask);
 
             // After task is created, hide the loading message
-            this.showMessage("The task has been created.");
+            this.showMessageModal("Task created successfully!");
 
             // Refresh the task list after task is created
             await this.taskUtility.fetchTasks();
@@ -183,6 +177,30 @@ class MainPage extends BaseClass {
         } finally {
             this.taskUtility.loadingSpinner(false);
         }
+    }
+
+    // Function to show the modal with a message
+    showMessageModal(message) {
+        const modal = document.getElementById("messageModal");
+        const overlay = document.getElementById("modalOverlay");
+        const messageTitle = document.getElementById("messageTitle");
+        const closeModalBtn = document.getElementById("closeMessageModal");
+
+        // Set the message text
+        messageTitle.textContent = message;
+
+        // Ensure the overlay has the correct background color and is visible
+        overlay.classList.add('modal-overlay-message');
+        overlay.style.display = "flex";
+
+        // Display the modal
+        modal.style.display = "flex";
+
+        // Close modal on button click
+        closeModalBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        });
     }
 
     /**
