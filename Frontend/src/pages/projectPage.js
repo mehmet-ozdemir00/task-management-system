@@ -20,7 +20,7 @@ class ProjectPage extends BaseClass {
         this.client = new Client();
         await this.taskUtility.mount();
         const tasks = await this.client.getAllTasks();
-        this.dataStore.set("tasks", tasks);
+        this.dataStore.set('tasks', tasks);
         this.addEventListeners();
     }
 
@@ -319,7 +319,6 @@ class ProjectPage extends BaseClass {
             this.showMessage("Something went wrong while deleting the task.. Please try again later!");
         } finally {
             this.taskUtility.loadingSpinner(false);
-            this.cleanupAfterDelete?.();
         }
     }
 

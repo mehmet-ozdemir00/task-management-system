@@ -31,8 +31,8 @@
     <nav class="sidebar-nav">
       <ul class="sidebar-list">
         <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
-        <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Projects</a></li>
-        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar"></i> Analytics</a></li>
+        <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Tasks</a></li>
+        <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar vertical-icon"></i> Analytics</a></li>
       </ul>
     </nav>
   </aside>
@@ -75,11 +75,12 @@
 
 <!-- Title Description -->
 <div class="content-section">
-  <h2>Task Progress Overview</h2>
+  <h2>Task Progress and Status Insights</h2>
   <p>
-    Track and monitor task performance efficiently. This dashboard provides an overview of task counts
-    categorized by status—Completed, In-Progress, Pending, Canceled, and Overdue. It also displays
-    the percentage of completion for each category, helping you assess progress and prioritize tasks effectively.
+    Monitor task performance and progress efficiently. This dashboard provides a comprehensive overview of task counts
+    categorized by status—Completed, In Progress, Pending, Canceled, Overdue, and On Hold.
+    It dynamically displays percentages and progress bars for each category, helping you assess task distribution,
+    identify bottlenecks, and prioritize tasks effectively.
   </p>
 </div>
 
@@ -190,11 +191,11 @@
 
 <!-- Title Section -->
 <div class="content-section">
-  <h2>Task Distribution and Performance Insights</h2>
+  <h2>Task Status Distribution and Insights</h2>
   <p>
-    Analyze task performance and status distribution. This chart dynamically displays task counts categorized by
-    status—Completed, In-Progress, Pending, Canceled, and Overdue—along with their percentage contributions.
-    Identify areas needing attention to improve task management efficiency.
+    Visualize task status distribution with detailed counts and percentage contributions for each category:
+    Completed, In Progress, Pending, Canceled, Overdue, and On Hold.
+    Gain actionable insights to identify performance trends and optimize task management strategies.
   </p>
 </div>
 
@@ -210,11 +211,11 @@
 
 <!-- Title Section -->
 <div class="content-section">
-  <h2>Task Status Over Time</h2>
+  <h2>Task Status by Deadline</h2>
   <p>
-    Visualize the progress of tasks marked as "In Progress" and "Pending" over time. This line chart dynamically
-    displays task counts grouped by current dates, helping you track how these tasks evolve and progress on a daily
-    basis. Analyze trends, monitor progress, and make informed decisions to address any potential delays or bottlenecks.
+    Visualize the distribution of tasks marked as "In Progress" and "Pending" by their deadline dates. This line chart
+    dynamically displays task counts grouped by their due dates, providing insights into upcoming deadlines and workload
+    distribution. Leverage these insights to stay organized, address bottlenecks, and ensure tasks are completed on time.
   </p>
 </div>
 
@@ -228,6 +229,34 @@
   </div>
 </div>
 
+<!-- Productivity Trends Chart -->
+<div class="content-section">
+  <h2>Track Your Productivity Trends</h2>
+  <p>
+    Visualize your productivity trends with a line chart that displays the number of tasks completed over the past week, month, or custom date range.
+  </p>
+</div>
+
+<!-- Date Range Filter -->
+<div class="filter-date">
+  <label for="start-date">Start Date:</label>
+  <input type="date" id="start-date">
+  <label for="end-date">End Date:</label>
+  <input type="date" id="end-date">
+  <button id="apply-date-filter">Apply Date Filter</button>
+  <!-- Preset Date Ranges -->
+  <button id="last-7-days">Last 7 Days</button>
+  <button id="last-30-days">Last 30 Days</button>
+</div>
+
+<!-- Line Chart for Completed Tasks -->
+<div class="new-chart-container">
+  <canvas id="productivityTrendsChart"></canvas>
+  <div class="new-message" id="select-date-message" style="display: block;">
+    <i class="fas fa-calendar"></i>
+    <p>Please select a date range to visualize the completed tasks..</p>
+  </div>
+</div>
 
 <!-- Loading Spinner -->
 <div id="loadingSpinner" class="loading-spinner" style="display: none;">

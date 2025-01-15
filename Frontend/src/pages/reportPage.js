@@ -6,7 +6,7 @@ import Client from "../api/client";
 class ReportPage extends BaseClass {
     constructor() {
         super();
-        this.bindClassMethods(['mount', 'updateNotifications', 'updateTaskCounts', 'updateTaskCountsBar', 'renderAnalytics', 'initializeChart', 'initializeLineChart'], this);
+        this.bindClassMethods(['mount', 'updateNotifications', 'updateTaskCounts', 'updateTaskCountsBar', 'renderAnalytics', 'initializeChart', 'initializeLineChart', 'applyDateFilter', 'renderProductivityTrendsChart', 'handlePresetDateFilter'], this);
         this.dataStore = new DataStore();
         this.taskUtility = new TaskUtility(
             () => {}, // updateDailyTask
@@ -14,6 +14,7 @@ class ReportPage extends BaseClass {
             () => {}, // onDeleteTask
             this.updateTaskCounts
         );
+        this.productivityChart = null; // Store the chart instance
     }
 
     /**
@@ -56,6 +57,17 @@ class ReportPage extends BaseClass {
         // Prevent dropdown from closing if clicked inside it
         notificationDropdown.addEventListener("click", (event) => {
             event.stopPropagation();
+        });
+
+        // Add event listeners for date range filter buttons
+        document.getElementById("apply-date-filter").addEventListener("click", () => this.applyDateFilter());
+        document.getElementById("last-7-days").addEventListener("click", () => {
+            this.handlePresetDateFilter(7);
+            this.highlightActiveButton("last-7-days");
+        });
+        document.getElementById("last-30-days").addEventListener("click", () => {
+            this.handlePresetDateFilter(30);
+            this.highlightActiveButton("last-30-days");
         });
     }
 
@@ -556,7 +568,7 @@ class ReportPage extends BaseClass {
         const allDates = Object.keys({
             ...taskCountsByDate[STATUS_IN_PROGRESS],
             ...taskCountsByDate[STATUS_PENDING]
-        }).sort();
+        }).sort((a, b) => new Date(a) - new Date(b));
 
         // Prepare data for the chart
         const inProgressData = allDates.map(date => taskCountsByDate[STATUS_IN_PROGRESS][date] || 0);
@@ -582,35 +594,41 @@ class ReportPage extends BaseClass {
             return gradient;
         };
 
-        // Common dataset configuration
-        const commonDatasetConfig = {
-            tension: 0.4,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            fill: true,
-        };
+        // Dynamically create datasets based on available data
+        const datasets = [];
+
+        if (inProgressData.some(value => value > 0)) {
+            datasets.push({
+                label: STATUS_IN_PROGRESS,
+                data: inProgressData,
+                borderColor: '#FFA500',
+                backgroundColor: createGradient(ctx, '#FFA500'),
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                fill: true,
+            });
+        }
+
+        if (pendingData.some(value => value > 0)) {
+            datasets.push({
+                label: STATUS_PENDING,
+                data: pendingData,
+                borderColor: '#00BFFF',
+                backgroundColor: createGradient(ctx, '#00BFFF'),
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                fill: true,
+            });
+        }
 
         // Create the line chart
         this.lineChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: allDates,
-                datasets: [
-                    {
-                        label: STATUS_IN_PROGRESS,
-                        data: inProgressData,
-                        borderColor: '#FFA500',
-                        backgroundColor: createGradient(ctx, '#FFA500'),
-                        ...commonDatasetConfig,
-                    },
-                    {
-                        label: STATUS_PENDING,
-                        data: pendingData,
-                        borderColor: '#00BFFF',
-                        backgroundColor: createGradient(ctx, '#00BFFF'),
-                        ...commonDatasetConfig,
-                    }
-                ]
+                datasets: datasets,
             },
             options: {
                 responsive: true,
@@ -619,7 +637,7 @@ class ReportPage extends BaseClass {
                     x: {
                         title: {
                             display: true,
-                            text: 'Current Dates',
+                            text: 'Deadline Dates',
                             font: { size: 16, weight: 'bold' }
                         },
                         grid: {
@@ -656,7 +674,7 @@ class ReportPage extends BaseClass {
                     },
                     title: {
                         display: true,
-                        text: 'Remaining Tasks (In Progress & Pending) Over Time',
+                        text: 'Tasks (In Progress & Pending) by Deadline Date',
                         font: {
                             size: 19,
                             weight: 'bold',
@@ -680,6 +698,187 @@ class ReportPage extends BaseClass {
                 },
             }
         });
+    }
+
+    // Function to apply the date filter and display the chart
+    applyDateFilter() {
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+
+        if (startDate && endDate) {
+            // Hide the "Please select a date range" message
+            document.getElementById("select-date-message").style.display = "none";
+
+            // Call the chart render method with the selected date range
+            this.renderProductivityTrendsChart(null, startDate, endDate);
+        } else {
+            this.showWarning("Please select both start and end dates..");
+        }
+    }
+
+    // Handle the preset date filter selection
+    handlePresetDateFilter(days) {
+        const today = new Date();
+        const startDate = new Date();
+        startDate.setDate(today.getDate() - days);
+
+        const startDateString = startDate.toISOString().split("T")[0];
+        const endDateString = today.toISOString().split("T")[0];
+
+        document.getElementById("start-date").value = startDateString;
+        document.getElementById("end-date").value = endDateString;
+
+        // Hide the "Please select a date range" message
+        document.getElementById("select-date-message").style.display = "none";
+
+        // Call the chart render method for the selected range
+        this.renderProductivityTrendsChart(days);
+    }
+
+    // Render productivity trends chart based on selected date range
+    renderProductivityTrendsChart(days = null, startDate = null, endDate = null) {
+        const analytics = this.taskUtility.dataStore.get("analytics");
+        const chartData = {
+            labels: [],
+            completed: [],
+        };
+
+        const today = new Date();
+        let startDateObj;
+
+        if (days) {
+            startDateObj = new Date();
+            startDateObj.setDate(today.getDate() - days);
+        } else if (startDate && endDate) {
+            startDateObj = new Date(startDate);
+        }
+
+        if (!startDateObj) return;
+
+        const endDateObj = endDate ? new Date(endDate) : today;
+
+        // Initialize a counter for total completed tasks
+        let totalCompletedTasks = 0;
+
+        // Filter tasks based on the selected date range
+        analytics.tasks.forEach(task => {
+            const taskDate = new Date(task.taskDueDate);
+            if (taskDate >= startDateObj && taskDate <= endDateObj) {
+                const taskDateString = taskDate.toISOString().split("T")[0];
+                if (!chartData.labels.includes(taskDateString)) {
+                    chartData.labels.push(taskDateString);
+                    chartData.completed.push(0);
+                }
+                const index = chartData.labels.indexOf(taskDateString);
+                if (task.status === "Completed") {
+                    chartData.completed[index]++;
+                    totalCompletedTasks++; // Increment the total completed tasks
+                }
+            }
+        });
+
+        // Render the chart with the data and total completed tasks
+        this.renderChart(chartData, totalCompletedTasks);
+    }
+
+    // Render the chart on the canvas
+    renderChart(chartData, totalCompletedTasks) {
+        const ctx = document.getElementById("productivityTrendsChart").getContext("2d");
+
+        // Destroy existing chart instance if it exists
+        if (this.productivityChart) {
+            this.productivityChart.destroy();
+        }
+
+        // Create the chart
+        this.productivityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: chartData.completed,
+                    backgroundColor: 'rgba(4, 194, 4, 0.5)',
+                    borderColor: '#04c204',
+                    borderWidth: 1,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    subtitle: {
+                        display: true,
+                        text: [
+                            'Visual representation of task completion over time..',
+                            `Total Tasks Completed: ${totalCompletedTasks}`
+                        ],
+                        font: {
+                            size: 15,
+                            family: 'Arial, Helvetica, sans-serif',
+                            style: 'italic'
+                        },
+                        padding: {
+                            bottom: 10
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Completed Dates',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        grid: {
+                            color: "rgba(200, 200, 200, 0.3)",
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Task Count',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        grid: {
+                            color: "rgba(200, 200, 200, 0.3)",
+                        },
+                        beginAtZero: true,
+                        suggestedMax: totalCompletedTasks > 0 ? undefined : 0.5,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                return Number.isInteger(value) ? value : '';
+                            }
+                        },
+                    },
+                }
+            }
+        });
+
+        // Show or hide the "No Data" message if no data exists
+        if (chartData.labels.length === 0) {
+            document.getElementById("select-date-message").style.display = "none";
+        } else {
+            document.getElementById("select-date-message").style.display = "none";
+        }
+    }
+
+    // Highlight the active button
+    highlightActiveButton(activeButtonId) {
+        // Get all buttons with the same class or ID group
+        const buttons = document.querySelectorAll("#last-7-days, #last-30-days");
+
+        // Remove 'active' class from all buttons
+        buttons.forEach(button => {
+            button.classList.remove("active");
+        });
+
+        // Add 'active' class to the clicked button
+        const activeButton = document.getElementById(activeButtonId);
+        if (activeButton) {
+            activeButton.classList.add("active");
+        }
     }
 }
 
