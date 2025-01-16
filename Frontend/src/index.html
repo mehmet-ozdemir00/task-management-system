@@ -33,7 +33,7 @@
         <li><a href="index.html" class="sidebar-link"><i class="fa fa-fw fa-home"></i> Dashboard</a></li>
         <li><a href="project.html" class="sidebar-link"><i class="fa fa-fw fa-folder-open"></i> Tasks</a></li>
         <li><a href="report.html" class="sidebar-link"><i class="fa fa-fw fa-chart-bar vertical-icon"></i> Analytics</a></li>
-        <li><a href="#" class="sidebar-link"><i class="fa fa-fw fa-sign-out-alt"></i> Logout</a></li>
+        <li><a href="logout.html" class="sidebar-link"><i class="fa fa-fw fa-sign-out-alt"></i> Logout</a></li>
       </ul>
     </nav>
   </aside>
@@ -111,10 +111,10 @@
     <h2>Create Task</h2>
 
     <label for="addTaskTitle">Title:</label>
-    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="20" />
+    <input type="text" id="addTaskTitle" name="title" placeholder="Enter task title..." required maxlength="50" />
 
     <label for="addTaskDescription">Description:</label>
-    <textarea id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="50"></textarea>
+    <textarea id="addTaskDescription" name="description" placeholder="Enter task description..." required maxlength="100"></textarea>
 
     <label for="addTaskAssignedTo">Assigned To:</label>
     <input type="text" id="addTaskAssignedTo" name="assignedTo" placeholder="Enter assignee name..." required />

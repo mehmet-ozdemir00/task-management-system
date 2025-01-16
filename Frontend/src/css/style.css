@@ -84,6 +84,11 @@ body {
 .vertical-icon {
     transform: rotate(270deg);
 }
+
+.sidebar-link.active {
+    background-color: #ccc;
+    color: var(--text-color);
+}
 /* --------------- Sidebar Styles Ends -------------- */
 
 
@@ -655,9 +660,22 @@ body {
 
 .table-container th,
 .table-container td {
-    max-width: 200px;
+    padding: 8px;
     text-align: center;
+    border: 1px solid #c0c0c0;
     word-wrap: break-word;
+}
+
+.table-container td:nth-child(3),
+.table-container td:nth-child(4) {
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    max-width: 185px;
+}
+
+.table-container td:nth-child(10) {
+    width: 200px;
 }
 
 .table-container th {
@@ -671,11 +689,6 @@ body {
     padding: 4px;
     text-align: center;
     border: 1px solid #c0c0c0;
-}
-
-.table-container td:nth-child(2),
-.table-container td:nth-child(3) {
-    text-align: left;
 }
 
 .table-container table td h3 {
@@ -731,7 +744,7 @@ body {
     font-size: 14px;
     padding: 10px 12px;
     border-radius: 4px;
-    margin-left: 18rem;
+    margin-left: 19rem;
     background-color: #dc3545;
 }
 
@@ -1420,11 +1433,11 @@ button.active {
     }
 
     .new-message {
-        top: auto;
+        top: 37%;
         color: gray;
         font-size: 1rem;
-        padding: 10px;
-        position: relative;
+        position: absolute;
+        text-align: center;
     }
 
     .new-message i {

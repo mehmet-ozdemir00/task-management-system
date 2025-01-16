@@ -56,6 +56,17 @@ class ProjectPage extends BaseClass {
             });
         });
 
+        // Highlight the active sidebar link
+        const links = document.querySelectorAll('.sidebar-link');
+        const currentPath = window.location.pathname.split('/').pop();
+
+        links.forEach(link => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
         // Task filter buttons
         const addTaskButton = document.getElementById("addTaskButton");
         if (addTaskButton) addTaskButton.addEventListener("click", this.onCreateTask);

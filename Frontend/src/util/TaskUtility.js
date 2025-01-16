@@ -12,6 +12,7 @@ export default class TaskUtility extends BaseClass {
         this.updateDailyTask = updateDailyTask;
         this.updateTaskCounts = updateTaskCounts;
         this.searchTimeout = null;
+        this.isWarningShown = false;
     }
 
     /**
@@ -470,8 +471,11 @@ export default class TaskUtility extends BaseClass {
             this.renderTasks(filteredTasks);
 
             // Show warning if no tasks found
-            if (filteredTasks.length === 0) {
+            if (filteredTasks.length === 0 && !this.isWarningShown) {
                 this.showWarning("No tasks found matching your search.");
+                this.isWarningShown = true; // Set the warning state to true
+            } else if (filteredTasks.length > 0) {
+                this.isWarningShown = false; // Reset the warning state if tasks are found
             }
         }, 300);
     }

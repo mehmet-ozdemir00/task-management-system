@@ -69,6 +69,17 @@ class ReportPage extends BaseClass {
             this.handlePresetDateFilter(30);
             this.highlightActiveButton("last-30-days");
         });
+
+        // Highlight the active sidebar link
+        const links = document.querySelectorAll('.sidebar-link');
+        const currentPath = window.location.pathname.split('/').pop();
+
+        links.forEach(link => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            }
+        });
     }
 
     /**
