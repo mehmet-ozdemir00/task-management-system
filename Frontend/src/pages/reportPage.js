@@ -460,6 +460,8 @@ class ReportPage extends BaseClass {
                             },
                             ticks: {
                                 beginAtZero: true,
+                                stepSize: 1,
+                                autoSkip: false,
                                 font: { size: 12, weight: 'normal' },
                                 callback: function(value) {
                                     return Number.isInteger(value) ? value : '';
