@@ -167,7 +167,6 @@ body {
     color: #000000;
     font-size: 43px;
     cursor: pointer;
-    margin-right: 3px;
     position: relative;
 }
 
@@ -241,6 +240,13 @@ body {
 /* --------------- Notification Section Ends --------------- */
 
 /* -------------- Profile Image Styles Starts -------------- */
+.profile-container {
+    gap: 1rem;
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
 .profile-image {
     width: 50px;
     height: 50px;
@@ -253,6 +259,69 @@ body {
     transform: scale(1.1);
     transition: var(--hover-transition);
 }
+
+.user-status-badge {
+    color: white;
+    font-size: 1rem;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    margin-right: 0.7rem;
+}
+
+/* Custom Dropdown for Status Selection */
+.status-dropdown {
+    opacity: 0;
+    top: 4.6rem;
+    right: -20px;
+    width: 220px;
+    z-index: 1000;
+    display: block;
+    overflow-y: auto;
+    position: absolute;
+    background-color: #eeeeee;
+    transform: translateX(100%);
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.status-dropdown h5 {
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    box-sizing: border-box;
+    background-color: #bebbbb;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.status-dropdown h5 i {
+    font-size: 16px;
+    margin-right: 2.2rem;
+}
+
+.status-dropdown.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.status-option {
+    padding: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #888;
+    transition: background-color 0.3s ease;
+}
+
+.status-option:hover {
+    transform: scale(1.05);
+    background-color: #bebbbb;
+    transition: var(--hover-transition);
+}
+
 /* ---------------- Profile Image Styles Ends ---------------- */
 
 /* --------------- Title Section Styles Starts --------------- */
@@ -303,11 +372,14 @@ body {
 
 .add-task-button:hover {
     transform: scale(1.05);
-    background-color: #00BFFF;
 }
 /* --------------- Title Section Styles Ends --------------- */
 
 /* --------------- Daily Task Summary & Messages Section Starts --------------- */
+.dashboard-content {
+    margin-left: 250px;
+    padding: 20px;
+}
 
 .content-wrapper {
     gap: 30px;
@@ -315,7 +387,7 @@ body {
     padding: 30px;
     margin: 30px auto;
     max-width: 1220px;
-    margin-left: 250px;
+    border-radius: 10px;
     align-items: flex-start;
     justify-content: space-between;
     box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.4),
@@ -642,12 +714,8 @@ body {
 .tabular--wrapper {
     padding: 20px;
     margin-left: 250px;
+    border-radius: 14px;
     box-shadow: 2px 6px 12px rgba(0, 0, 0, 0.9);
-}
-
-.table-container {
-    width: 100%;
-    overflow-x: auto;
 }
 
 .table-container table {
@@ -1258,14 +1326,26 @@ button.active {
         top: -50px;
     }
 
-    .content-wrapper {
+    .dashboard-content {
+        padding: 10px;
         margin-left: 0;
         flex-direction: column;
-        padding: 15px;
+    }
+
+    .content-wrapper {
+        width: 100%;
     }
 
     .task-summary {
         width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .text {
+        font-size: 15px;
     }
 
     .notification-container {

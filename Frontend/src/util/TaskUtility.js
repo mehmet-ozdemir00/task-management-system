@@ -20,6 +20,19 @@ export default class TaskUtility extends BaseClass {
     */
     async mount() {
         this.client = new Client();
+
+        // Check if tasks are available in localStorage
+        const cachedTasks = localStorage.getItem('cachedTasks');
+        if (cachedTasks) {
+            const tasks = JSON.parse(cachedTasks);
+            this.dataStore.set('tasks', tasks);
+            this.processAnalytics(tasks);
+            this.renderTasks(tasks); // Render cached tasks immediately
+            this.updateDailyTask(tasks.filter(task => task.status === "In Progress")); // Update daily tasks
+            this.updateNotifications(tasks);
+        }
+
+        // Fetch fresh data from the server
         await this.fetchTasks();
         this.setupSearch();
     }
@@ -35,6 +48,7 @@ export default class TaskUtility extends BaseClass {
 
             const taskList = await this.client.getAllTasks(); // Fetch all tasks
             this.dataStore.set("tasks", taskList);
+            localStorage.setItem('cachedTasks', JSON.stringify(taskList)); // Cache the tasks
 
             // Get today's date in local timezone
             const today = new Date();
@@ -146,7 +160,7 @@ export default class TaskUtility extends BaseClass {
                      </td>
                     <td><h3 class="task-info text-black">${task.priority}</h3></td>
                     <td><h3 class="task-info text-black">${formattedCreatedAt}</h3></td>
-                    <td><h3 class="task-info text-black">${task.taskDueDate}</h3></td>
+                    <td><h3 class="task-info text-black">${this.formatTaskDueDate(task.taskDueDate)}</h3></td>
                     <td>
                         <button type="button" class="update-btn" data-task-id="${task.taskId}"><i class="fa fa-pencil-alt"></i> Update</button>
                         <button type="button" class="delete-btn" data-task-id="${task.taskId}"><i class="fa fa-trash"></i> Delete</button>
@@ -175,7 +189,22 @@ export default class TaskUtility extends BaseClass {
             hour12: true
         };
 
-        return date.toLocaleString('en-US', options).replace(',', '');
+        return date.toLocaleString('en-US', options).replace(',', ' - ');
+    }
+
+    formatTaskDueDate(dateString) {
+        // Split the date string into year, month, and day
+        const [year, month, day] = dateString.split('-');
+
+        // Create a local date object using the parsed values
+        const dateObj = new Date(year, month - 1, day);
+
+        // Format the date as MM-DD-YYYY
+        const formattedMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const formattedDay = String(dateObj.getDate()).padStart(2, '0');
+        const formattedYear = dateObj.getFullYear();
+
+        return `${formattedMonth}-${formattedDay}-${formattedYear}`;
     }
 
     /**

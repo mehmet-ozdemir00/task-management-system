@@ -12,7 +12,6 @@ module.exports = {
     mainPage: path.resolve(__dirname, 'src', 'pages', 'mainPage.js'),
     projectPage: path.resolve(__dirname, 'src', 'pages', 'projectPage.js'),
     reportPage: path.resolve(__dirname, 'src', 'pages', 'reportPage.js'),
-    logoutPage: path.resolve(__dirname, 'src', 'pages', 'logoutPage.js'),
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -46,11 +45,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/report.html',
       filename: 'report.html',
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      template: './src/logout.html',
-      filename: 'logout.html',
       inject: false
     }),
     new CopyPlugin({

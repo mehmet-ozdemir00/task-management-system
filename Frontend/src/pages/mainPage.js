@@ -16,9 +16,9 @@ class MainPage extends BaseClass {
     */
     async mount() {
         this.client = new Client();
+        this.setGreetingMessage();
         await this.taskUtility.mount();
         this.addEventListeners();
-        this.setGreetingMessage();
     }
 
     /**

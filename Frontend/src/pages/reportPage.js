@@ -6,7 +6,8 @@ import Client from "../api/client";
 class ReportPage extends BaseClass {
     constructor() {
         super();
-        this.bindClassMethods(['mount', 'updateNotifications', 'updateTaskCounts', 'updateTaskCountsBar', 'renderAnalytics', 'initializeChart', 'initializeLineChart', 'applyDateFilter', 'renderProductivityTrendsChart', 'handlePresetDateFilter'], this);
+        this.bindClassMethods(['mount', 'updateNotifications', 'updateTaskCounts', 'updateTaskCountsBar', 'renderAnalytics', 'initializeChart',
+            'initializeLineChart', 'applyDateFilter', 'renderProductivityTrendsChart', 'handlePresetDateFilter', 'toggleStatusDropdown', 'updateHeaderStatus'], this);
         this.dataStore = new DataStore();
         this.taskUtility = new TaskUtility(
             () => {}, // updateDailyTask
@@ -14,7 +15,7 @@ class ReportPage extends BaseClass {
             () => {}, // onDeleteTask
             this.updateTaskCounts
         );
-        this.productivityChart = null; // Store the chart instance
+        this.productivityChart = null;
     }
 
     /**
@@ -22,6 +23,7 @@ class ReportPage extends BaseClass {
     */
     async mount() {
         this.client = new Client();
+        this.initializePersonStatus();
         await this.taskUtility.mount();
         this.initializeChart();
         this.initializeLineChart();
@@ -34,6 +36,9 @@ class ReportPage extends BaseClass {
     addEventListeners() {
         const notificationIcon = document.getElementById("notification-icon");
         const notificationDropdown = document.getElementById("notification-dropdown");
+        const profileImage = document.getElementById("profileImage");
+        const statusDropdown = document.getElementById("statusDropdown");
+        const statusOptions = document.querySelectorAll(".status-option");
 
         // Handle edge case if dropdown or icon does not exist
         if (!notificationDropdown || !notificationIcon) {
@@ -41,10 +46,11 @@ class ReportPage extends BaseClass {
             return;
         }
 
-        // Toggle dropdown visibility on click
+        // Toggle notification dropdown and close status dropdown when clicking notification icon
         notificationIcon.addEventListener("click", (event) => {
             event.stopPropagation();
             notificationDropdown.classList.toggle("active");
+            statusDropdown.classList.remove("active"); // Close status dropdown if open
         });
 
         // Close dropdown when clicking outside
@@ -52,11 +58,31 @@ class ReportPage extends BaseClass {
             if (!notificationDropdown.contains(event.target) && !notificationIcon.contains(event.target)) {
                 notificationDropdown.classList.remove("active");
             }
+            if (!statusDropdown.contains(event.target) && !profileImage.contains(event.target)) {
+                statusDropdown.classList.remove("active");
+            }
         });
 
-        // Prevent dropdown from closing if clicked inside it
+        // Prevent notification dropdown from closing if clicked inside it
         notificationDropdown.addEventListener("click", (event) => {
             event.stopPropagation();
+        });
+
+        // Event listener for the profile image to toggle the status dropdown
+        profileImage.addEventListener("click", (event) => {
+            event.stopPropagation();
+            statusDropdown.classList.toggle("active");
+            notificationDropdown.classList.remove("active"); // Close notification dropdown if open
+        });
+
+        // Event listener for the status selection to update the status
+        statusOptions.forEach(option => {
+            option.addEventListener("click", (event) => {
+                const newStatus = event.target.getAttribute("data-status");
+                this.updateHeaderStatus(newStatus);
+                localStorage.setItem("userStatus", newStatus); // Save status to localStorage
+                statusDropdown.classList.remove("active"); // Close dropdown after selection
+            });
         });
 
         // Add event listeners for date range filter buttons
@@ -80,6 +106,64 @@ class ReportPage extends BaseClass {
                 link.classList.add('active');
             }
         });
+    }
+
+    /**
+     * Toggle the visibility of the status dropdown.
+     */
+    toggleStatusDropdown() {
+        const statusDropdown = document.getElementById("statusDropdown");
+        if (statusDropdown) {
+            statusDropdown.classList.toggle("active");
+        }
+    }
+
+    /**
+    * Update the header status dynamically.
+    * @param {string} status - The new status.
+    */
+    updateHeaderStatus(status) {
+        const headerStatusElement = document.querySelector("#headerStatus");
+        if (headerStatusElement) {
+            headerStatusElement.textContent = status;
+            headerStatusElement.style.backgroundColor =
+            status === "Available" ? "#4caf50" : // Green for Available
+            status === "In a Meeting" ? "#2196f3" : // Blue for In a Meeting
+            status === "At Lunch" ? "#ff9800" : // Orange for At Lunch
+            status === "On Break" ? "#9c27b0" : ""; // Purple for On Break
+
+            // Ensure the badge is visible when a valid status is set
+            if (status !== "") {
+                headerStatusElement.style.display = "inline-block";
+            } else {
+                headerStatusElement.style.display = "none";
+            }
+        }
+    }
+
+    /**
+     * Initialize Person Status from localStorage and update the UI.
+     */
+    initializePersonStatus() {
+        const storedStatus = localStorage.getItem("userStatus") || "Available";
+        const headerStatusElement = document.querySelector("#headerStatus");
+
+        if (headerStatusElement) {
+            headerStatusElement.textContent = storedStatus;
+            headerStatusElement.style.backgroundColor =
+            storedStatus === "Available" ? "#4caf50" :
+            storedStatus === "In a Meeting" ? "#2196f3" :
+            storedStatus === "At Lunch" ? "#ff9800" :
+            storedStatus === "On Break" ? "#9c27b0" :
+            ""; // No background color if none of the above
+
+            // Ensure the badge is visible when a valid status is set
+            if (storedStatus !== "") {
+                headerStatusElement.style.display = "inline-block";
+            } else {
+                headerStatusElement.style.display = "none";
+            }
+        }
     }
 
     /**

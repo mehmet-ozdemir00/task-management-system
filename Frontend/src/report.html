@@ -44,7 +44,7 @@
       <i class="clear fa fa-times" style="display: none;"></i>
     </div>
 
-    <!-- Right-side elements (Notification Icon & Profile Image) -->
+    <!-- Right-side elements (Status Dropdown, Profile Image & Notification Icon) -->
     <div class="right-side">
       <!-- Notification Icon -->
       <div class="notification-container">
@@ -61,15 +61,26 @@
         </ul>
       </div>
 
-      <!-- Profile Image -->
-      <img src="image/image.jpeg" alt="Profile" class="profile-image">
+      <!-- Profile Image and Status -->
+      <div class="profile-container">
+        <span class="user-status-badge" id="headerStatus">Available</span>
+        <img src="image/image.jpeg" alt="Profile" class="profile-image" id="profileImage">
+
+        <!-- Custom Dropdown for status selection -->
+        <div id="statusDropdown" class="status-dropdown">
+          <h5><i class="fa fa-user"></i> Set Your Status</h5>
+          <div class="status-option" data-status="Available">Available</div>
+          <div class="status-option" data-status="In a Meeting">In a Meeting</div>
+          <div class="status-option" data-status="At Lunch">At Lunch</div>
+          <div class="status-option" data-status="On Break">On Break</div>
+        </div>
+      </div>
     </div>
   </header>
 </section>
 
 <!-- Title Section -->
 <div class="title-section">
-  <h1 class="page-title">Dashboard</h1>
   <h2 class="page-subtitle">Analytics</h2>
 </div>
 

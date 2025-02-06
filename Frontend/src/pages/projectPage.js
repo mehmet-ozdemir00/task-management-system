@@ -8,7 +8,7 @@ class ProjectPage extends BaseClass {
         super();
         this.bindClassMethods(['mount', 'updateNotifications', 'addEventListeners', 'onCreateTask', 'handleSubmitTask', 'onUpdateTask', 'saveUpdatedTask',
             'onDeleteTask', 'handleConfirmDelete' , 'onGetAllTasks', 'onGetCompletedTasks', 'onGetIncompleteTasks', 'onGetCanceledTasks', 'onGetOverdueTasks',
-            'onBulkDeleteTasks', 'closeModal', 'closeAddTaskModal'], this);
+            'onBulkDeleteTasks', 'closeModal', 'closeAddTaskModal', 'toggleStatusDropdown', 'updateHeaderStatus'], this);
         this.dataStore = new DataStore();
         this.taskUtility = new TaskUtility(() => {}, this.onUpdateTask, this.onDeleteTask);
     }
@@ -18,9 +18,23 @@ class ProjectPage extends BaseClass {
     */
     async mount() {
         this.client = new Client();
+        this.initializePersonStatus();
         await this.taskUtility.mount();
+
+        // Check if tasks are available in localStorage
+        const cachedTasks = localStorage.getItem('cachedTasks');
+        if (cachedTasks) {
+            const tasks = JSON.parse(cachedTasks);
+            this.dataStore.set('tasks', tasks);
+            this.taskUtility.renderTasks(tasks); // Render cached tasks immediately
+        }
+
+        // Fetch fresh data from the server
         const tasks = await this.client.getAllTasks();
         this.dataStore.set('tasks', tasks);
+        localStorage.setItem('cachedTasks', JSON.stringify(tasks)); // Cache the tasks
+        this.taskUtility.renderTasks(tasks); // Render fresh tasks
+
         this.addEventListeners();
     }
 
@@ -28,78 +42,153 @@ class ProjectPage extends BaseClass {
     *   Add event listeners for buttons and actions.
     */
     addEventListeners() {
+        // Notification Dropdown Toggle
         const notificationIcon = document.getElementById("notification-icon");
         const notificationDropdown = document.getElementById("notification-dropdown");
+        const statusDropdown = document.getElementById("statusDropdown");
+        const profileImage = document.getElementById("profileImage");
 
-        // Toggle dropdown visibility on click
-        if (notificationIcon) {
+        if (notificationIcon && notificationDropdown) {
             notificationIcon.addEventListener("click", (event) => {
                 event.stopPropagation();
                 notificationDropdown.classList.toggle("active");
+
+                // Close status dropdown if open
+                statusDropdown?.classList.remove("active");
             });
+
+            // Prevent notification dropdown from closing when clicked inside
+            notificationDropdown.addEventListener("click", (event) => event.stopPropagation());
         }
 
-        // Close dropdown when clicking outside
+        // Close dropdowns when clicking outside
         document.addEventListener("click", (event) => {
-            if (!notificationDropdown.contains(event.target) && !notificationIcon.contains(event.target)) {
-                notificationDropdown.classList.remove("active");
+            if (!notificationDropdown?.contains(event.target) && !notificationIcon?.contains(event.target)) {
+                notificationDropdown?.classList.remove("active");
+            }
+
+            if (statusDropdown?.classList.contains("active") &&
+            !statusDropdown.contains(event.target) && !profileImage?.contains(event.target)) {
+                statusDropdown.classList.remove("active");
             }
         });
 
-        // Prevent dropdown from closing if clicked inside it
-        notificationDropdown.addEventListener("click", (event) => { event.stopPropagation(); });
-
-        document.querySelectorAll('.buttons button').forEach(button => {
-            button.addEventListener('click', function() {
-                document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Highlight the active sidebar link
+        // Sidebar Navigation - Highlight Active Link
         const links = document.querySelectorAll('.sidebar-link');
         const currentPath = window.location.pathname.split('/').pop();
 
         links.forEach(link => {
-            const linkPath = link.getAttribute('href');
-            if (linkPath === currentPath) {
+            if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');
             }
         });
 
-        // Task filter buttons
-        const addTaskButton = document.getElementById("addTaskButton");
-        if (addTaskButton) addTaskButton.addEventListener("click", this.onCreateTask);
+        // Task Filter Buttons
+        const taskButtons = {
+            addTaskButton: this.onCreateTask,
+            retrieveTasksBtn: this.onGetAllTasks,
+            completedTasksBtn: this.onGetCompletedTasks,
+            incompleteTasksBtn: this.onGetIncompleteTasks,
+            cancelTasksBtn: this.onGetCanceledTasks,
+            overdueTasksBtn: this.onGetOverdueTasks,
+            bulkDeleteBtn: () => this.onBulkDeleteTasks(),
+        };
 
-        const retrieveTasksButton = document.getElementById("retrieveTasksBtn");
-        if (retrieveTasksButton) retrieveTasksButton.addEventListener("click", this.onGetAllTasks);
+        Object.entries(taskButtons).forEach(([id, handler]) => {
+            document.getElementById(id)?.addEventListener("click", handler);
+        });
 
-        const completedTasksButton = document.getElementById("completedTasksBtn");
-        if (completedTasksButton) completedTasksButton.addEventListener("click", this.onGetCompletedTasks);
-
-        const incompleteTasksButton = document.getElementById("incompleteTasksBtn");
-        if (incompleteTasksButton) incompleteTasksButton.addEventListener("click", this.onGetIncompleteTasks);
-
-        const cancelTasksButton = document.getElementById("cancelTasksBtn");
-        if (cancelTasksButton) cancelTasksButton.addEventListener("click", this.onGetCanceledTasks);
-
-        const overdueTasksButton = document.getElementById("overdueTasksBtn");
-        if (overdueTasksButton) overdueTasksButton.addEventListener("click", this.onGetOverdueTasks);
-
-        document.getElementById("bulkDeleteBtn").addEventListener("click", () => this.onBulkDeleteTasks());
-
+        // "Select All" Checkbox for Tasks
         const selectAllCheckbox = document.getElementById("selectAllCheckbox");
-        selectAllCheckbox.addEventListener("change", () => {
-            const isChecked = selectAllCheckbox.checked;
-            document.querySelectorAll(".task-checkbox").forEach((checkbox) => {
-                checkbox.checked = isChecked;
+        selectAllCheckbox?.addEventListener("change", () => {
+            document.querySelectorAll(".task-checkbox").forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+
+        // Status Dropdown Toggle
+        profileImage?.addEventListener("click", this.toggleStatusDropdown);
+
+        // Status Selection - Update Status
+        document.querySelectorAll(".status-option").forEach(option => {
+            option.addEventListener("click", (event) => {
+                const selectedStatus = event.target.getAttribute("data-status");
+                this.updateHeaderStatus(selectedStatus);
+                this.toggleStatusDropdown();
+                localStorage.setItem("userStatus", selectedStatus);
+            });
+        });
+
+        // Button Active State Toggle
+        document.querySelectorAll('.buttons button').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.buttons button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
             });
         });
     }
 
     /**
-     * Handle the creating of a task.
-     */
+    * Toggle the visibility of the status dropdown.
+    */
+    toggleStatusDropdown() {
+        const statusDropdown = document.getElementById("statusDropdown");
+        if (statusDropdown) {
+            statusDropdown.classList.toggle("active");
+        }
+    }
+
+    /**
+    * Update the header status dynamically.
+    * @param {string} status - The new status.
+    */
+    updateHeaderStatus(status) {
+        const headerStatusElement = document.querySelector("#headerStatus");
+        if (headerStatusElement) {
+            headerStatusElement.textContent = status;
+            headerStatusElement.style.backgroundColor =
+            status === "Available" ? "#4caf50" : // Green for Available
+            status === "In a Meeting" ? "#2196f3" : // Blue for In a Meeting
+            status === "At Lunch" ? "#ff9800" : // Orange for At Lunch
+            status === "On Break" ? "#9c27b0" : ""; // Purple for On Break
+
+            // Ensure the badge is visible when a valid status is set
+            if (status !== "") {
+                headerStatusElement.style.display = "inline-block";
+            } else {
+                headerStatusElement.style.display = "none";
+            }
+        }
+    }
+
+    /**
+    * Initialize Person Status from localStorage and update the UI.
+    */
+    initializePersonStatus() {
+        const storedStatus = localStorage.getItem("userStatus") || "Available";
+        const headerStatusElement = document.querySelector("#headerStatus");
+
+        if (headerStatusElement) {
+            headerStatusElement.textContent = storedStatus;
+            headerStatusElement.style.backgroundColor =
+            storedStatus === "Available" ? "#4caf50" :
+            storedStatus === "In a Meeting" ? "#2196f3" :
+            storedStatus === "At Lunch" ? "#ff9800" :
+            storedStatus === "On Break" ? "#9c27b0" :
+            ""; // No background color if none of the above
+
+            // Ensure the badge is visible when a valid status is set
+            if (storedStatus !== "") {
+                headerStatusElement.style.display = "inline-block";
+            } else {
+                headerStatusElement.style.display = "none";
+            }
+        }
+    }
+
+    /**
+    * Handle the creating of a task.
+    */
     async onCreateTask(event) {
         // Prevent the page from refreshing on form submit
         event.preventDefault();
