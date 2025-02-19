@@ -150,7 +150,8 @@ class ProjectPage extends BaseClass {
             status === "Available" ? "#4caf50" : // Green for Available
             status === "In a Meeting" ? "#2196f3" : // Blue for In a Meeting
             status === "At Lunch" ? "#ff9800" : // Orange for At Lunch
-            status === "On Break" ? "#9c27b0" : ""; // Purple for On Break
+            status === "On Break" ? "#9c27b0" : // Purple for On Break
+            status === "Training" ? "#009688" : ""; // Teal for Training
 
             // Ensure the badge is visible when a valid status is set
             if (status !== "") {
@@ -175,6 +176,7 @@ class ProjectPage extends BaseClass {
             storedStatus === "In a Meeting" ? "#2196f3" :
             storedStatus === "At Lunch" ? "#ff9800" :
             storedStatus === "On Break" ? "#9c27b0" :
+            storedStatus === "Training" ? "#009688" :
             ""; // No background color if none of the above
 
             // Ensure the badge is visible when a valid status is set
