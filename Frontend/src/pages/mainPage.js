@@ -12,7 +12,7 @@ class MainPage extends BaseClass {
     }
 
     /**
-    *   Once the page has loaded, set up the event handlers and fetch the task list.
+    *   Once the page has loaded, set up the event handlers and fetch the task list. (*)
     */
     async mount() {
         this.client = new Client();
